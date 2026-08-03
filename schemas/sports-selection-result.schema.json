@@ -1,0 +1,72 @@
+{
+  "$defs": {
+    "SportsQualification": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_id": {
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "qualified": {
+          "title": "Qualified",
+          "type": "boolean"
+        },
+        "reasons": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Reasons",
+          "type": "array"
+        }
+      },
+      "required": [
+        "candidate_id",
+        "qualified"
+      ],
+      "title": "SportsQualification",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "qualifications": {
+      "items": {
+        "$ref": "#/$defs/SportsQualification"
+      },
+      "title": "Qualifications",
+      "type": "array"
+    },
+    "selected_candidate_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Selected Candidate Ids",
+      "type": "array"
+    },
+    "strategy_id": {
+      "default": "sports_highlight",
+      "title": "Strategy Id",
+      "type": "string"
+    },
+    "strategy_version": {
+      "default": "alpha-0.2.0",
+      "title": "Strategy Version",
+      "type": "string"
+    },
+    "unsatisfied_requirements": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Unsatisfied Requirements",
+      "type": "array"
+    }
+  },
+  "required": [
+    "selected_candidate_ids",
+    "qualifications"
+  ],
+  "title": "SportsSelectionResult",
+  "type": "object"
+}

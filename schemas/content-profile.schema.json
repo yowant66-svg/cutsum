@@ -1,0 +1,457 @@
+{
+  "$defs": {
+    "ClipConstraints": {
+      "additionalProperties": false,
+      "properties": {
+        "absolute_auto_max_duration_ms": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Absolute Auto Max Duration Ms"
+        },
+        "default_max_duration_ms": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Default Max Duration Ms"
+        },
+        "duration_source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DurationSource"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "extension_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Extension Reason"
+        },
+        "host_requested_duration_ms": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Host Requested Duration Ms"
+        },
+        "maximum_count": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Maximum Count"
+        },
+        "maximum_duration_ms": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Maximum Duration Ms"
+        },
+        "minimum_count": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Minimum Count"
+        },
+        "minimum_duration_ms": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Minimum Duration Ms"
+        },
+        "preferred_duration_ms": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Preferred Duration Ms"
+        },
+        "target_count": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target Count"
+        },
+        "target_duration_ms": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target Duration Ms"
+        }
+      },
+      "title": "ClipConstraints",
+      "type": "object"
+    },
+    "ContentDensity": {
+      "additionalProperties": false,
+      "properties": {
+        "emotion": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Emotion",
+          "type": "number"
+        },
+        "knowledge": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Knowledge",
+          "type": "number"
+        },
+        "narrative": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Narrative",
+          "type": "number"
+        },
+        "opinion": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Opinion",
+          "type": "number"
+        },
+        "procedural": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Procedural",
+          "type": "number"
+        }
+      },
+      "required": [
+        "narrative",
+        "knowledge",
+        "procedural",
+        "opinion",
+        "emotion"
+      ],
+      "title": "ContentDensity",
+      "type": "object"
+    },
+    "ContentTrack": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence_refs": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "topic": {
+          "title": "Topic",
+          "type": "string"
+        },
+        "track_id": {
+          "title": "Track Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "track_id",
+        "label",
+        "topic",
+        "evidence_refs"
+      ],
+      "title": "ContentTrack",
+      "type": "object"
+    },
+    "DependencyProfile": {
+      "additionalProperties": false,
+      "properties": {
+        "audio": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Audio",
+          "type": "number"
+        },
+        "subtitle": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Subtitle",
+          "type": "number"
+        },
+        "visual": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Visual",
+          "type": "number"
+        }
+      },
+      "required": [
+        "visual",
+        "audio",
+        "subtitle"
+      ],
+      "title": "DependencyProfile",
+      "type": "object"
+    },
+    "DurationSource": {
+      "enum": [
+        "host_explicit",
+        "content_inference",
+        "default_policy",
+        "automatic_extension"
+      ],
+      "title": "DurationSource",
+      "type": "string"
+    },
+    "JsonValue": {}
+  },
+  "additionalProperties": false,
+  "properties": {
+    "auto_clip_constraints": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ClipConstraints"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "auto_objectives": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Auto Objectives",
+      "type": "array"
+    },
+    "confidence": {
+      "maximum": 1,
+      "minimum": 0,
+      "title": "Confidence",
+      "type": "number"
+    },
+    "content_types": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Content Types",
+      "type": "array"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "created_by": {
+      "title": "Created By",
+      "type": "string"
+    },
+    "density": {
+      "$ref": "#/$defs/ContentDensity"
+    },
+    "dependencies": {
+      "$ref": "#/$defs/DependencyProfile"
+    },
+    "document_type": {
+      "title": "Document Type",
+      "type": "string"
+    },
+    "extensions": {
+      "additionalProperties": {
+        "$ref": "#/$defs/JsonValue"
+      },
+      "title": "Extensions",
+      "type": "object"
+    },
+    "language": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Language"
+    },
+    "primary_topic": {
+      "title": "Primary Topic",
+      "type": "string"
+    },
+    "profile_id": {
+      "title": "Profile Id",
+      "type": "string"
+    },
+    "provider_record_ref": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Provider Record Ref"
+    },
+    "required_extensions": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Required Extensions",
+      "type": "array"
+    },
+    "schema_version": {
+      "default": "0.1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source_id": {
+      "title": "Source Id",
+      "type": "string"
+    },
+    "structure_types": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Structure Types",
+      "type": "array"
+    },
+    "subtopics": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Subtopics",
+      "type": "array"
+    },
+    "supporting_evidence_refs": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Supporting Evidence Refs",
+      "type": "array"
+    },
+    "tracks": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ContentTrack"
+      },
+      "title": "Tracks",
+      "type": "array"
+    },
+    "typical_audiences": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Typical Audiences",
+      "type": "array"
+    },
+    "value_sources": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Value Sources",
+      "type": "array"
+    }
+  },
+  "required": [
+    "document_type",
+    "created_at",
+    "created_by",
+    "profile_id",
+    "source_id",
+    "content_types",
+    "primary_topic",
+    "structure_types",
+    "density",
+    "dependencies",
+    "confidence",
+    "supporting_evidence_refs"
+  ],
+  "title": "ContentProfile",
+  "type": "object"
+}

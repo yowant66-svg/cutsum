@@ -1,0 +1,104 @@
+{
+  "$defs": {
+    "EducationSignalType": {
+      "enum": [
+        "definition",
+        "theorem_or_rule",
+        "reasoning_chain",
+        "worked_example",
+        "procedure_or_step",
+        "summary",
+        "common_mistake",
+        "difficult_point",
+        "teacher_emphasis",
+        "exam_relevance"
+      ],
+      "title": "EducationSignalType",
+      "type": "string"
+    },
+    "EducationalQualification": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_id": {
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "matched_types": {
+          "items": {
+            "$ref": "#/$defs/EducationSignalType"
+          },
+          "title": "Matched Types",
+          "type": "array"
+        },
+        "missing_types": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/EducationSignalType"
+          },
+          "title": "Missing Types",
+          "type": "array"
+        },
+        "qualified": {
+          "title": "Qualified",
+          "type": "boolean"
+        },
+        "reasons": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Reasons",
+          "type": "array"
+        }
+      },
+      "required": [
+        "candidate_id",
+        "qualified",
+        "matched_types"
+      ],
+      "title": "EducationalQualification",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "qualifications": {
+      "items": {
+        "$ref": "#/$defs/EducationalQualification"
+      },
+      "title": "Qualifications",
+      "type": "array"
+    },
+    "selected_candidate_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Selected Candidate Ids",
+      "type": "array"
+    },
+    "strategy_id": {
+      "default": "educational_distillation",
+      "title": "Strategy Id",
+      "type": "string"
+    },
+    "strategy_version": {
+      "default": "alpha-0.1.0",
+      "title": "Strategy Version",
+      "type": "string"
+    },
+    "unsatisfied_requirements": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Unsatisfied Requirements",
+      "type": "array"
+    }
+  },
+  "required": [
+    "selected_candidate_ids",
+    "qualifications"
+  ],
+  "title": "EducationalSelectionResult",
+  "type": "object"
+}

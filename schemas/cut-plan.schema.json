@@ -1,0 +1,2335 @@
+{
+  "$defs": {
+    "ContextualTranslationRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "following_context": {
+          "default": "",
+          "title": "Following Context",
+          "type": "string"
+        },
+        "glossary": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Glossary",
+          "type": "object"
+        },
+        "preceding_context": {
+          "default": "",
+          "title": "Preceding Context",
+          "type": "string"
+        },
+        "provider_record_ref": {
+          "title": "Provider Record Ref",
+          "type": "string"
+        },
+        "source_cue_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Cue Ids",
+          "type": "array"
+        },
+        "source_language": {
+          "title": "Source Language",
+          "type": "string"
+        },
+        "source_text": {
+          "minLength": 1,
+          "title": "Source Text",
+          "type": "string"
+        },
+        "source_text_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Text Sha256",
+          "type": "string"
+        },
+        "translated_text": {
+          "minLength": 1,
+          "title": "Translated Text",
+          "type": "string"
+        },
+        "translation_language": {
+          "title": "Translation Language",
+          "type": "string"
+        },
+        "translation_record_id": {
+          "title": "Translation Record Id",
+          "type": "string"
+        },
+        "translation_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Translation Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "translation_record_id",
+        "provider_record_ref",
+        "source_language",
+        "translation_language",
+        "source_cue_ids",
+        "source_text",
+        "translated_text",
+        "source_text_sha256",
+        "translation_sha256"
+      ],
+      "title": "ContextualTranslationRecord",
+      "type": "object"
+    },
+    "CutCandidate": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_id": {
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "contextual_translation_records": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ContextualTranslationRecord"
+          },
+          "title": "Contextual Translation Records",
+          "type": "array"
+        },
+        "education_signals": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/EducationSignal"
+          },
+          "title": "Education Signals",
+          "type": "array"
+        },
+        "education_visual_dependencies": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/EducationVisualDependency"
+          },
+          "title": "Education Visual Dependencies",
+          "type": "array"
+        },
+        "educational_profile": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EducationalCandidateProfile"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "end_ms": {
+          "exclusiveMinimum": 0,
+          "title": "End Ms",
+          "type": "integer"
+        },
+        "evidence_refs": {
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "minItems": 1,
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "extension_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Extension Reason"
+        },
+        "semantic_structure": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Semantic Structure",
+          "type": "array"
+        },
+        "semantic_types": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SemanticType"
+          },
+          "title": "Semantic Types",
+          "type": "array"
+        },
+        "series_group_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Series Group Id"
+        },
+        "series_index": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Series Index"
+        },
+        "series_total": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Series Total"
+        },
+        "source_id": {
+          "title": "Source Id",
+          "type": "string"
+        },
+        "speakers": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Speakers",
+          "type": "array"
+        },
+        "sports_event": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SportsEvent"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "sports_profile": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SportsCandidateProfile"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "start_ms": {
+          "minimum": 0,
+          "title": "Start Ms",
+          "type": "integer"
+        },
+        "strategy_scores": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/StrategyScore"
+          },
+          "title": "Strategy Scores",
+          "type": "array"
+        },
+        "subtitle_cues": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SubtitleCue"
+          },
+          "title": "Subtitle Cues",
+          "type": "array"
+        },
+        "subtitle_display_units": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SubtitleDisplayUnit"
+          },
+          "title": "Subtitle Display Units",
+          "type": "array"
+        },
+        "subtitle_semantic_spans": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SubtitleSemanticSpan"
+          },
+          "title": "Subtitle Semantic Spans",
+          "type": "array"
+        },
+        "subtitle_word_timings": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SubtitleWordTiming"
+          },
+          "title": "Subtitle Word Timings",
+          "type": "array"
+        },
+        "summary": {
+          "title": "Summary",
+          "type": "string"
+        },
+        "tags": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags",
+          "type": "array"
+        },
+        "topics": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Topics",
+          "type": "array"
+        },
+        "translated_subtitle_cues": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SubtitleCue"
+          },
+          "title": "Translated Subtitle Cues",
+          "type": "array"
+        },
+        "warnings": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "candidate_id",
+        "source_id",
+        "start_ms",
+        "end_ms",
+        "summary",
+        "evidence_refs"
+      ],
+      "title": "CutCandidate",
+      "type": "object"
+    },
+    "DimensionScore": {
+      "additionalProperties": false,
+      "properties": {
+        "dimension_id": {
+          "title": "Dimension Id",
+          "type": "string"
+        },
+        "evidence_refs": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        },
+        "warning": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Warning"
+        }
+      },
+      "required": [
+        "dimension_id"
+      ],
+      "title": "DimensionScore",
+      "type": "object"
+    },
+    "EducationContextRole": {
+      "enum": [
+        "self_contained",
+        "requires_previous",
+        "requires_following",
+        "requires_visual"
+      ],
+      "title": "EducationContextRole",
+      "type": "string"
+    },
+    "EducationSignal": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "context_roles": {
+          "default": [
+            "self_contained"
+          ],
+          "items": {
+            "$ref": "#/$defs/EducationContextRole"
+          },
+          "title": "Context Roles",
+          "type": "array"
+        },
+        "end_ms": {
+          "exclusiveMinimum": 0,
+          "title": "End Ms",
+          "type": "integer"
+        },
+        "evidence_refs": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "key_terms": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Key Terms",
+          "type": "array"
+        },
+        "language": {
+          "title": "Language",
+          "type": "string"
+        },
+        "matched_text": {
+          "minLength": 1,
+          "title": "Matched Text",
+          "type": "string"
+        },
+        "signal_id": {
+          "title": "Signal Id",
+          "type": "string"
+        },
+        "signal_type": {
+          "$ref": "#/$defs/EducationSignalType"
+        },
+        "start_ms": {
+          "minimum": 0,
+          "title": "Start Ms",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "signal_id",
+        "signal_type",
+        "matched_text",
+        "language",
+        "start_ms",
+        "end_ms",
+        "confidence",
+        "evidence_refs"
+      ],
+      "title": "EducationSignal",
+      "type": "object"
+    },
+    "EducationSignalType": {
+      "enum": [
+        "definition",
+        "theorem_or_rule",
+        "reasoning_chain",
+        "worked_example",
+        "procedure_or_step",
+        "summary",
+        "common_mistake",
+        "difficult_point",
+        "teacher_emphasis",
+        "exam_relevance"
+      ],
+      "title": "EducationSignalType",
+      "type": "string"
+    },
+    "EducationVisualDependency": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "dependency_id": {
+          "title": "Dependency Id",
+          "type": "string"
+        },
+        "dependency_type": {
+          "$ref": "#/$defs/EducationVisualDependencyType"
+        },
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "end_ms": {
+          "exclusiveMinimum": 0,
+          "title": "End Ms",
+          "type": "integer"
+        },
+        "evidence_refs": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "start_ms": {
+          "minimum": 0,
+          "title": "Start Ms",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "dependency_id",
+        "dependency_type",
+        "start_ms",
+        "end_ms",
+        "description",
+        "confidence",
+        "evidence_refs"
+      ],
+      "title": "EducationVisualDependency",
+      "type": "object"
+    },
+    "EducationVisualDependencyType": {
+      "enum": [
+        "slide",
+        "blackboard",
+        "code",
+        "formula",
+        "diagram"
+      ],
+      "title": "EducationVisualDependencyType",
+      "type": "string"
+    },
+    "EducationalCandidateProfile": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_id": {
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "completeness_confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Completeness Confidence",
+          "type": "number"
+        },
+        "context_roles": {
+          "items": {
+            "$ref": "#/$defs/EducationContextRole"
+          },
+          "title": "Context Roles",
+          "type": "array"
+        },
+        "key_terms": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Key Terms",
+          "type": "array"
+        },
+        "qualified": {
+          "title": "Qualified",
+          "type": "boolean"
+        },
+        "signal_types": {
+          "items": {
+            "$ref": "#/$defs/EducationSignalType"
+          },
+          "title": "Signal Types",
+          "type": "array"
+        },
+        "visual_dependency_types": {
+          "items": {
+            "$ref": "#/$defs/EducationVisualDependencyType"
+          },
+          "title": "Visual Dependency Types",
+          "type": "array"
+        }
+      },
+      "required": [
+        "candidate_id",
+        "qualified",
+        "signal_types",
+        "context_roles",
+        "key_terms",
+        "visual_dependency_types",
+        "completeness_confidence"
+      ],
+      "title": "EducationalCandidateProfile",
+      "type": "object"
+    },
+    "EvidenceArtifactIdentity": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": {
+          "title": "Artifact Id",
+          "type": "string"
+        },
+        "segment_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Segment Ids",
+          "type": "array"
+        },
+        "source_id": {
+          "title": "Source Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "artifact_id",
+        "source_id",
+        "segment_ids"
+      ],
+      "title": "EvidenceArtifactIdentity",
+      "type": "object"
+    },
+    "EvidenceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": {
+          "title": "Artifact Id",
+          "type": "string"
+        },
+        "end_ms": {
+          "exclusiveMinimum": 0,
+          "title": "End Ms",
+          "type": "integer"
+        },
+        "evidence_id": {
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "segment_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Segment Ids",
+          "type": "array"
+        },
+        "snapshot": {
+          "anyOf": [
+            {
+              "maxLength": 2048,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Snapshot"
+        },
+        "start_ms": {
+          "minimum": 0,
+          "title": "Start Ms",
+          "type": "integer"
+        },
+        "text_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Text Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "evidence_id",
+        "artifact_id",
+        "segment_ids",
+        "start_ms",
+        "end_ms",
+        "text_sha256"
+      ],
+      "title": "EvidenceRef",
+      "type": "object"
+    },
+    "JsonValue": {},
+    "MediaSource": {
+      "additionalProperties": false,
+      "properties": {
+        "basename_hint": {
+          "title": "Basename Hint",
+          "type": "string"
+        },
+        "duration_ms": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Duration Ms"
+        },
+        "kind": {
+          "enum": [
+            "video",
+            "audio",
+            "transcript"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "media_id": {
+          "title": "Media Id",
+          "type": "string"
+        },
+        "mime_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Mime Type"
+        },
+        "rights_attestation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RightsAttestation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "source_id": {
+          "title": "Source Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_id",
+        "media_id",
+        "kind",
+        "sha256",
+        "basename_hint"
+      ],
+      "title": "MediaSource",
+      "type": "object"
+    },
+    "OutputSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "reframe": {
+          "$ref": "#/$defs/ReframeSpec",
+          "default": {
+            "focus_x": null,
+            "focus_y": null,
+            "mode": "none",
+            "safe_area_preset": "none"
+          }
+        },
+        "render": {
+          "$ref": "#/$defs/RenderSpec",
+          "default": {
+            "allow_upscale": false,
+            "audio_codec": "aac",
+            "container": "mp4",
+            "duration_tolerance_ms": 150,
+            "overwrite": "fail",
+            "quality_preset": "review",
+            "rate_control": {
+              "audio_bitrate": "128k",
+              "crf": 23,
+              "mode": "crf",
+              "video_bitrate": null
+            },
+            "resolution_mode": "720p",
+            "target_height": null,
+            "target_width": null,
+            "video_codec": "libx264"
+          }
+        },
+        "subtitle": {
+          "$ref": "#/$defs/SubtitleSpec",
+          "default": {
+            "background_opacity": 0.35,
+            "bilingual_order": "source_first",
+            "font_family": "Arial",
+            "font_path": null,
+            "language": null,
+            "margin_vertical": 48,
+            "max_characters_per_line": 34,
+            "max_lines": 2,
+            "max_width_ratio": 0.9,
+            "mode": "none",
+            "outline_width": 2,
+            "safe_area": {
+              "bottom_ratio": 0.03,
+              "left_ratio": 0.03,
+              "preset": "none",
+              "right_ratio": 0.03,
+              "top_ratio": 0.03,
+              "vertical_position": "bottom"
+            },
+            "sidecar_format": "srt",
+            "source_font_size": 22,
+            "translation_font_size": 22,
+            "translation_language": null
+          }
+        }
+      },
+      "title": "OutputSpec",
+      "type": "object"
+    },
+    "ProviderRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "completed_at": {
+          "format": "date-time",
+          "title": "Completed At",
+          "type": "string"
+        },
+        "cost_minor_units": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cost Minor Units"
+        },
+        "currency": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Currency"
+        },
+        "input_hashes": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Input Hashes",
+          "type": "array"
+        },
+        "model_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model Id"
+        },
+        "operation": {
+          "title": "Operation",
+          "type": "string"
+        },
+        "output_hashes": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Output Hashes",
+          "type": "array"
+        },
+        "provider_id": {
+          "title": "Provider Id",
+          "type": "string"
+        },
+        "provider_record_id": {
+          "title": "Provider Record Id",
+          "type": "string"
+        },
+        "started_at": {
+          "format": "date-time",
+          "title": "Started At",
+          "type": "string"
+        },
+        "warnings": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "started_at",
+        "completed_at",
+        "provider_record_id",
+        "provider_id",
+        "operation"
+      ],
+      "title": "ProviderRecord",
+      "type": "object"
+    },
+    "QualityPreset": {
+      "enum": [
+        "preview",
+        "review",
+        "publish"
+      ],
+      "title": "QualityPreset",
+      "type": "string"
+    },
+    "RateControlSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "audio_bitrate": {
+          "default": "128k",
+          "title": "Audio Bitrate",
+          "type": "string"
+        },
+        "crf": {
+          "anyOf": [
+            {
+              "maximum": 51,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 23,
+          "title": "Crf"
+        },
+        "mode": {
+          "default": "crf",
+          "enum": [
+            "crf",
+            "bitrate"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "video_bitrate": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Video Bitrate"
+        }
+      },
+      "title": "RateControlSpec",
+      "type": "object"
+    },
+    "ReframeSafeAreaPreset": {
+      "enum": [
+        "none",
+        "youtube_shorts",
+        "tiktok",
+        "instagram_reels"
+      ],
+      "title": "ReframeSafeAreaPreset",
+      "type": "string"
+    },
+    "ReframeSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "focus_x": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Focus X"
+        },
+        "focus_y": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Focus Y"
+        },
+        "mode": {
+          "default": "none",
+          "enum": [
+            "none",
+            "center_crop",
+            "manual_focus",
+            "fit_background",
+            "fixed_subject",
+            "tracked_focus"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "safe_area_preset": {
+          "$ref": "#/$defs/ReframeSafeAreaPreset",
+          "default": "none"
+        }
+      },
+      "title": "ReframeSpec",
+      "type": "object"
+    },
+    "RenderSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "allow_upscale": {
+          "default": false,
+          "title": "Allow Upscale",
+          "type": "boolean"
+        },
+        "audio_codec": {
+          "default": "aac",
+          "title": "Audio Codec",
+          "type": "string"
+        },
+        "container": {
+          "default": "mp4",
+          "enum": [
+            "mp4",
+            "mov",
+            "mkv"
+          ],
+          "title": "Container",
+          "type": "string"
+        },
+        "duration_tolerance_ms": {
+          "default": 150,
+          "minimum": 0,
+          "title": "Duration Tolerance Ms",
+          "type": "integer"
+        },
+        "overwrite": {
+          "const": "fail",
+          "default": "fail",
+          "title": "Overwrite",
+          "type": "string"
+        },
+        "quality_preset": {
+          "$ref": "#/$defs/QualityPreset",
+          "default": "review"
+        },
+        "rate_control": {
+          "$ref": "#/$defs/RateControlSpec",
+          "default": {
+            "audio_bitrate": "128k",
+            "crf": 23,
+            "mode": "crf",
+            "video_bitrate": null
+          }
+        },
+        "resolution_mode": {
+          "$ref": "#/$defs/ResolutionMode",
+          "default": "720p"
+        },
+        "target_height": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target Height"
+        },
+        "target_width": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target Width"
+        },
+        "video_codec": {
+          "default": "libx264",
+          "title": "Video Codec",
+          "type": "string"
+        }
+      },
+      "title": "RenderSpec",
+      "type": "object"
+    },
+    "ResolutionMode": {
+      "enum": [
+        "source",
+        "1080p",
+        "720p",
+        "480p",
+        "360p",
+        "144p"
+      ],
+      "title": "ResolutionMode",
+      "type": "string"
+    },
+    "RightsAttestation": {
+      "enum": [
+        "owned",
+        "licensed",
+        "public_domain",
+        "authorized_other",
+        "analysis_only"
+      ],
+      "title": "RightsAttestation",
+      "type": "string"
+    },
+    "SelectionDecision": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_id": {
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "evidence_refs": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "overridden": {
+          "default": false,
+          "title": "Overridden",
+          "type": "boolean"
+        },
+        "override_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Override Reason"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        },
+        "rule_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Rule Ids",
+          "type": "array"
+        },
+        "status": {
+          "$ref": "#/$defs/SelectionStatus"
+        }
+      },
+      "required": [
+        "candidate_id",
+        "status",
+        "reason"
+      ],
+      "title": "SelectionDecision",
+      "type": "object"
+    },
+    "SelectionResult": {
+      "additionalProperties": false,
+      "properties": {
+        "decisions": {
+          "items": {
+            "$ref": "#/$defs/SelectionDecision"
+          },
+          "title": "Decisions",
+          "type": "array"
+        },
+        "provider_record_refs": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Provider Record Refs",
+          "type": "array"
+        },
+        "selection_id": {
+          "title": "Selection Id",
+          "type": "string"
+        },
+        "selection_strategy_id": {
+          "title": "Selection Strategy Id",
+          "type": "string"
+        },
+        "selection_strategy_version": {
+          "title": "Selection Strategy Version",
+          "type": "string"
+        },
+        "strategy_record_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Strategy Record Ref"
+        },
+        "warnings": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "selection_id",
+        "selection_strategy_id",
+        "selection_strategy_version",
+        "decisions"
+      ],
+      "title": "SelectionResult",
+      "type": "object"
+    },
+    "SelectionStatus": {
+      "enum": [
+        "selected",
+        "rejected",
+        "deferred"
+      ],
+      "title": "SelectionStatus",
+      "type": "string"
+    },
+    "SemanticType": {
+      "enum": [
+        "definition",
+        "reasoning_chain",
+        "conflict",
+        "hook",
+        "step",
+        "story_arc"
+      ],
+      "title": "SemanticType",
+      "type": "string"
+    },
+    "SportsCandidateProfile": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_id": {
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "completeness_confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Completeness Confidence",
+          "type": "number"
+        },
+        "cross_modal_confirmations": {
+          "minimum": 0,
+          "title": "Cross Modal Confirmations",
+          "type": "integer"
+        },
+        "event_id": {
+          "title": "Event Id",
+          "type": "string"
+        },
+        "event_type": {
+          "$ref": "#/$defs/SportsEventType"
+        },
+        "modalities": {
+          "items": {
+            "$ref": "#/$defs/SportsModality"
+          },
+          "title": "Modalities",
+          "type": "array"
+        },
+        "narrative_cues": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SportsNarrativeCue"
+          },
+          "title": "Narrative Cues",
+          "type": "array"
+        },
+        "observation_types": {
+          "items": {
+            "$ref": "#/$defs/SportsObservationType"
+          },
+          "title": "Observation Types",
+          "type": "array"
+        },
+        "qualified": {
+          "title": "Qualified",
+          "type": "boolean"
+        },
+        "replay_only": {
+          "title": "Replay Only",
+          "type": "boolean"
+        },
+        "temporal_roles": {
+          "items": {
+            "$ref": "#/$defs/SportsTemporalRole"
+          },
+          "title": "Temporal Roles",
+          "type": "array"
+        }
+      },
+      "required": [
+        "candidate_id",
+        "event_id",
+        "qualified",
+        "event_type",
+        "temporal_roles",
+        "modalities",
+        "observation_types",
+        "cross_modal_confirmations",
+        "replay_only",
+        "completeness_confidence"
+      ],
+      "title": "SportsCandidateProfile",
+      "type": "object"
+    },
+    "SportsEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "end_ms": {
+          "exclusiveMinimum": 0,
+          "title": "End Ms",
+          "type": "integer"
+        },
+        "event_id": {
+          "title": "Event Id",
+          "type": "string"
+        },
+        "event_type": {
+          "$ref": "#/$defs/SportsEventType"
+        },
+        "modalities": {
+          "items": {
+            "$ref": "#/$defs/SportsModality"
+          },
+          "title": "Modalities",
+          "type": "array"
+        },
+        "narrative_cues": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SportsNarrativeCue"
+          },
+          "title": "Narrative Cues",
+          "type": "array"
+        },
+        "observation_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Observation Ids",
+          "type": "array"
+        },
+        "observation_types": {
+          "items": {
+            "$ref": "#/$defs/SportsObservationType"
+          },
+          "title": "Observation Types",
+          "type": "array"
+        },
+        "replay_of_event_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Replay Of Event Id"
+        },
+        "source_id": {
+          "title": "Source Id",
+          "type": "string"
+        },
+        "start_ms": {
+          "minimum": 0,
+          "title": "Start Ms",
+          "type": "integer"
+        },
+        "temporal_roles": {
+          "items": {
+            "$ref": "#/$defs/SportsTemporalRole"
+          },
+          "title": "Temporal Roles",
+          "type": "array"
+        }
+      },
+      "required": [
+        "event_id",
+        "source_id",
+        "event_type",
+        "start_ms",
+        "end_ms",
+        "observation_ids",
+        "temporal_roles",
+        "modalities",
+        "observation_types",
+        "confidence"
+      ],
+      "title": "SportsEvent",
+      "type": "object"
+    },
+    "SportsEventType": {
+      "enum": [
+        "score",
+        "attempt",
+        "save",
+        "block",
+        "overtake",
+        "finish",
+        "celebration",
+        "controversy",
+        "unknown"
+      ],
+      "title": "SportsEventType",
+      "type": "string"
+    },
+    "SportsModality": {
+      "enum": [
+        "audio",
+        "video",
+        "ocr",
+        "text",
+        "metadata"
+      ],
+      "title": "SportsModality",
+      "type": "string"
+    },
+    "SportsNarrativeCue": {
+      "enum": [
+        "decisive_score"
+      ],
+      "title": "SportsNarrativeCue",
+      "type": "string"
+    },
+    "SportsObservationType": {
+      "enum": [
+        "audio_peak",
+        "shot_change",
+        "motion_burst",
+        "scoreboard_change",
+        "ocr_text",
+        "commentator_emphasis",
+        "replay_start",
+        "replay_end",
+        "event_classification"
+      ],
+      "title": "SportsObservationType",
+      "type": "string"
+    },
+    "SportsTemporalRole": {
+      "enum": [
+        "buildup",
+        "action",
+        "outcome",
+        "reaction",
+        "replay"
+      ],
+      "title": "SportsTemporalRole",
+      "type": "string"
+    },
+    "StrategyRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "completed_at": {
+          "format": "date-time",
+          "title": "Completed At",
+          "type": "string"
+        },
+        "config_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Config Hash",
+          "type": "string"
+        },
+        "distribution_name": {
+          "title": "Distribution Name",
+          "type": "string"
+        },
+        "distribution_version": {
+          "title": "Distribution Version",
+          "type": "string"
+        },
+        "input_hashes": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Input Hashes",
+          "type": "array"
+        },
+        "output_hashes": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Output Hashes",
+          "type": "array"
+        },
+        "provenance_ref": {
+          "title": "Provenance Ref",
+          "type": "string"
+        },
+        "provider_record_refs": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Provider Record Refs",
+          "type": "array"
+        },
+        "started_at": {
+          "format": "date-time",
+          "title": "Started At",
+          "type": "string"
+        },
+        "strategy_id": {
+          "title": "Strategy Id",
+          "type": "string"
+        },
+        "strategy_record_id": {
+          "title": "Strategy Record Id",
+          "type": "string"
+        },
+        "strategy_role": {
+          "$ref": "#/$defs/StrategyRole"
+        },
+        "strategy_version": {
+          "title": "Strategy Version",
+          "type": "string"
+        },
+        "warnings": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "started_at",
+        "completed_at",
+        "strategy_record_id",
+        "strategy_id",
+        "strategy_version",
+        "strategy_role",
+        "distribution_name",
+        "distribution_version",
+        "config_hash",
+        "provenance_ref"
+      ],
+      "title": "StrategyRecord",
+      "type": "object"
+    },
+    "StrategyRole": {
+      "enum": [
+        "proposal",
+        "scoring",
+        "selection"
+      ],
+      "title": "StrategyRole",
+      "type": "string"
+    },
+    "StrategyScore": {
+      "additionalProperties": false,
+      "properties": {
+        "aggregate": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Aggregate"
+        },
+        "dimensions": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/DimensionScore"
+          },
+          "title": "Dimensions",
+          "type": "array"
+        },
+        "strategy_id": {
+          "title": "Strategy Id",
+          "type": "string"
+        },
+        "strategy_record_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Strategy Record Ref"
+        },
+        "strategy_version": {
+          "title": "Strategy Version",
+          "type": "string"
+        },
+        "warnings": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "strategy_id",
+        "strategy_version"
+      ],
+      "title": "StrategyScore",
+      "type": "object"
+    },
+    "SubtitleCue": {
+      "additionalProperties": false,
+      "properties": {
+        "cue_id": {
+          "title": "Cue Id",
+          "type": "string"
+        },
+        "end_ms": {
+          "exclusiveMinimum": 0,
+          "title": "End Ms",
+          "type": "integer"
+        },
+        "language": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Language"
+        },
+        "source_id": {
+          "title": "Source Id",
+          "type": "string"
+        },
+        "source_segment_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Segment Ids",
+          "type": "array"
+        },
+        "speaker": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Speaker"
+        },
+        "start_ms": {
+          "minimum": 0,
+          "title": "Start Ms",
+          "type": "integer"
+        },
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "cue_id",
+        "source_id",
+        "start_ms",
+        "end_ms",
+        "text",
+        "source_segment_ids"
+      ],
+      "title": "SubtitleCue",
+      "type": "object"
+    },
+    "SubtitleDisplayUnit": {
+      "additionalProperties": false,
+      "properties": {
+        "display_unit_id": {
+          "title": "Display Unit Id",
+          "type": "string"
+        },
+        "end_ms": {
+          "exclusiveMinimum": 0,
+          "title": "End Ms",
+          "type": "integer"
+        },
+        "segmentation_reason": {
+          "title": "Segmentation Reason",
+          "type": "string"
+        },
+        "semantic_level": {
+          "$ref": "#/$defs/SubtitleSemanticLevel",
+          "default": "sentence"
+        },
+        "source_cue_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Cue Ids",
+          "type": "array"
+        },
+        "source_id": {
+          "title": "Source Id",
+          "type": "string"
+        },
+        "source_language": {
+          "title": "Source Language",
+          "type": "string"
+        },
+        "source_text": {
+          "minLength": 1,
+          "title": "Source Text",
+          "type": "string"
+        },
+        "start_ms": {
+          "minimum": 0,
+          "title": "Start Ms",
+          "type": "integer"
+        },
+        "timing_precision": {
+          "$ref": "#/$defs/SubtitleTimingPrecision",
+          "default": "exact"
+        },
+        "translated_text": {
+          "minLength": 1,
+          "title": "Translated Text",
+          "type": "string"
+        },
+        "translation_language": {
+          "title": "Translation Language",
+          "type": "string"
+        },
+        "translation_record_ref": {
+          "title": "Translation Record Ref",
+          "type": "string"
+        }
+      },
+      "required": [
+        "display_unit_id",
+        "source_id",
+        "start_ms",
+        "end_ms",
+        "source_cue_ids",
+        "source_text",
+        "translated_text",
+        "source_language",
+        "translation_language",
+        "segmentation_reason",
+        "translation_record_ref"
+      ],
+      "title": "SubtitleDisplayUnit",
+      "type": "object"
+    },
+    "SubtitleMode": {
+      "enum": [
+        "none",
+        "source_sidecar",
+        "translated_sidecar",
+        "bilingual_sidecar",
+        "source_burn_in",
+        "translated_burn_in",
+        "bilingual_burn_in",
+        "sidecar",
+        "burn_in"
+      ],
+      "title": "SubtitleMode",
+      "type": "string"
+    },
+    "SubtitleSafeAreaPreset": {
+      "enum": [
+        "none",
+        "youtube_shorts",
+        "tiktok",
+        "instagram_reels"
+      ],
+      "title": "SubtitleSafeAreaPreset",
+      "type": "string"
+    },
+    "SubtitleSafeAreaSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "bottom_ratio": {
+          "default": 0.03,
+          "maximum": 0.45,
+          "minimum": 0,
+          "title": "Bottom Ratio",
+          "type": "number"
+        },
+        "left_ratio": {
+          "default": 0.03,
+          "maximum": 0.45,
+          "minimum": 0,
+          "title": "Left Ratio",
+          "type": "number"
+        },
+        "preset": {
+          "$ref": "#/$defs/SubtitleSafeAreaPreset",
+          "default": "none"
+        },
+        "right_ratio": {
+          "default": 0.03,
+          "maximum": 0.45,
+          "minimum": 0,
+          "title": "Right Ratio",
+          "type": "number"
+        },
+        "top_ratio": {
+          "default": 0.03,
+          "maximum": 0.45,
+          "minimum": 0,
+          "title": "Top Ratio",
+          "type": "number"
+        },
+        "vertical_position": {
+          "$ref": "#/$defs/SubtitleVerticalPosition",
+          "default": "bottom"
+        }
+      },
+      "title": "SubtitleSafeAreaSpec",
+      "type": "object"
+    },
+    "SubtitleSemanticLevel": {
+      "enum": [
+        "sentence",
+        "clause",
+        "phrase"
+      ],
+      "title": "SubtitleSemanticLevel",
+      "type": "string"
+    },
+    "SubtitleSemanticSpan": {
+      "additionalProperties": false,
+      "properties": {
+        "end_ms": {
+          "exclusiveMinimum": 0,
+          "title": "End Ms",
+          "type": "integer"
+        },
+        "language": {
+          "title": "Language",
+          "type": "string"
+        },
+        "semantic_level": {
+          "$ref": "#/$defs/SubtitleSemanticLevel"
+        },
+        "semantic_span_id": {
+          "title": "Semantic Span Id",
+          "type": "string"
+        },
+        "source_cue_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Cue Ids",
+          "type": "array"
+        },
+        "source_id": {
+          "title": "Source Id",
+          "type": "string"
+        },
+        "start_ms": {
+          "minimum": 0,
+          "title": "Start Ms",
+          "type": "integer"
+        },
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "timing_precision": {
+          "$ref": "#/$defs/SubtitleTimingPrecision"
+        }
+      },
+      "required": [
+        "semantic_span_id",
+        "source_id",
+        "start_ms",
+        "end_ms",
+        "source_cue_ids",
+        "text",
+        "language",
+        "semantic_level",
+        "timing_precision"
+      ],
+      "title": "SubtitleSemanticSpan",
+      "type": "object"
+    },
+    "SubtitleSidecarFormat": {
+      "enum": [
+        "srt",
+        "vtt",
+        "ass"
+      ],
+      "title": "SubtitleSidecarFormat",
+      "type": "string"
+    },
+    "SubtitleSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "background_opacity": {
+          "default": 0.35,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Background Opacity",
+          "type": "number"
+        },
+        "bilingual_order": {
+          "default": "source_first",
+          "enum": [
+            "source_first",
+            "translation_first"
+          ],
+          "title": "Bilingual Order",
+          "type": "string"
+        },
+        "font_family": {
+          "default": "Arial",
+          "title": "Font Family",
+          "type": "string"
+        },
+        "font_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Font Path"
+        },
+        "language": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Language"
+        },
+        "margin_vertical": {
+          "default": 48,
+          "minimum": 0,
+          "title": "Margin Vertical",
+          "type": "integer"
+        },
+        "max_characters_per_line": {
+          "default": 34,
+          "maximum": 80,
+          "minimum": 10,
+          "title": "Max Characters Per Line",
+          "type": "integer"
+        },
+        "max_lines": {
+          "default": 2,
+          "enum": [
+            1,
+            2
+          ],
+          "title": "Max Lines",
+          "type": "integer"
+        },
+        "max_width_ratio": {
+          "default": 0.9,
+          "maximum": 1,
+          "minimum": 0.4,
+          "title": "Max Width Ratio",
+          "type": "number"
+        },
+        "mode": {
+          "$ref": "#/$defs/SubtitleMode",
+          "default": "none"
+        },
+        "outline_width": {
+          "default": 2,
+          "maximum": 8,
+          "minimum": 0,
+          "title": "Outline Width",
+          "type": "integer"
+        },
+        "safe_area": {
+          "$ref": "#/$defs/SubtitleSafeAreaSpec",
+          "default": {
+            "bottom_ratio": 0.03,
+            "left_ratio": 0.03,
+            "preset": "none",
+            "right_ratio": 0.03,
+            "top_ratio": 0.03,
+            "vertical_position": "bottom"
+          }
+        },
+        "sidecar_format": {
+          "$ref": "#/$defs/SubtitleSidecarFormat",
+          "default": "srt"
+        },
+        "source_font_size": {
+          "default": 22,
+          "maximum": 72,
+          "minimum": 12,
+          "title": "Source Font Size",
+          "type": "integer"
+        },
+        "translation_font_size": {
+          "default": 22,
+          "maximum": 72,
+          "minimum": 12,
+          "title": "Translation Font Size",
+          "type": "integer"
+        },
+        "translation_language": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Translation Language"
+        }
+      },
+      "title": "SubtitleSpec",
+      "type": "object"
+    },
+    "SubtitleTimingPrecision": {
+      "enum": [
+        "exact",
+        "estimated"
+      ],
+      "title": "SubtitleTimingPrecision",
+      "type": "string"
+    },
+    "SubtitleVerticalPosition": {
+      "enum": [
+        "bottom",
+        "top"
+      ],
+      "title": "SubtitleVerticalPosition",
+      "type": "string"
+    },
+    "SubtitleWordTiming": {
+      "additionalProperties": false,
+      "properties": {
+        "end_ms": {
+          "exclusiveMinimum": 0,
+          "title": "End Ms",
+          "type": "integer"
+        },
+        "source_cue_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Cue Ids",
+          "type": "array"
+        },
+        "source_id": {
+          "title": "Source Id",
+          "type": "string"
+        },
+        "start_ms": {
+          "minimum": 0,
+          "title": "Start Ms",
+          "type": "integer"
+        },
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "timing_precision": {
+          "$ref": "#/$defs/SubtitleTimingPrecision"
+        },
+        "word_timing_id": {
+          "title": "Word Timing Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "word_timing_id",
+        "source_id",
+        "start_ms",
+        "end_ms",
+        "text",
+        "source_cue_ids",
+        "timing_precision"
+      ],
+      "title": "SubtitleWordTiming",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "candidates": {
+      "items": {
+        "$ref": "#/$defs/CutCandidate"
+      },
+      "title": "Candidates",
+      "type": "array"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "created_by": {
+      "title": "Created By",
+      "type": "string"
+    },
+    "derived_from_plan_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Derived From Plan Id"
+    },
+    "document_type": {
+      "title": "Document Type",
+      "type": "string"
+    },
+    "evidence_artifacts": {
+      "items": {
+        "$ref": "#/$defs/EvidenceArtifactIdentity"
+      },
+      "title": "Evidence Artifacts",
+      "type": "array"
+    },
+    "extensions": {
+      "additionalProperties": {
+        "$ref": "#/$defs/JsonValue"
+      },
+      "title": "Extensions",
+      "type": "object"
+    },
+    "output_spec": {
+      "$ref": "#/$defs/OutputSpec",
+      "default": {
+        "reframe": {
+          "focus_x": null,
+          "focus_y": null,
+          "mode": "none",
+          "safe_area_preset": "none"
+        },
+        "render": {
+          "allow_upscale": false,
+          "audio_codec": "aac",
+          "container": "mp4",
+          "duration_tolerance_ms": 150,
+          "overwrite": "fail",
+          "quality_preset": "review",
+          "rate_control": {
+            "audio_bitrate": "128k",
+            "crf": 23,
+            "mode": "crf",
+            "video_bitrate": null
+          },
+          "resolution_mode": "720p",
+          "target_height": null,
+          "target_width": null,
+          "video_codec": "libx264"
+        },
+        "subtitle": {
+          "background_opacity": 0.35,
+          "bilingual_order": "source_first",
+          "font_family": "Arial",
+          "font_path": null,
+          "language": null,
+          "margin_vertical": 48,
+          "max_characters_per_line": 34,
+          "max_lines": 2,
+          "max_width_ratio": 0.9,
+          "mode": "none",
+          "outline_width": 2,
+          "safe_area": {
+            "bottom_ratio": 0.03,
+            "left_ratio": 0.03,
+            "preset": "none",
+            "right_ratio": 0.03,
+            "top_ratio": 0.03,
+            "vertical_position": "bottom"
+          },
+          "sidecar_format": "srt",
+          "source_font_size": 22,
+          "translation_font_size": 22,
+          "translation_language": null
+        }
+      }
+    },
+    "plan_id": {
+      "title": "Plan Id",
+      "type": "string"
+    },
+    "provider_records": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ProviderRecord"
+      },
+      "title": "Provider Records",
+      "type": "array"
+    },
+    "required_extensions": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Required Extensions",
+      "type": "array"
+    },
+    "schema_version": {
+      "default": "0.1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "selection_result": {
+      "$ref": "#/$defs/SelectionResult"
+    },
+    "source": {
+      "$ref": "#/$defs/MediaSource"
+    },
+    "strategy_records": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/StrategyRecord"
+      },
+      "title": "Strategy Records",
+      "type": "array"
+    }
+  },
+  "required": [
+    "document_type",
+    "created_at",
+    "created_by",
+    "plan_id",
+    "source",
+    "evidence_artifacts",
+    "candidates",
+    "selection_result"
+  ],
+  "title": "CutPlan",
+  "type": "object"
+}

@@ -1,0 +1,1329 @@
+{
+  "$defs": {
+    "ContextualTranslationRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "following_context": {
+          "default": "",
+          "title": "Following Context",
+          "type": "string"
+        },
+        "glossary": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Glossary",
+          "type": "object"
+        },
+        "preceding_context": {
+          "default": "",
+          "title": "Preceding Context",
+          "type": "string"
+        },
+        "provider_record_ref": {
+          "title": "Provider Record Ref",
+          "type": "string"
+        },
+        "source_cue_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Cue Ids",
+          "type": "array"
+        },
+        "source_language": {
+          "title": "Source Language",
+          "type": "string"
+        },
+        "source_text": {
+          "minLength": 1,
+          "title": "Source Text",
+          "type": "string"
+        },
+        "source_text_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Text Sha256",
+          "type": "string"
+        },
+        "translated_text": {
+          "minLength": 1,
+          "title": "Translated Text",
+          "type": "string"
+        },
+        "translation_language": {
+          "title": "Translation Language",
+          "type": "string"
+        },
+        "translation_record_id": {
+          "title": "Translation Record Id",
+          "type": "string"
+        },
+        "translation_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Translation Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "translation_record_id",
+        "provider_record_ref",
+        "source_language",
+        "translation_language",
+        "source_cue_ids",
+        "source_text",
+        "translated_text",
+        "source_text_sha256",
+        "translation_sha256"
+      ],
+      "title": "ContextualTranslationRecord",
+      "type": "object"
+    },
+    "CutCandidate": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_id": {
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "contextual_translation_records": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ContextualTranslationRecord"
+          },
+          "title": "Contextual Translation Records",
+          "type": "array"
+        },
+        "education_signals": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/EducationSignal"
+          },
+          "title": "Education Signals",
+          "type": "array"
+        },
+        "education_visual_dependencies": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/EducationVisualDependency"
+          },
+          "title": "Education Visual Dependencies",
+          "type": "array"
+        },
+        "educational_profile": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EducationalCandidateProfile"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "end_ms": {
+          "exclusiveMinimum": 0,
+          "title": "End Ms",
+          "type": "integer"
+        },
+        "evidence_refs": {
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "minItems": 1,
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "extension_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Extension Reason"
+        },
+        "semantic_structure": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Semantic Structure",
+          "type": "array"
+        },
+        "semantic_types": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SemanticType"
+          },
+          "title": "Semantic Types",
+          "type": "array"
+        },
+        "series_group_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Series Group Id"
+        },
+        "series_index": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Series Index"
+        },
+        "series_total": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Series Total"
+        },
+        "source_id": {
+          "title": "Source Id",
+          "type": "string"
+        },
+        "speakers": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Speakers",
+          "type": "array"
+        },
+        "sports_event": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SportsEvent"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "sports_profile": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SportsCandidateProfile"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "start_ms": {
+          "minimum": 0,
+          "title": "Start Ms",
+          "type": "integer"
+        },
+        "strategy_scores": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/StrategyScore"
+          },
+          "title": "Strategy Scores",
+          "type": "array"
+        },
+        "subtitle_cues": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SubtitleCue"
+          },
+          "title": "Subtitle Cues",
+          "type": "array"
+        },
+        "subtitle_display_units": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SubtitleDisplayUnit"
+          },
+          "title": "Subtitle Display Units",
+          "type": "array"
+        },
+        "subtitle_semantic_spans": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SubtitleSemanticSpan"
+          },
+          "title": "Subtitle Semantic Spans",
+          "type": "array"
+        },
+        "subtitle_word_timings": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SubtitleWordTiming"
+          },
+          "title": "Subtitle Word Timings",
+          "type": "array"
+        },
+        "summary": {
+          "title": "Summary",
+          "type": "string"
+        },
+        "tags": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags",
+          "type": "array"
+        },
+        "topics": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Topics",
+          "type": "array"
+        },
+        "translated_subtitle_cues": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SubtitleCue"
+          },
+          "title": "Translated Subtitle Cues",
+          "type": "array"
+        },
+        "warnings": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "candidate_id",
+        "source_id",
+        "start_ms",
+        "end_ms",
+        "summary",
+        "evidence_refs"
+      ],
+      "title": "CutCandidate",
+      "type": "object"
+    },
+    "DimensionScore": {
+      "additionalProperties": false,
+      "properties": {
+        "dimension_id": {
+          "title": "Dimension Id",
+          "type": "string"
+        },
+        "evidence_refs": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        },
+        "warning": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Warning"
+        }
+      },
+      "required": [
+        "dimension_id"
+      ],
+      "title": "DimensionScore",
+      "type": "object"
+    },
+    "EducationContextRole": {
+      "enum": [
+        "self_contained",
+        "requires_previous",
+        "requires_following",
+        "requires_visual"
+      ],
+      "title": "EducationContextRole",
+      "type": "string"
+    },
+    "EducationSignal": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "context_roles": {
+          "default": [
+            "self_contained"
+          ],
+          "items": {
+            "$ref": "#/$defs/EducationContextRole"
+          },
+          "title": "Context Roles",
+          "type": "array"
+        },
+        "end_ms": {
+          "exclusiveMinimum": 0,
+          "title": "End Ms",
+          "type": "integer"
+        },
+        "evidence_refs": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "key_terms": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Key Terms",
+          "type": "array"
+        },
+        "language": {
+          "title": "Language",
+          "type": "string"
+        },
+        "matched_text": {
+          "minLength": 1,
+          "title": "Matched Text",
+          "type": "string"
+        },
+        "signal_id": {
+          "title": "Signal Id",
+          "type": "string"
+        },
+        "signal_type": {
+          "$ref": "#/$defs/EducationSignalType"
+        },
+        "start_ms": {
+          "minimum": 0,
+          "title": "Start Ms",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "signal_id",
+        "signal_type",
+        "matched_text",
+        "language",
+        "start_ms",
+        "end_ms",
+        "confidence",
+        "evidence_refs"
+      ],
+      "title": "EducationSignal",
+      "type": "object"
+    },
+    "EducationSignalType": {
+      "enum": [
+        "definition",
+        "theorem_or_rule",
+        "reasoning_chain",
+        "worked_example",
+        "procedure_or_step",
+        "summary",
+        "common_mistake",
+        "difficult_point",
+        "teacher_emphasis",
+        "exam_relevance"
+      ],
+      "title": "EducationSignalType",
+      "type": "string"
+    },
+    "EducationVisualDependency": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "dependency_id": {
+          "title": "Dependency Id",
+          "type": "string"
+        },
+        "dependency_type": {
+          "$ref": "#/$defs/EducationVisualDependencyType"
+        },
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "end_ms": {
+          "exclusiveMinimum": 0,
+          "title": "End Ms",
+          "type": "integer"
+        },
+        "evidence_refs": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "start_ms": {
+          "minimum": 0,
+          "title": "Start Ms",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "dependency_id",
+        "dependency_type",
+        "start_ms",
+        "end_ms",
+        "description",
+        "confidence",
+        "evidence_refs"
+      ],
+      "title": "EducationVisualDependency",
+      "type": "object"
+    },
+    "EducationVisualDependencyType": {
+      "enum": [
+        "slide",
+        "blackboard",
+        "code",
+        "formula",
+        "diagram"
+      ],
+      "title": "EducationVisualDependencyType",
+      "type": "string"
+    },
+    "EducationalCandidateProfile": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_id": {
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "completeness_confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Completeness Confidence",
+          "type": "number"
+        },
+        "context_roles": {
+          "items": {
+            "$ref": "#/$defs/EducationContextRole"
+          },
+          "title": "Context Roles",
+          "type": "array"
+        },
+        "key_terms": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Key Terms",
+          "type": "array"
+        },
+        "qualified": {
+          "title": "Qualified",
+          "type": "boolean"
+        },
+        "signal_types": {
+          "items": {
+            "$ref": "#/$defs/EducationSignalType"
+          },
+          "title": "Signal Types",
+          "type": "array"
+        },
+        "visual_dependency_types": {
+          "items": {
+            "$ref": "#/$defs/EducationVisualDependencyType"
+          },
+          "title": "Visual Dependency Types",
+          "type": "array"
+        }
+      },
+      "required": [
+        "candidate_id",
+        "qualified",
+        "signal_types",
+        "context_roles",
+        "key_terms",
+        "visual_dependency_types",
+        "completeness_confidence"
+      ],
+      "title": "EducationalCandidateProfile",
+      "type": "object"
+    },
+    "EvidenceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": {
+          "title": "Artifact Id",
+          "type": "string"
+        },
+        "end_ms": {
+          "exclusiveMinimum": 0,
+          "title": "End Ms",
+          "type": "integer"
+        },
+        "evidence_id": {
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "segment_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Segment Ids",
+          "type": "array"
+        },
+        "snapshot": {
+          "anyOf": [
+            {
+              "maxLength": 2048,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Snapshot"
+        },
+        "start_ms": {
+          "minimum": 0,
+          "title": "Start Ms",
+          "type": "integer"
+        },
+        "text_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Text Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "evidence_id",
+        "artifact_id",
+        "segment_ids",
+        "start_ms",
+        "end_ms",
+        "text_sha256"
+      ],
+      "title": "EvidenceRef",
+      "type": "object"
+    },
+    "JsonValue": {},
+    "SemanticType": {
+      "enum": [
+        "definition",
+        "reasoning_chain",
+        "conflict",
+        "hook",
+        "step",
+        "story_arc"
+      ],
+      "title": "SemanticType",
+      "type": "string"
+    },
+    "SportsCandidateProfile": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_id": {
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "completeness_confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Completeness Confidence",
+          "type": "number"
+        },
+        "cross_modal_confirmations": {
+          "minimum": 0,
+          "title": "Cross Modal Confirmations",
+          "type": "integer"
+        },
+        "event_id": {
+          "title": "Event Id",
+          "type": "string"
+        },
+        "event_type": {
+          "$ref": "#/$defs/SportsEventType"
+        },
+        "modalities": {
+          "items": {
+            "$ref": "#/$defs/SportsModality"
+          },
+          "title": "Modalities",
+          "type": "array"
+        },
+        "narrative_cues": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SportsNarrativeCue"
+          },
+          "title": "Narrative Cues",
+          "type": "array"
+        },
+        "observation_types": {
+          "items": {
+            "$ref": "#/$defs/SportsObservationType"
+          },
+          "title": "Observation Types",
+          "type": "array"
+        },
+        "qualified": {
+          "title": "Qualified",
+          "type": "boolean"
+        },
+        "replay_only": {
+          "title": "Replay Only",
+          "type": "boolean"
+        },
+        "temporal_roles": {
+          "items": {
+            "$ref": "#/$defs/SportsTemporalRole"
+          },
+          "title": "Temporal Roles",
+          "type": "array"
+        }
+      },
+      "required": [
+        "candidate_id",
+        "event_id",
+        "qualified",
+        "event_type",
+        "temporal_roles",
+        "modalities",
+        "observation_types",
+        "cross_modal_confirmations",
+        "replay_only",
+        "completeness_confidence"
+      ],
+      "title": "SportsCandidateProfile",
+      "type": "object"
+    },
+    "SportsEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "end_ms": {
+          "exclusiveMinimum": 0,
+          "title": "End Ms",
+          "type": "integer"
+        },
+        "event_id": {
+          "title": "Event Id",
+          "type": "string"
+        },
+        "event_type": {
+          "$ref": "#/$defs/SportsEventType"
+        },
+        "modalities": {
+          "items": {
+            "$ref": "#/$defs/SportsModality"
+          },
+          "title": "Modalities",
+          "type": "array"
+        },
+        "narrative_cues": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SportsNarrativeCue"
+          },
+          "title": "Narrative Cues",
+          "type": "array"
+        },
+        "observation_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Observation Ids",
+          "type": "array"
+        },
+        "observation_types": {
+          "items": {
+            "$ref": "#/$defs/SportsObservationType"
+          },
+          "title": "Observation Types",
+          "type": "array"
+        },
+        "replay_of_event_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Replay Of Event Id"
+        },
+        "source_id": {
+          "title": "Source Id",
+          "type": "string"
+        },
+        "start_ms": {
+          "minimum": 0,
+          "title": "Start Ms",
+          "type": "integer"
+        },
+        "temporal_roles": {
+          "items": {
+            "$ref": "#/$defs/SportsTemporalRole"
+          },
+          "title": "Temporal Roles",
+          "type": "array"
+        }
+      },
+      "required": [
+        "event_id",
+        "source_id",
+        "event_type",
+        "start_ms",
+        "end_ms",
+        "observation_ids",
+        "temporal_roles",
+        "modalities",
+        "observation_types",
+        "confidence"
+      ],
+      "title": "SportsEvent",
+      "type": "object"
+    },
+    "SportsEventType": {
+      "enum": [
+        "score",
+        "attempt",
+        "save",
+        "block",
+        "overtake",
+        "finish",
+        "celebration",
+        "controversy",
+        "unknown"
+      ],
+      "title": "SportsEventType",
+      "type": "string"
+    },
+    "SportsModality": {
+      "enum": [
+        "audio",
+        "video",
+        "ocr",
+        "text",
+        "metadata"
+      ],
+      "title": "SportsModality",
+      "type": "string"
+    },
+    "SportsNarrativeCue": {
+      "enum": [
+        "decisive_score"
+      ],
+      "title": "SportsNarrativeCue",
+      "type": "string"
+    },
+    "SportsObservationType": {
+      "enum": [
+        "audio_peak",
+        "shot_change",
+        "motion_burst",
+        "scoreboard_change",
+        "ocr_text",
+        "commentator_emphasis",
+        "replay_start",
+        "replay_end",
+        "event_classification"
+      ],
+      "title": "SportsObservationType",
+      "type": "string"
+    },
+    "SportsTemporalRole": {
+      "enum": [
+        "buildup",
+        "action",
+        "outcome",
+        "reaction",
+        "replay"
+      ],
+      "title": "SportsTemporalRole",
+      "type": "string"
+    },
+    "StrategyScore": {
+      "additionalProperties": false,
+      "properties": {
+        "aggregate": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Aggregate"
+        },
+        "dimensions": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/DimensionScore"
+          },
+          "title": "Dimensions",
+          "type": "array"
+        },
+        "strategy_id": {
+          "title": "Strategy Id",
+          "type": "string"
+        },
+        "strategy_record_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Strategy Record Ref"
+        },
+        "strategy_version": {
+          "title": "Strategy Version",
+          "type": "string"
+        },
+        "warnings": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "strategy_id",
+        "strategy_version"
+      ],
+      "title": "StrategyScore",
+      "type": "object"
+    },
+    "SubtitleCue": {
+      "additionalProperties": false,
+      "properties": {
+        "cue_id": {
+          "title": "Cue Id",
+          "type": "string"
+        },
+        "end_ms": {
+          "exclusiveMinimum": 0,
+          "title": "End Ms",
+          "type": "integer"
+        },
+        "language": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Language"
+        },
+        "source_id": {
+          "title": "Source Id",
+          "type": "string"
+        },
+        "source_segment_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Segment Ids",
+          "type": "array"
+        },
+        "speaker": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Speaker"
+        },
+        "start_ms": {
+          "minimum": 0,
+          "title": "Start Ms",
+          "type": "integer"
+        },
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "cue_id",
+        "source_id",
+        "start_ms",
+        "end_ms",
+        "text",
+        "source_segment_ids"
+      ],
+      "title": "SubtitleCue",
+      "type": "object"
+    },
+    "SubtitleDisplayUnit": {
+      "additionalProperties": false,
+      "properties": {
+        "display_unit_id": {
+          "title": "Display Unit Id",
+          "type": "string"
+        },
+        "end_ms": {
+          "exclusiveMinimum": 0,
+          "title": "End Ms",
+          "type": "integer"
+        },
+        "segmentation_reason": {
+          "title": "Segmentation Reason",
+          "type": "string"
+        },
+        "semantic_level": {
+          "$ref": "#/$defs/SubtitleSemanticLevel",
+          "default": "sentence"
+        },
+        "source_cue_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Cue Ids",
+          "type": "array"
+        },
+        "source_id": {
+          "title": "Source Id",
+          "type": "string"
+        },
+        "source_language": {
+          "title": "Source Language",
+          "type": "string"
+        },
+        "source_text": {
+          "minLength": 1,
+          "title": "Source Text",
+          "type": "string"
+        },
+        "start_ms": {
+          "minimum": 0,
+          "title": "Start Ms",
+          "type": "integer"
+        },
+        "timing_precision": {
+          "$ref": "#/$defs/SubtitleTimingPrecision",
+          "default": "exact"
+        },
+        "translated_text": {
+          "minLength": 1,
+          "title": "Translated Text",
+          "type": "string"
+        },
+        "translation_language": {
+          "title": "Translation Language",
+          "type": "string"
+        },
+        "translation_record_ref": {
+          "title": "Translation Record Ref",
+          "type": "string"
+        }
+      },
+      "required": [
+        "display_unit_id",
+        "source_id",
+        "start_ms",
+        "end_ms",
+        "source_cue_ids",
+        "source_text",
+        "translated_text",
+        "source_language",
+        "translation_language",
+        "segmentation_reason",
+        "translation_record_ref"
+      ],
+      "title": "SubtitleDisplayUnit",
+      "type": "object"
+    },
+    "SubtitleSemanticLevel": {
+      "enum": [
+        "sentence",
+        "clause",
+        "phrase"
+      ],
+      "title": "SubtitleSemanticLevel",
+      "type": "string"
+    },
+    "SubtitleSemanticSpan": {
+      "additionalProperties": false,
+      "properties": {
+        "end_ms": {
+          "exclusiveMinimum": 0,
+          "title": "End Ms",
+          "type": "integer"
+        },
+        "language": {
+          "title": "Language",
+          "type": "string"
+        },
+        "semantic_level": {
+          "$ref": "#/$defs/SubtitleSemanticLevel"
+        },
+        "semantic_span_id": {
+          "title": "Semantic Span Id",
+          "type": "string"
+        },
+        "source_cue_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Cue Ids",
+          "type": "array"
+        },
+        "source_id": {
+          "title": "Source Id",
+          "type": "string"
+        },
+        "start_ms": {
+          "minimum": 0,
+          "title": "Start Ms",
+          "type": "integer"
+        },
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "timing_precision": {
+          "$ref": "#/$defs/SubtitleTimingPrecision"
+        }
+      },
+      "required": [
+        "semantic_span_id",
+        "source_id",
+        "start_ms",
+        "end_ms",
+        "source_cue_ids",
+        "text",
+        "language",
+        "semantic_level",
+        "timing_precision"
+      ],
+      "title": "SubtitleSemanticSpan",
+      "type": "object"
+    },
+    "SubtitleTimingPrecision": {
+      "enum": [
+        "exact",
+        "estimated"
+      ],
+      "title": "SubtitleTimingPrecision",
+      "type": "string"
+    },
+    "SubtitleWordTiming": {
+      "additionalProperties": false,
+      "properties": {
+        "end_ms": {
+          "exclusiveMinimum": 0,
+          "title": "End Ms",
+          "type": "integer"
+        },
+        "source_cue_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Cue Ids",
+          "type": "array"
+        },
+        "source_id": {
+          "title": "Source Id",
+          "type": "string"
+        },
+        "start_ms": {
+          "minimum": 0,
+          "title": "Start Ms",
+          "type": "integer"
+        },
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "timing_precision": {
+          "$ref": "#/$defs/SubtitleTimingPrecision"
+        },
+        "word_timing_id": {
+          "title": "Word Timing Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "word_timing_id",
+        "source_id",
+        "start_ms",
+        "end_ms",
+        "text",
+        "source_cue_ids",
+        "timing_precision"
+      ],
+      "title": "SubtitleWordTiming",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "candidates": {
+      "items": {
+        "$ref": "#/$defs/CutCandidate"
+      },
+      "title": "Candidates",
+      "type": "array"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "created_by": {
+      "title": "Created By",
+      "type": "string"
+    },
+    "document_type": {
+      "title": "Document Type",
+      "type": "string"
+    },
+    "extensions": {
+      "additionalProperties": {
+        "$ref": "#/$defs/JsonValue"
+      },
+      "title": "Extensions",
+      "type": "object"
+    },
+    "input_document_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Input Document Sha256",
+      "type": "string"
+    },
+    "is_fixture": {
+      "default": false,
+      "title": "Is Fixture",
+      "type": "boolean"
+    },
+    "proposal_bundle_id": {
+      "title": "Proposal Bundle Id",
+      "type": "string"
+    },
+    "provider_kind": {
+      "enum": [
+        "fixture",
+        "host_ai_file",
+        "human_file"
+      ],
+      "title": "Provider Kind",
+      "type": "string"
+    },
+    "provider_record_ref": {
+      "title": "Provider Record Ref",
+      "type": "string"
+    },
+    "required_extensions": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Required Extensions",
+      "type": "array"
+    },
+    "schema_version": {
+      "default": "0.1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source_id": {
+      "title": "Source Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "document_type",
+    "created_at",
+    "created_by",
+    "proposal_bundle_id",
+    "source_id",
+    "provider_record_ref",
+    "provider_kind",
+    "candidates",
+    "input_document_sha256"
+  ],
+  "title": "CandidateProposalBundle",
+  "type": "object"
+}

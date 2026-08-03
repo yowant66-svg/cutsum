@@ -1,0 +1,207 @@
+{
+  "schema_version": "1.0",
+  "scenarios": [
+    {
+      "scenario_id": "auto-university-lecture",
+      "title": "Synthetic university lecture",
+      "category": "auto",
+      "transcript_segments": [
+        {"start_ms": 0, "end_ms": 6000, "text": "A feedback loop is a process whose output changes its next input."},
+        {"start_ms": 6000, "end_ms": 13000, "text": "A thermostat is a simple example because measured temperature changes the heating decision."},
+        {"start_ms": 13000, "end_ms": 19000, "text": "Therefore stability depends on how strongly and how quickly the system responds."}
+      ],
+      "host_instruction": "",
+      "expected_content_types": ["lecture"],
+      "expected_constraints": ["preserve_definition_example_conclusion"],
+      "debatable_items": ["Whether the example should be a separate clip"],
+      "creation_method": "Maintainer-directed synthetic text authored for Gate F",
+      "spdx_license": "Apache-2.0",
+      "provenance": "NEW_ORIGINAL synthetic fixture; no third-party source"
+    },
+    {
+      "scenario_id": "auto-paid-knowledge-method",
+      "title": "Synthetic methodology lesson",
+      "category": "auto",
+      "transcript_segments": [
+        {"start_ms": 0, "end_ms": 5000, "text": "Start by writing the decision you need to make, not the data you happen to have."},
+        {"start_ms": 5000, "end_ms": 11000, "text": "Then collect only evidence that could change that decision."},
+        {"start_ms": 11000, "end_ms": 17000, "text": "This prevents research from becoming an endless inventory."}
+      ],
+      "host_instruction": "",
+      "expected_content_types": ["knowledge"],
+      "expected_constraints": ["retain_method_and_reason"],
+      "debatable_items": ["Whether the opening line is independently quotable"],
+      "creation_method": "Maintainer-directed synthetic text authored for Gate F",
+      "spdx_license": "Apache-2.0",
+      "provenance": "NEW_ORIGINAL synthetic fixture; no third-party source"
+    },
+    {
+      "scenario_id": "auto-fiction-story",
+      "title": "Synthetic story scene",
+      "category": "auto",
+      "transcript_segments": [
+        {"start_ms": 0, "end_ms": 5000, "text": "Mara hid the lighthouse key after promising her brother she would return it."},
+        {"start_ms": 5000, "end_ms": 10000, "text": "When the storm arrived, the rescue crew discovered the locked signal room."},
+        {"start_ms": 10000, "end_ms": 16000, "text": "Mara confessed and led them through an older tunnel before the final boat passed."}
+      ],
+      "host_instruction": "",
+      "expected_content_types": ["story"],
+      "expected_constraints": ["preserve_time_order", "retain_cause_and_resolution"],
+      "debatable_items": ["How much setup the confession needs"],
+      "creation_method": "Maintainer-directed synthetic fiction authored for Gate F",
+      "spdx_license": "Apache-2.0",
+      "provenance": "NEW_ORIGINAL synthetic fixture; no third-party source"
+    },
+    {
+      "scenario_id": "auto-podcast-interview",
+      "title": "Synthetic podcast interview",
+      "category": "auto",
+      "transcript_segments": [
+        {"start_ms": 0, "end_ms": 7000, "text": "HOST: Why did your first community workshop fail?"},
+        {"start_ms": 7000, "end_ms": 15000, "text": "GUEST: I designed it for impressive presentations instead of useful practice."},
+        {"start_ms": 15000, "end_ms": 22000, "text": "GUEST: Attendance improved only after participants built one small tool during every session."}
+      ],
+      "host_instruction": "",
+      "expected_content_types": ["interview", "podcast"],
+      "expected_constraints": ["retain_question_and_answer_context"],
+      "debatable_items": ["Whether to include the host question"],
+      "creation_method": "Maintainer-directed synthetic dialogue authored for Gate F",
+      "spdx_license": "Apache-2.0",
+      "provenance": "NEW_ORIGINAL synthetic fixture; no third-party source"
+    },
+    {
+      "scenario_id": "auto-product-manual",
+      "title": "Synthetic device setup tutorial",
+      "category": "auto",
+      "transcript_segments": [
+        {"start_ms": 0, "end_ms": 6000, "text": "Disconnect the battery before opening the sensor cover."},
+        {"start_ms": 6000, "end_ms": 13000, "text": "Insert the calibration strip with the printed arrow facing the blue marker."},
+        {"start_ms": 13000, "end_ms": 19000, "text": "If the status light flashes red, remove the strip and check that the contacts are dry."}
+      ],
+      "host_instruction": "",
+      "expected_content_types": ["manual", "tutorial"],
+      "expected_constraints": ["retain_step_order", "retain_safety_warning"],
+      "debatable_items": ["Whether troubleshooting is a separate clip"],
+      "creation_method": "Maintainer-directed synthetic instructions authored for Gate F",
+      "spdx_license": "Apache-2.0",
+      "provenance": "NEW_ORIGINAL synthetic fixture; no third-party source"
+    },
+    {
+      "scenario_id": "auto-hybrid-video",
+      "title": "Synthetic hybrid documentary tutorial",
+      "category": "auto",
+      "transcript_segments": [
+        {"start_ms": 0, "end_ms": 6000, "text": "The neighborhood archive began when a flood damaged hundreds of family photographs."},
+        {"start_ms": 6000, "end_ms": 13000, "text": "ARCHIVIST: Scan each photograph before cleaning it so the original condition remains documented."},
+        {"start_ms": 13000, "end_ms": 20000, "text": "A volunteer then demonstrates how to label the digital file with date, owner, and location."}
+      ],
+      "host_instruction": "",
+      "expected_content_types": ["documentary", "tutorial", "interview"],
+      "expected_constraints": ["allow_multiple_content_tracks"],
+      "debatable_items": ["Whether history and procedure belong in one result"],
+      "creation_method": "Maintainer-directed synthetic mixed format authored for Gate F",
+      "spdx_license": "Apache-2.0",
+      "provenance": "NEW_ORIGINAL synthetic fixture; no third-party source"
+    },
+    {
+      "scenario_id": "directed-course-three-second-hook",
+      "title": "Directed short hook from a course",
+      "category": "directed",
+      "transcript_segments": [
+        {"start_ms": 0, "end_ms": 3000, "text": "The safest prediction is often the one you refuse to make."},
+        {"start_ms": 3000, "end_ms": 12000, "text": "Uncertainty ranges are useful because they expose what evidence could reverse a decision."}
+      ],
+      "host_instruction": "Find exactly one three-second hook.",
+      "expected_content_types": ["lecture"],
+      "expected_constraints": ["target_count_1", "target_duration_ms_3000", "completion_advisory"],
+      "debatable_items": ["Which word creates the strongest opening"],
+      "creation_method": "Maintainer-directed synthetic lecture authored for Gate F",
+      "spdx_license": "Apache-2.0",
+      "provenance": "NEW_ORIGINAL synthetic fixture; no third-party source"
+    },
+    {
+      "scenario_id": "directed-interview-full-argument",
+      "title": "Directed long-form interview argument",
+      "category": "directed",
+      "transcript_segments": [
+        {"start_ms": 0, "end_ms": 60000, "text": "The guest states a disputed claim and defines the terms of the disagreement."},
+        {"start_ms": 60000, "end_ms": 130000, "text": "The host challenges the claim with a counterexample and the guest revises one premise."},
+        {"start_ms": 130000, "end_ms": 180000, "text": "The guest presents the revised conclusion and identifies what evidence would change it."}
+      ],
+      "host_instruction": "Cut one three-minute segment that preserves the complete argument.",
+      "expected_content_types": ["interview"],
+      "expected_constraints": ["target_count_1", "target_duration_ms_180000", "retain_argument_chain"],
+      "debatable_items": ["Whether the counterexample needs all supporting detail"],
+      "creation_method": "Maintainer-directed synthetic dialogue summary authored for Gate F",
+      "spdx_license": "Apache-2.0",
+      "provenance": "NEW_ORIGINAL synthetic fixture; no third-party source"
+    },
+    {
+      "scenario_id": "directed-story-order",
+      "title": "Directed chronological story",
+      "category": "directed",
+      "transcript_segments": [
+        {"start_ms": 0, "end_ms": 5000, "text": "A courier receives a sealed map."},
+        {"start_ms": 5000, "end_ms": 10000, "text": "The courier loses the map while crossing the market."},
+        {"start_ms": 10000, "end_ms": 15000, "text": "A vendor returns it after recognizing the seal."}
+      ],
+      "host_instruction": "Preserve chronological story order.",
+      "expected_content_types": ["story"],
+      "expected_constraints": ["preserve_time_order"],
+      "debatable_items": ["Whether all three events need equal duration"],
+      "creation_method": "Maintainer-directed synthetic fiction authored for Gate F",
+      "spdx_license": "Apache-2.0",
+      "provenance": "NEW_ORIGINAL synthetic fixture; no third-party source"
+    },
+    {
+      "scenario_id": "guided-count-and-length",
+      "title": "Guided count and duration",
+      "category": "guided",
+      "transcript_segments": [
+        {"start_ms": 0, "end_ms": 10000, "text": "A planner explains how to identify a reversible decision."},
+        {"start_ms": 10000, "end_ms": 20000, "text": "A second example contrasts reversible and irreversible choices."},
+        {"start_ms": 20000, "end_ms": 30000, "text": "The speaker closes with a short decision checklist."}
+      ],
+      "host_instruction": "Return two clips between eight and twelve seconds; decide the rest.",
+      "expected_content_types": ["knowledge"],
+      "expected_constraints": ["target_count_2", "minimum_duration_ms_8000", "maximum_duration_ms_12000"],
+      "debatable_items": ["Which two segments provide the most variety"],
+      "creation_method": "Maintainer-directed synthetic lesson authored for Gate F",
+      "spdx_license": "Apache-2.0",
+      "provenance": "NEW_ORIGINAL synthetic fixture; no third-party source"
+    },
+    {
+      "scenario_id": "directed-mismatch-executable",
+      "title": "Executable mismatched host request",
+      "category": "directed",
+      "transcript_segments": [
+        {"start_ms": 0, "end_ms": 4000, "text": "Press and hold the reset button until the indicator turns amber."},
+        {"start_ms": 4000, "end_ms": 8000, "text": "A fast cut reveals the indicator changing color."},
+        {"start_ms": 8000, "end_ms": 12000, "text": "Release the button after the confirmation tone."}
+      ],
+      "host_instruction": "Prioritize emotional tension even though this is a setup tutorial.",
+      "expected_content_types": ["tutorial"],
+      "expected_constraints": ["host_emotion_priority_over_content_inference"],
+      "debatable_items": ["Whether the material contains enough genuine tension"],
+      "creation_method": "Maintainer-directed synthetic instructions authored for Gate F",
+      "spdx_license": "Apache-2.0",
+      "provenance": "NEW_ORIGINAL synthetic fixture; no third-party source"
+    },
+    {
+      "scenario_id": "directed-capability-conflict",
+      "title": "Technically unavailable request",
+      "category": "directed",
+      "transcript_segments": [
+        {"start_ms": 0, "end_ms": 6000, "text": "Two speakers move independently across a synthetic stage."},
+        {"start_ms": 6000, "end_ms": 12000, "text": "The transcript cannot identify either speaker's screen position."}
+      ],
+      "host_instruction": "Track and center each speaker automatically with no visual analysis provider.",
+      "expected_content_types": ["presentation"],
+      "expected_constraints": ["capability_conflict_tracked_focus"],
+      "debatable_items": [],
+      "creation_method": "Maintainer-directed synthetic scenario authored for Gate F",
+      "spdx_license": "Apache-2.0",
+      "provenance": "NEW_ORIGINAL synthetic fixture; no third-party source"
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "schema_version": "1.0",
+  "cases": [
+    {
+      "case_id": "gate-i-chinese-fragments",
+      "description": "Regression for Chinese text forced into English micro-cue widths.",
+      "expected_pass": false,
+      "expected_codes": ["semantic_fragment"],
+      "units": [
+        {
+          "source_text": "An algorithm is",
+          "translated_text": "算法是",
+          "start_ms": 0,
+          "end_ms": 900,
+          "semantic_level": "phrase"
+        },
+        {
+          "source_text": "a finite",
+          "translated_text": "一套有限",
+          "start_ms": 900,
+          "end_ms": 1900,
+          "semantic_level": "phrase"
+        },
+        {
+          "source_text": "and unambiguous",
+          "translated_text": "而明确",
+          "start_ms": 1900,
+          "end_ms": 2800,
+          "semantic_level": "phrase"
+        },
+        {
+          "source_text": "set of",
+          "translated_text": "的步",
+          "start_ms": 2800,
+          "end_ms": 3500,
+          "semantic_level": "phrase"
+        },
+        {
+          "source_text": "steps.",
+          "translated_text": "骤。",
+          "start_ms": 3500,
+          "end_ms": 4300,
+          "semantic_level": "phrase"
+        }
+      ]
+    },
+    {
+      "case_id": "complete-technical-definition",
+      "description": "Complete bilingual technical definition at readable speed.",
+      "expected_pass": true,
+      "expected_codes": [],
+      "units": [
+        {
+          "source_text": "An algorithm is a function that maps inputs to correct outputs.",
+          "translated_text": "算法是把输入映射为正确输出的函数。",
+          "start_ms": 0,
+          "end_ms": 6000,
+          "semantic_level": "sentence"
+        }
+      ]
+    },
+    {
+      "case_id": "excessive-reading-speed",
+      "description": "Complete sentence that remains unreadable because its duration is too short.",
+      "expected_pass": false,
+      "expected_codes": ["characters_per_second"],
+      "units": [
+        {
+          "source_text": "The formal definition preserves every valid input and output relationship.",
+          "translated_text": "形式化定义保留每个有效输入与输出之间的关系。",
+          "start_ms": 0,
+          "end_ms": 1000,
+          "semantic_level": "sentence"
+        }
+      ]
+    }
+  ]
+}

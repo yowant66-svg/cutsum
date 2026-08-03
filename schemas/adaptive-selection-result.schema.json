@@ -1,0 +1,163 @@
+{
+  "$defs": {
+    "AdaptiveSelectionDecision": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_id": {
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "missing_qualifications": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Missing Qualifications",
+          "type": "array"
+        },
+        "overall": {
+          "anyOf": [
+            {
+              "maximum": 10,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Overall"
+        },
+        "rank": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rank"
+        },
+        "reasons": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Reasons",
+          "type": "array"
+        },
+        "selected": {
+          "title": "Selected",
+          "type": "boolean"
+        },
+        "semantic_qualified": {
+          "default": true,
+          "title": "Semantic Qualified",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "candidate_id",
+        "selected",
+        "reasons"
+      ],
+      "title": "AdaptiveSelectionDecision",
+      "type": "object"
+    },
+    "JsonValue": {}
+  },
+  "additionalProperties": false,
+  "properties": {
+    "calculation_version": {
+      "title": "Calculation Version",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "created_by": {
+      "title": "Created By",
+      "type": "string"
+    },
+    "decisions": {
+      "items": {
+        "$ref": "#/$defs/AdaptiveSelectionDecision"
+      },
+      "title": "Decisions",
+      "type": "array"
+    },
+    "document_type": {
+      "title": "Document Type",
+      "type": "string"
+    },
+    "extensions": {
+      "additionalProperties": {
+        "$ref": "#/$defs/JsonValue"
+      },
+      "title": "Extensions",
+      "type": "object"
+    },
+    "input_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Input Sha256",
+      "type": "string"
+    },
+    "nearest_candidate_ids": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Nearest Candidate Ids",
+      "type": "array"
+    },
+    "required_extensions": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Required Extensions",
+      "type": "array"
+    },
+    "schema_version": {
+      "default": "0.1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "selected_candidate_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Selected Candidate Ids",
+      "type": "array"
+    },
+    "selection_id": {
+      "title": "Selection Id",
+      "type": "string"
+    },
+    "unsatisfied_constraints": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Unsatisfied Constraints",
+      "type": "array"
+    }
+  },
+  "required": [
+    "document_type",
+    "created_at",
+    "created_by",
+    "selection_id",
+    "decisions",
+    "selected_candidate_ids",
+    "calculation_version",
+    "input_sha256"
+  ],
+  "title": "AdaptiveSelectionResult",
+  "type": "object"
+}

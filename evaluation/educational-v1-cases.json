@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0",
+  "transcript": [
+    {
+      "start_ms": 0,
+      "end_ms": 15000,
+      "text": "Welcome back. Today we continue the lecture."
+    },
+    {
+      "start_ms": 15000,
+      "end_ms": 30000,
+      "text": "An algorithm is a function that maps inputs to correct outputs."
+    },
+    {
+      "start_ms": 30000,
+      "end_ms": 45000,
+      "text": "For example, binary search repeatedly cuts the remaining range in half."
+    },
+    {
+      "start_ms": 45000,
+      "end_ms": 60000,
+      "text": "A common mistake is to discard the half that can still contain the target."
+    },
+    {
+      "start_ms": 60000,
+      "end_ms": 75000,
+      "text": "Suppose the target is smaller than the midpoint. We keep the left half."
+    },
+    {
+      "start_ms": 75000,
+      "end_ms": 90000,
+      "text": "Remember, the formal definition requires the output to be correct for the input."
+    },
+    {
+      "start_ms": 90000,
+      "end_ms": 105000,
+      "text": "First we compute the midpoint and compare it with the target."
+    },
+    {
+      "start_ms": 105000,
+      "end_ms": 120000,
+      "text": "The tricky part is preserving the invariant after every comparison."
+    },
+    {
+      "start_ms": 120000,
+      "end_ms": 135000,
+      "text": "Therefore this output is correct."
+    }
+  ],
+  "expected_proposed_types": [
+    "definition",
+    "worked_example",
+    "common_mistake",
+    "procedure_or_step",
+    "difficult_point",
+    "reasoning_chain"
+  ],
+  "expected_unqualified_summaries": [
+    "Therefore this output is correct."
+  ],
+  "contract_coverage": {
+    "visual_dependency": "tests/contract/test_educational_context.py",
+    "failure_cases": "context-incomplete reasoning remains proposed but is not AUTO-qualified"
+  },
+  "runs": [
+    {
+      "run_id": "auto-education",
+      "mode": "auto",
+      "instruction": "",
+      "expected_selected_types": ["definition", "worked_example", "common_mistake"],
+      "forbidden_selected_types": []
+    },
+    {
+      "run_id": "directed-examples",
+      "mode": "directed",
+      "instruction": "只要两个例题，不要定义。",
+      "expected_selected_types": ["worked_example"],
+      "forbidden_selected_types": ["definition"]
+    }
+  ]
+}

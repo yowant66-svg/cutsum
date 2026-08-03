@@ -1,0 +1,155 @@
+{
+  "$defs": {
+    "BlindEvaluationTrack": {
+      "enum": [
+        "interview",
+        "drama",
+        "education",
+        "sports"
+      ],
+      "title": "BlindEvaluationTrack",
+      "type": "string"
+    },
+    "BlindRunState": {
+      "enum": [
+        "frozen"
+      ],
+      "title": "BlindRunState",
+      "type": "string"
+    },
+    "FrozenArtifact": {
+      "additionalProperties": false,
+      "properties": {
+        "relative_path": {
+          "title": "Relative Path",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "size_bytes": {
+          "minimum": 0,
+          "title": "Size Bytes",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "relative_path",
+        "sha256",
+        "size_bytes"
+      ],
+      "title": "FrozenArtifact",
+      "type": "object"
+    },
+    "JsonValue": {}
+  },
+  "additionalProperties": false,
+  "properties": {
+    "aggregate_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Aggregate Sha256",
+      "type": "string"
+    },
+    "artifacts": {
+      "items": {
+        "$ref": "#/$defs/FrozenArtifact"
+      },
+      "minItems": 1,
+      "title": "Artifacts",
+      "type": "array"
+    },
+    "blind_run_id": {
+      "title": "Blind Run Id",
+      "type": "string"
+    },
+    "case_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Case Id"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "created_by": {
+      "title": "Created By",
+      "type": "string"
+    },
+    "document_type": {
+      "title": "Document Type",
+      "type": "string"
+    },
+    "extensions": {
+      "additionalProperties": {
+        "$ref": "#/$defs/JsonValue"
+      },
+      "title": "Extensions",
+      "type": "object"
+    },
+    "required_extensions": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Required Extensions",
+      "type": "array"
+    },
+    "result_root": {
+      "title": "Result Root",
+      "type": "string"
+    },
+    "schema_version": {
+      "default": "0.1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "state": {
+      "$ref": "#/$defs/BlindRunState",
+      "default": "frozen"
+    },
+    "suite_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Suite Id"
+    },
+    "track": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/BlindEvaluationTrack"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "document_type",
+    "created_at",
+    "created_by",
+    "blind_run_id",
+    "result_root",
+    "artifacts",
+    "aggregate_sha256"
+  ],
+  "title": "BlindRunManifest",
+  "type": "object"
+}

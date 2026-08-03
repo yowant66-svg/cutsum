@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "fixtures": [
+    {
+      "path": "gate_f/scenarios.json",
+      "spdx_license": "Apache-2.0",
+      "provenance": "NEW_ORIGINAL maintainer-directed synthetic transcripts authored for Gate F",
+      "generator_version": "gate-f-synthetic/1.0",
+      "sha256": "7e3c47bc49f779bcdfb838e5e7829a58a2894ecfcff7e7fb6af68a809b7371de"
+    }
+  ]
+}

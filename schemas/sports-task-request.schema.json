@@ -1,0 +1,93 @@
+{
+  "$defs": {
+    "ControlMode": {
+      "enum": [
+        "auto",
+        "guided",
+        "directed"
+      ],
+      "title": "ControlMode",
+      "type": "string"
+    },
+    "SportsEventType": {
+      "enum": [
+        "score",
+        "attempt",
+        "save",
+        "block",
+        "overtake",
+        "finish",
+        "celebration",
+        "controversy",
+        "unknown"
+      ],
+      "title": "SportsEventType",
+      "type": "string"
+    },
+    "SportsNarrativeCue": {
+      "enum": [
+        "decisive_score"
+      ],
+      "title": "SportsNarrativeCue",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "control_mode": {
+      "$ref": "#/$defs/ControlMode"
+    },
+    "forbidden_event_types": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/SportsEventType"
+      },
+      "title": "Forbidden Event Types",
+      "type": "array"
+    },
+    "include_replays": {
+      "default": false,
+      "title": "Include Replays",
+      "type": "boolean"
+    },
+    "raw_instruction": {
+      "title": "Raw Instruction",
+      "type": "string"
+    },
+    "required_event_types": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/SportsEventType"
+      },
+      "title": "Required Event Types",
+      "type": "array"
+    },
+    "required_narrative_cues": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/SportsNarrativeCue"
+      },
+      "title": "Required Narrative Cues",
+      "type": "array"
+    },
+    "target_count": {
+      "anyOf": [
+        {
+          "minimum": 1,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Target Count"
+    }
+  },
+  "required": [
+    "control_mode",
+    "raw_instruction"
+  ],
+  "title": "SportsTaskRequest",
+  "type": "object"
+}

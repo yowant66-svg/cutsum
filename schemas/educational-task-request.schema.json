@@ -1,0 +1,74 @@
+{
+  "$defs": {
+    "ControlMode": {
+      "enum": [
+        "auto",
+        "guided",
+        "directed"
+      ],
+      "title": "ControlMode",
+      "type": "string"
+    },
+    "EducationSignalType": {
+      "enum": [
+        "definition",
+        "theorem_or_rule",
+        "reasoning_chain",
+        "worked_example",
+        "procedure_or_step",
+        "summary",
+        "common_mistake",
+        "difficult_point",
+        "teacher_emphasis",
+        "exam_relevance"
+      ],
+      "title": "EducationSignalType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "control_mode": {
+      "$ref": "#/$defs/ControlMode"
+    },
+    "forbidden_types": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/EducationSignalType"
+      },
+      "title": "Forbidden Types",
+      "type": "array"
+    },
+    "raw_instruction": {
+      "title": "Raw Instruction",
+      "type": "string"
+    },
+    "required_types": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/EducationSignalType"
+      },
+      "title": "Required Types",
+      "type": "array"
+    },
+    "target_count": {
+      "anyOf": [
+        {
+          "minimum": 1,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Target Count"
+    }
+  },
+  "required": [
+    "control_mode",
+    "raw_instruction"
+  ],
+  "title": "EducationalTaskRequest",
+  "type": "object"
+}

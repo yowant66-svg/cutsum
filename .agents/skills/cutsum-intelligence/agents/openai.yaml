@@ -1,0 +1,4 @@
+interface:
+  display_name: "CutSum Intelligence"
+  short_description: "Create validated adaptive offline cut plans"
+  default_prompt: "Use $cutsum-intelligence to analyze this transcript and produce a validated offline cut plan."

@@ -1,0 +1,752 @@
+{
+  "$defs": {
+    "JsonValue": {},
+    "MediaBinding": {
+      "additionalProperties": false,
+      "properties": {
+        "local_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Local Path"
+        },
+        "source_id": {
+          "title": "Source Id",
+          "type": "string"
+        },
+        "uri": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Uri"
+        }
+      },
+      "required": [
+        "source_id"
+      ],
+      "title": "MediaBinding",
+      "type": "object"
+    },
+    "MediaSource": {
+      "additionalProperties": false,
+      "properties": {
+        "basename_hint": {
+          "title": "Basename Hint",
+          "type": "string"
+        },
+        "duration_ms": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Duration Ms"
+        },
+        "kind": {
+          "enum": [
+            "video",
+            "audio",
+            "transcript"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "media_id": {
+          "title": "Media Id",
+          "type": "string"
+        },
+        "mime_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Mime Type"
+        },
+        "rights_attestation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RightsAttestation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "source_id": {
+          "title": "Source Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_id",
+        "media_id",
+        "kind",
+        "sha256",
+        "basename_hint"
+      ],
+      "title": "MediaSource",
+      "type": "object"
+    },
+    "OutputSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "reframe": {
+          "$ref": "#/$defs/ReframeSpec",
+          "default": {
+            "focus_x": null,
+            "focus_y": null,
+            "mode": "none",
+            "safe_area_preset": "none"
+          }
+        },
+        "render": {
+          "$ref": "#/$defs/RenderSpec",
+          "default": {
+            "allow_upscale": false,
+            "audio_codec": "aac",
+            "container": "mp4",
+            "duration_tolerance_ms": 150,
+            "overwrite": "fail",
+            "quality_preset": "review",
+            "rate_control": {
+              "audio_bitrate": "128k",
+              "crf": 23,
+              "mode": "crf",
+              "video_bitrate": null
+            },
+            "resolution_mode": "720p",
+            "target_height": null,
+            "target_width": null,
+            "video_codec": "libx264"
+          }
+        },
+        "subtitle": {
+          "$ref": "#/$defs/SubtitleSpec",
+          "default": {
+            "background_opacity": 0.35,
+            "bilingual_order": "source_first",
+            "font_family": "Arial",
+            "font_path": null,
+            "language": null,
+            "margin_vertical": 48,
+            "max_characters_per_line": 34,
+            "max_lines": 2,
+            "max_width_ratio": 0.9,
+            "mode": "none",
+            "outline_width": 2,
+            "safe_area": {
+              "bottom_ratio": 0.03,
+              "left_ratio": 0.03,
+              "preset": "none",
+              "right_ratio": 0.03,
+              "top_ratio": 0.03,
+              "vertical_position": "bottom"
+            },
+            "sidecar_format": "srt",
+            "source_font_size": 22,
+            "translation_font_size": 22,
+            "translation_language": null
+          }
+        }
+      },
+      "title": "OutputSpec",
+      "type": "object"
+    },
+    "QualityPreset": {
+      "enum": [
+        "preview",
+        "review",
+        "publish"
+      ],
+      "title": "QualityPreset",
+      "type": "string"
+    },
+    "RateControlSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "audio_bitrate": {
+          "default": "128k",
+          "title": "Audio Bitrate",
+          "type": "string"
+        },
+        "crf": {
+          "anyOf": [
+            {
+              "maximum": 51,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 23,
+          "title": "Crf"
+        },
+        "mode": {
+          "default": "crf",
+          "enum": [
+            "crf",
+            "bitrate"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "video_bitrate": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Video Bitrate"
+        }
+      },
+      "title": "RateControlSpec",
+      "type": "object"
+    },
+    "ReframeSafeAreaPreset": {
+      "enum": [
+        "none",
+        "youtube_shorts",
+        "tiktok",
+        "instagram_reels"
+      ],
+      "title": "ReframeSafeAreaPreset",
+      "type": "string"
+    },
+    "ReframeSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "focus_x": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Focus X"
+        },
+        "focus_y": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Focus Y"
+        },
+        "mode": {
+          "default": "none",
+          "enum": [
+            "none",
+            "center_crop",
+            "manual_focus",
+            "fit_background",
+            "fixed_subject",
+            "tracked_focus"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "safe_area_preset": {
+          "$ref": "#/$defs/ReframeSafeAreaPreset",
+          "default": "none"
+        }
+      },
+      "title": "ReframeSpec",
+      "type": "object"
+    },
+    "RenderSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "allow_upscale": {
+          "default": false,
+          "title": "Allow Upscale",
+          "type": "boolean"
+        },
+        "audio_codec": {
+          "default": "aac",
+          "title": "Audio Codec",
+          "type": "string"
+        },
+        "container": {
+          "default": "mp4",
+          "enum": [
+            "mp4",
+            "mov",
+            "mkv"
+          ],
+          "title": "Container",
+          "type": "string"
+        },
+        "duration_tolerance_ms": {
+          "default": 150,
+          "minimum": 0,
+          "title": "Duration Tolerance Ms",
+          "type": "integer"
+        },
+        "overwrite": {
+          "const": "fail",
+          "default": "fail",
+          "title": "Overwrite",
+          "type": "string"
+        },
+        "quality_preset": {
+          "$ref": "#/$defs/QualityPreset",
+          "default": "review"
+        },
+        "rate_control": {
+          "$ref": "#/$defs/RateControlSpec",
+          "default": {
+            "audio_bitrate": "128k",
+            "crf": 23,
+            "mode": "crf",
+            "video_bitrate": null
+          }
+        },
+        "resolution_mode": {
+          "$ref": "#/$defs/ResolutionMode",
+          "default": "720p"
+        },
+        "target_height": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target Height"
+        },
+        "target_width": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target Width"
+        },
+        "video_codec": {
+          "default": "libx264",
+          "title": "Video Codec",
+          "type": "string"
+        }
+      },
+      "title": "RenderSpec",
+      "type": "object"
+    },
+    "ResolutionMode": {
+      "enum": [
+        "source",
+        "1080p",
+        "720p",
+        "480p",
+        "360p",
+        "144p"
+      ],
+      "title": "ResolutionMode",
+      "type": "string"
+    },
+    "RightsAttestation": {
+      "enum": [
+        "owned",
+        "licensed",
+        "public_domain",
+        "authorized_other",
+        "analysis_only"
+      ],
+      "title": "RightsAttestation",
+      "type": "string"
+    },
+    "SubtitleMode": {
+      "enum": [
+        "none",
+        "source_sidecar",
+        "translated_sidecar",
+        "bilingual_sidecar",
+        "source_burn_in",
+        "translated_burn_in",
+        "bilingual_burn_in",
+        "sidecar",
+        "burn_in"
+      ],
+      "title": "SubtitleMode",
+      "type": "string"
+    },
+    "SubtitleSafeAreaPreset": {
+      "enum": [
+        "none",
+        "youtube_shorts",
+        "tiktok",
+        "instagram_reels"
+      ],
+      "title": "SubtitleSafeAreaPreset",
+      "type": "string"
+    },
+    "SubtitleSafeAreaSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "bottom_ratio": {
+          "default": 0.03,
+          "maximum": 0.45,
+          "minimum": 0,
+          "title": "Bottom Ratio",
+          "type": "number"
+        },
+        "left_ratio": {
+          "default": 0.03,
+          "maximum": 0.45,
+          "minimum": 0,
+          "title": "Left Ratio",
+          "type": "number"
+        },
+        "preset": {
+          "$ref": "#/$defs/SubtitleSafeAreaPreset",
+          "default": "none"
+        },
+        "right_ratio": {
+          "default": 0.03,
+          "maximum": 0.45,
+          "minimum": 0,
+          "title": "Right Ratio",
+          "type": "number"
+        },
+        "top_ratio": {
+          "default": 0.03,
+          "maximum": 0.45,
+          "minimum": 0,
+          "title": "Top Ratio",
+          "type": "number"
+        },
+        "vertical_position": {
+          "$ref": "#/$defs/SubtitleVerticalPosition",
+          "default": "bottom"
+        }
+      },
+      "title": "SubtitleSafeAreaSpec",
+      "type": "object"
+    },
+    "SubtitleSidecarFormat": {
+      "enum": [
+        "srt",
+        "vtt",
+        "ass"
+      ],
+      "title": "SubtitleSidecarFormat",
+      "type": "string"
+    },
+    "SubtitleSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "background_opacity": {
+          "default": 0.35,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Background Opacity",
+          "type": "number"
+        },
+        "bilingual_order": {
+          "default": "source_first",
+          "enum": [
+            "source_first",
+            "translation_first"
+          ],
+          "title": "Bilingual Order",
+          "type": "string"
+        },
+        "font_family": {
+          "default": "Arial",
+          "title": "Font Family",
+          "type": "string"
+        },
+        "font_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Font Path"
+        },
+        "language": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Language"
+        },
+        "margin_vertical": {
+          "default": 48,
+          "minimum": 0,
+          "title": "Margin Vertical",
+          "type": "integer"
+        },
+        "max_characters_per_line": {
+          "default": 34,
+          "maximum": 80,
+          "minimum": 10,
+          "title": "Max Characters Per Line",
+          "type": "integer"
+        },
+        "max_lines": {
+          "default": 2,
+          "enum": [
+            1,
+            2
+          ],
+          "title": "Max Lines",
+          "type": "integer"
+        },
+        "max_width_ratio": {
+          "default": 0.9,
+          "maximum": 1,
+          "minimum": 0.4,
+          "title": "Max Width Ratio",
+          "type": "number"
+        },
+        "mode": {
+          "$ref": "#/$defs/SubtitleMode",
+          "default": "none"
+        },
+        "outline_width": {
+          "default": 2,
+          "maximum": 8,
+          "minimum": 0,
+          "title": "Outline Width",
+          "type": "integer"
+        },
+        "safe_area": {
+          "$ref": "#/$defs/SubtitleSafeAreaSpec",
+          "default": {
+            "bottom_ratio": 0.03,
+            "left_ratio": 0.03,
+            "preset": "none",
+            "right_ratio": 0.03,
+            "top_ratio": 0.03,
+            "vertical_position": "bottom"
+          }
+        },
+        "sidecar_format": {
+          "$ref": "#/$defs/SubtitleSidecarFormat",
+          "default": "srt"
+        },
+        "source_font_size": {
+          "default": 22,
+          "maximum": 72,
+          "minimum": 12,
+          "title": "Source Font Size",
+          "type": "integer"
+        },
+        "translation_font_size": {
+          "default": 22,
+          "maximum": 72,
+          "minimum": 12,
+          "title": "Translation Font Size",
+          "type": "integer"
+        },
+        "translation_language": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Translation Language"
+        }
+      },
+      "title": "SubtitleSpec",
+      "type": "object"
+    },
+    "SubtitleVerticalPosition": {
+      "enum": [
+        "bottom",
+        "top"
+      ],
+      "title": "SubtitleVerticalPosition",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "binding": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/MediaBinding"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "created_by": {
+      "title": "Created By",
+      "type": "string"
+    },
+    "document_type": {
+      "title": "Document Type",
+      "type": "string"
+    },
+    "extensions": {
+      "additionalProperties": {
+        "$ref": "#/$defs/JsonValue"
+      },
+      "title": "Extensions",
+      "type": "object"
+    },
+    "output_spec": {
+      "$ref": "#/$defs/OutputSpec",
+      "default": {
+        "reframe": {
+          "focus_x": null,
+          "focus_y": null,
+          "mode": "none",
+          "safe_area_preset": "none"
+        },
+        "render": {
+          "allow_upscale": false,
+          "audio_codec": "aac",
+          "container": "mp4",
+          "duration_tolerance_ms": 150,
+          "overwrite": "fail",
+          "quality_preset": "review",
+          "rate_control": {
+            "audio_bitrate": "128k",
+            "crf": 23,
+            "mode": "crf",
+            "video_bitrate": null
+          },
+          "resolution_mode": "720p",
+          "target_height": null,
+          "target_width": null,
+          "video_codec": "libx264"
+        },
+        "subtitle": {
+          "background_opacity": 0.35,
+          "bilingual_order": "source_first",
+          "font_family": "Arial",
+          "font_path": null,
+          "language": null,
+          "margin_vertical": 48,
+          "max_characters_per_line": 34,
+          "max_lines": 2,
+          "max_width_ratio": 0.9,
+          "mode": "none",
+          "outline_width": 2,
+          "safe_area": {
+            "bottom_ratio": 0.03,
+            "left_ratio": 0.03,
+            "preset": "none",
+            "right_ratio": 0.03,
+            "top_ratio": 0.03,
+            "vertical_position": "bottom"
+          },
+          "sidecar_format": "srt",
+          "source_font_size": 22,
+          "translation_font_size": 22,
+          "translation_language": null
+        }
+      }
+    },
+    "request_id": {
+      "title": "Request Id",
+      "type": "string"
+    },
+    "required_extensions": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Required Extensions",
+      "type": "array"
+    },
+    "schema_version": {
+      "default": "0.1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source": {
+      "$ref": "#/$defs/MediaSource"
+    },
+    "strategy_id": {
+      "default": "deterministic",
+      "title": "Strategy Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "document_type",
+    "created_at",
+    "created_by",
+    "request_id",
+    "source"
+  ],
+  "title": "CutRequest",
+  "type": "object"
+}

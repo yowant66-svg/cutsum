@@ -1,0 +1,133 @@
+{
+  "$defs": {
+    "EvaluationEvidenceClass": {
+      "enum": [
+        "real_local",
+        "synthetic",
+        "curated_protocol"
+      ],
+      "title": "EvaluationEvidenceClass",
+      "type": "string"
+    },
+    "EvaluationTrack": {
+      "enum": [
+        "interview",
+        "drama",
+        "education",
+        "sports"
+      ],
+      "title": "EvaluationTrack",
+      "type": "string"
+    },
+    "TrackEvaluationMetrics": {
+      "additionalProperties": false,
+      "properties": {
+        "capability_pass_rate": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Capability Pass Rate",
+          "type": "number"
+        },
+        "case_count": {
+          "minimum": 1,
+          "title": "Case Count",
+          "type": "integer"
+        },
+        "evidence_classes": {
+          "items": {
+            "$ref": "#/$defs/EvaluationEvidenceClass"
+          },
+          "title": "Evidence Classes",
+          "type": "array"
+        },
+        "failure_taxonomy": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Failure Taxonomy",
+          "type": "array"
+        },
+        "human_review_required": {
+          "title": "Human Review Required",
+          "type": "boolean"
+        },
+        "pass_at_1": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Pass At 1",
+          "type": "number"
+        },
+        "pass_power_3": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Pass Power 3",
+          "type": "number"
+        },
+        "quality_claim_allowed": {
+          "title": "Quality Claim Allowed",
+          "type": "boolean"
+        },
+        "track": {
+          "$ref": "#/$defs/EvaluationTrack"
+        }
+      },
+      "required": [
+        "track",
+        "case_count",
+        "capability_pass_rate",
+        "pass_at_1",
+        "pass_power_3",
+        "evidence_classes",
+        "failure_taxonomy",
+        "quality_claim_allowed",
+        "human_review_required"
+      ],
+      "title": "TrackEvaluationMetrics",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "deterministic_regression_passed": {
+      "title": "Deterministic Regression Passed",
+      "type": "boolean"
+    },
+    "disclaimer": {
+      "default": "Automated pass rates cover capability and deterministic regression; they are not a content-quality claim.",
+      "title": "Disclaimer",
+      "type": "string"
+    },
+    "evidence_count": {
+      "minimum": 4,
+      "title": "Evidence Count",
+      "type": "integer"
+    },
+    "human_review_required": {
+      "title": "Human Review Required",
+      "type": "boolean"
+    },
+    "report_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Report Sha256",
+      "type": "string"
+    },
+    "track_metrics": {
+      "items": {
+        "$ref": "#/$defs/TrackEvaluationMetrics"
+      },
+      "maxItems": 4,
+      "minItems": 4,
+      "title": "Track Metrics",
+      "type": "array"
+    }
+  },
+  "required": [
+    "evidence_count",
+    "track_metrics",
+    "deterministic_regression_passed",
+    "human_review_required",
+    "report_sha256"
+  ],
+  "title": "FourTrackEvaluationReport",
+  "type": "object"
+}

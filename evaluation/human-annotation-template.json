@@ -1,0 +1,16 @@
+{
+  "scenario_id": "",
+  "candidate_id": "",
+  "reviewer_id": "",
+  "instruction_adherence": null,
+  "content_profile_fit": null,
+  "selection_value": null,
+  "context_integrity": null,
+  "boundary_quality": null,
+  "duration_compliance": null,
+  "evidence_quality": null,
+  "diversity": null,
+  "title_summary_accuracy": null,
+  "overall_usefulness": null,
+  "reviewer_notes": ""
+}

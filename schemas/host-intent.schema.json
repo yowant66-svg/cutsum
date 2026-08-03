@@ -1,0 +1,613 @@
+{
+  "$defs": {
+    "ClipConstraints": {
+      "additionalProperties": false,
+      "properties": {
+        "absolute_auto_max_duration_ms": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Absolute Auto Max Duration Ms"
+        },
+        "default_max_duration_ms": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Default Max Duration Ms"
+        },
+        "duration_source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DurationSource"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "extension_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Extension Reason"
+        },
+        "host_requested_duration_ms": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Host Requested Duration Ms"
+        },
+        "maximum_count": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Maximum Count"
+        },
+        "maximum_duration_ms": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Maximum Duration Ms"
+        },
+        "minimum_count": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Minimum Count"
+        },
+        "minimum_duration_ms": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Minimum Duration Ms"
+        },
+        "preferred_duration_ms": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Preferred Duration Ms"
+        },
+        "target_count": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target Count"
+        },
+        "target_duration_ms": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target Duration Ms"
+        }
+      },
+      "title": "ClipConstraints",
+      "type": "object"
+    },
+    "ControlMode": {
+      "enum": [
+        "auto",
+        "guided",
+        "directed"
+      ],
+      "title": "ControlMode",
+      "type": "string"
+    },
+    "DecisionSource": {
+      "enum": [
+        "host_explicit",
+        "host_preset",
+        "content_inference",
+        "system_capability",
+        "fallback"
+      ],
+      "title": "DecisionSource",
+      "type": "string"
+    },
+    "DimensionApplicability": {
+      "enum": [
+        "required",
+        "weighted",
+        "advisory",
+        "not_applicable"
+      ],
+      "title": "DimensionApplicability",
+      "type": "string"
+    },
+    "DimensionKey": {
+      "enum": [
+        "insight",
+        "novelty",
+        "emotion",
+        "quotability",
+        "hook",
+        "standalone",
+        "clarity",
+        "completion",
+        "shareability",
+        "silent_watchability",
+        "pace",
+        "editability",
+        "subtitle_reliability",
+        "visual_independence"
+      ],
+      "title": "DimensionKey",
+      "type": "string"
+    },
+    "DimensionPolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "applicability": {
+          "$ref": "#/$defs/DimensionApplicability"
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Confidence"
+        },
+        "dimension": {
+          "$ref": "#/$defs/DimensionKey"
+        },
+        "minimum": {
+          "anyOf": [
+            {
+              "maximum": 10,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Minimum"
+        },
+        "rationale": {
+          "title": "Rationale",
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/DecisionSource"
+        },
+        "weight": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Weight"
+        }
+      },
+      "required": [
+        "dimension",
+        "applicability",
+        "rationale",
+        "source"
+      ],
+      "title": "DimensionPolicy",
+      "type": "object"
+    },
+    "DurationSource": {
+      "enum": [
+        "host_explicit",
+        "content_inference",
+        "default_policy",
+        "automatic_extension"
+      ],
+      "title": "DurationSource",
+      "type": "string"
+    },
+    "JsonValue": {},
+    "SemanticRequirements": {
+      "additionalProperties": false,
+      "properties": {
+        "forbidden_types": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SemanticType"
+          },
+          "title": "Forbidden Types",
+          "type": "array"
+        },
+        "required_count": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Required Count",
+          "type": "integer"
+        },
+        "required_structure": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Required Structure",
+          "type": "array"
+        },
+        "semantic_type": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SemanticType"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "sequence_constraint": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sequence Constraint"
+        },
+        "speaker_constraint": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Speaker Constraint"
+        },
+        "topic_constraint": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Topic Constraint"
+        }
+      },
+      "title": "SemanticRequirements",
+      "type": "object"
+    },
+    "SemanticType": {
+      "enum": [
+        "definition",
+        "reasoning_chain",
+        "conflict",
+        "hook",
+        "step",
+        "story_arc"
+      ],
+      "title": "SemanticType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "allow_context_dependency": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Allow Context Dependency"
+    },
+    "clip_constraints": {
+      "$ref": "#/$defs/ClipConstraints",
+      "default": {
+        "absolute_auto_max_duration_ms": null,
+        "default_max_duration_ms": null,
+        "duration_source": null,
+        "extension_reason": null,
+        "host_requested_duration_ms": null,
+        "maximum_count": null,
+        "maximum_duration_ms": null,
+        "minimum_count": null,
+        "minimum_duration_ms": null,
+        "preferred_duration_ms": null,
+        "target_count": null,
+        "target_duration_ms": null
+      }
+    },
+    "control_mode": {
+      "$ref": "#/$defs/ControlMode"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "created_by": {
+      "title": "Created By",
+      "type": "string"
+    },
+    "desired_outcomes": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Desired Outcomes",
+      "type": "array"
+    },
+    "dimension_policies": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/DimensionPolicy"
+      },
+      "title": "Dimension Policies",
+      "type": "array"
+    },
+    "document_type": {
+      "title": "Document Type",
+      "type": "string"
+    },
+    "extensions": {
+      "additionalProperties": {
+        "$ref": "#/$defs/JsonValue"
+      },
+      "title": "Extensions",
+      "type": "object"
+    },
+    "hard_exclude_candidate_ids": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Hard Exclude Candidate Ids",
+      "type": "array"
+    },
+    "hard_include_candidate_ids": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Hard Include Candidate Ids",
+      "type": "array"
+    },
+    "intent_id": {
+      "title": "Intent Id",
+      "type": "string"
+    },
+    "language": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Language"
+    },
+    "platform": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Platform"
+    },
+    "preserve_time_order": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Preserve Time Order"
+    },
+    "preset_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Preset Id"
+    },
+    "prohibited_outcomes": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Prohibited Outcomes",
+      "type": "array"
+    },
+    "raw_instruction": {
+      "title": "Raw Instruction",
+      "type": "string"
+    },
+    "require_track_diversity": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Require Track Diversity"
+    },
+    "required_extensions": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Required Extensions",
+      "type": "array"
+    },
+    "schema_version": {
+      "default": "0.1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "semantic_requirements": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SemanticRequirements"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "subtitle_requirements": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Subtitle Requirements",
+      "type": "array"
+    },
+    "target_audience": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Target Audience"
+    },
+    "unrecognized_requirements": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Unrecognized Requirements",
+      "type": "array"
+    },
+    "visual_requirements": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Visual Requirements",
+      "type": "array"
+    }
+  },
+  "required": [
+    "document_type",
+    "created_at",
+    "created_by",
+    "intent_id",
+    "raw_instruction",
+    "control_mode"
+  ],
+  "title": "HostIntent",
+  "type": "object"
+}

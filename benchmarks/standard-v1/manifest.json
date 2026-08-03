@@ -1,0 +1,736 @@
+{
+  "schema_version": "0.1.0",
+  "document_type": "benchmark_manifest",
+  "created_at": "2026-07-30T17:30:00Z",
+  "created_by": "universal-cutup-maintainers",
+  "benchmark_id": "universal-cutup-standard",
+  "benchmark_version": "1.0.0",
+  "items": [
+    {
+      "benchmark_id": "universal-cutup-standard",
+      "benchmark_version": "1.0.0",
+      "item_id": "interview-elon-musk-ted-2022",
+      "category": "interview_or_talk",
+      "title": "A future worth getting excited about",
+      "canonical_subject": "Elon Musk interviewed by Chris Anderson",
+      "source_url": "https://www.youtube.com/watch?v=YRvf00NooN8",
+      "source_kind": "youtube_video",
+      "media_availability": "available",
+      "transcript_availability": "available",
+      "duration_ms": 3984000,
+      "language": "en",
+      "publication_or_release_date": "2022-04-18",
+      "accessed_at": "2026-07-30T17:30:00Z",
+      "content_hash": "a0675a0540862ae114a9814d55204c11363f95fe87b6544d79dbd1d4cfc0806f",
+      "source_notes": [
+        "Official TED channel; English VTT was retrieved without cookies.",
+        "The content hash identifies the retrieved VTT evaluation input."
+      ],
+      "rights_notes": [
+        "Analysis-only benchmark under TED's published usage terms; no media redistribution.",
+        "This records the testing boundary and is not a legal conclusion."
+      ],
+      "selection_rationale": [
+        "Globally recognized subject and a long interview with independent themes.",
+        "Tests topic changes across energy, AI, robotics, abundance, Neuralink and space."
+      ],
+      "expected_content_structure": [
+        "host framing",
+        "topic-based questions",
+        "extended answers",
+        "cross-topic transitions",
+        "closing thesis"
+      ],
+      "known_difficulties": [
+        "long duration",
+        "multiple speculative claims",
+        "speaker turns and topic shifts"
+      ],
+      "auto_task": {
+        "task_id": "interview-elon-auto",
+        "control_mode": "auto",
+        "raw_instruction": "Only the source material is supplied; infer an appropriate task."
+      },
+      "directed_tasks": [
+        {
+          "task_id": "interview-elon-hook",
+          "control_mode": "directed",
+          "raw_instruction": "Select one immediate three-second hook about AI risk; do not substitute a general summary.",
+          "desired_outcomes": ["three_second_hook", "ai_risk"],
+          "clip_constraints": {
+            "target_count": 1,
+            "target_duration_ms": 3000
+          },
+          "hard_include_candidate_ids": ["interview-elon-musk-ted-2022-c2"],
+          "hard_exclude_candidate_ids": ["interview-elon-musk-ted-2022-c4"]
+        },
+        {
+          "task_id": "interview-elon-argument",
+          "control_mode": "directed",
+          "raw_instruction": "Preserve one complete long-form argument about sustainable energy, not a viral hook.",
+          "desired_outcomes": ["complete_argument", "sustainable_energy"],
+          "clip_constraints": {
+            "target_count": 1,
+            "target_duration_ms": 180000
+          },
+          "preserve_time_order": true,
+          "hard_include_candidate_ids": ["interview-elon-musk-ted-2022-c4"],
+          "hard_exclude_candidate_ids": ["interview-elon-musk-ted-2022-c2"]
+        }
+      ],
+      "execution_policy": {
+        "analysis_window": {"start_ms": 0, "end_ms": 3984000},
+        "plan_only": true,
+        "media_download_permitted": false,
+        "media_execution_permitted": false,
+        "network_provider_permitted": false,
+        "maximum_cost_minor_units": 0,
+        "currency": "USD",
+        "rationale": "Use the full public transcript; do not download or render TED media."
+      },
+      "evaluation_status": "ready"
+    },
+    {
+      "benchmark_id": "universal-cutup-standard",
+      "benchmark_version": "1.0.0",
+      "item_id": "interview-jensen-huang-stanford-2024",
+      "category": "interview_or_talk",
+      "title": "Jensen Huang, Founder and CEO of NVIDIA",
+      "canonical_subject": "Jensen Huang interviewed by Shantam Jain",
+      "source_url": "https://www.youtube.com/watch?v=lXLBTBBil2U",
+      "source_kind": "youtube_video",
+      "media_availability": "available",
+      "transcript_availability": "available",
+      "duration_ms": 3387000,
+      "language": "en",
+      "publication_or_release_date": "2024-03-06",
+      "accessed_at": "2026-07-30T17:30:00Z",
+      "content_hash": "62ebc82f53271f5ed5c9666d04666694b0f1d62a54fe60e8345d3ad6f9440cf2",
+      "source_notes": [
+        "Official Stanford Graduate School of Business channel.",
+        "English VTT was retrieved without cookies and is the hashed evaluation input."
+      ],
+      "rights_notes": [
+        "Analysis-only benchmark; no claim is made about redistribution rights.",
+        "This records the testing boundary and is not a legal conclusion."
+      ],
+      "selection_rationale": [
+        "Globally recognized technology leader in a university interview.",
+        "Distinct channel and interviewer from the Elon Musk item.",
+        "Contains company formation, market selection, organization design and AI themes."
+      ],
+      "expected_content_structure": [
+        "chronological founder story",
+        "leadership principles",
+        "first-principles explanations",
+        "audience questions"
+      ],
+      "known_difficulties": [
+        "automatic-caption name errors",
+        "anecdotes interleaved with general principles"
+      ],
+      "auto_task": {
+        "task_id": "interview-jensen-auto",
+        "control_mode": "auto",
+        "raw_instruction": "Only the source material is supplied; infer an appropriate task."
+      },
+      "directed_tasks": [
+        {
+          "task_id": "interview-jensen-hook",
+          "control_mode": "directed",
+          "raw_instruction": "Select one three-second leadership hook; exclude the company-history explanation.",
+          "desired_outcomes": ["three_second_hook", "leadership"],
+          "clip_constraints": {"target_count": 1, "target_duration_ms": 3000},
+          "hard_include_candidate_ids": ["interview-jensen-huang-stanford-2024-c2"],
+          "hard_exclude_candidate_ids": ["interview-jensen-huang-stanford-2024-c4"]
+        },
+        {
+          "task_id": "interview-jensen-argument",
+          "control_mode": "directed",
+          "raw_instruction": "Keep the complete first-principles argument and its context in one long segment.",
+          "desired_outcomes": ["complete_argument", "first_principles"],
+          "clip_constraints": {"target_count": 1, "target_duration_ms": 180000},
+          "preserve_time_order": true,
+          "hard_include_candidate_ids": ["interview-jensen-huang-stanford-2024-c4"],
+          "hard_exclude_candidate_ids": ["interview-jensen-huang-stanford-2024-c2"]
+        }
+      ],
+      "execution_policy": {
+        "analysis_window": {"start_ms": 0, "end_ms": 3387000},
+        "plan_only": true,
+        "media_download_permitted": false,
+        "media_execution_permitted": false,
+        "network_provider_permitted": false,
+        "maximum_cost_minor_units": 0,
+        "currency": "USD",
+        "rationale": "Use the full public captions; do not download or render Stanford media."
+      },
+      "evaluation_status": "ready"
+    },
+    {
+      "benchmark_id": "universal-cutup-standard",
+      "benchmark_version": "1.0.0",
+      "item_id": "talk-steve-jobs-stanford-2005",
+      "category": "interview_or_talk",
+      "title": "Steve Jobs' 2005 Stanford Commencement Address",
+      "canonical_subject": "Steve Jobs",
+      "source_url": "https://www.youtube.com/watch?v=UF8uR6Z6KLc",
+      "source_kind": "youtube_video",
+      "media_availability": "available",
+      "transcript_availability": "available",
+      "duration_ms": 904000,
+      "language": "en",
+      "publication_or_release_date": "2005-06-12",
+      "accessed_at": "2026-07-30T17:30:00Z",
+      "content_hash": "1140ebe9a85b1720640892b01edf9af1fdf0d3e66effbf69344e31e8b5f56eda",
+      "source_notes": [
+        "Official Stanford channel and a separate official Stanford prepared transcript.",
+        "English VTT was retrieved without cookies and is the hashed evaluation input."
+      ],
+      "rights_notes": [
+        "Analysis-only benchmark; no media redistribution.",
+        "This records the testing boundary and is not a legal conclusion."
+      ],
+      "selection_rationale": [
+        "Globally recognized business figure in a structured single-speaker talk.",
+        "Provides a non-interview format with three connected narrative arcs."
+      ],
+      "expected_content_structure": [
+        "opening promise",
+        "three autobiographical stories",
+        "repeated life lessons",
+        "closing imperative"
+      ],
+      "known_difficulties": [
+        "high quotability across many passages",
+        "story completeness competes with short-hook selection"
+      ],
+      "auto_task": {
+        "task_id": "talk-jobs-auto",
+        "control_mode": "auto",
+        "raw_instruction": "Only the source material is supplied; infer an appropriate task."
+      },
+      "directed_tasks": [
+        {
+          "task_id": "talk-jobs-hook",
+          "control_mode": "directed",
+          "raw_instruction": "Select one three-second memorable hook and exclude the long narrative candidate.",
+          "desired_outcomes": ["three_second_hook", "quotable"],
+          "clip_constraints": {"target_count": 1, "target_duration_ms": 3000},
+          "hard_include_candidate_ids": ["talk-steve-jobs-stanford-2005-c2"],
+          "hard_exclude_candidate_ids": ["talk-steve-jobs-stanford-2005-c4"]
+        },
+        {
+          "task_id": "talk-jobs-story",
+          "control_mode": "directed",
+          "raw_instruction": "Preserve a complete story and its lesson; do not reduce it to a slogan.",
+          "desired_outcomes": ["complete_story", "lesson"],
+          "clip_constraints": {"target_count": 1, "target_duration_ms": 180000},
+          "preserve_time_order": true,
+          "hard_include_candidate_ids": ["talk-steve-jobs-stanford-2005-c4"],
+          "hard_exclude_candidate_ids": ["talk-steve-jobs-stanford-2005-c2"]
+        }
+      ],
+      "execution_policy": {
+        "analysis_window": {"start_ms": 0, "end_ms": 904000},
+        "plan_only": true,
+        "media_download_permitted": false,
+        "media_execution_permitted": false,
+        "network_provider_permitted": false,
+        "maximum_cost_minor_units": 0,
+        "currency": "USD",
+        "rationale": "Use the complete 15-minute caption track; do not download or render media."
+      },
+      "evaluation_status": "ready"
+    },
+    {
+      "benchmark_id": "universal-cutup-standard",
+      "benchmark_version": "1.0.0",
+      "item_id": "film-wings-1927",
+      "category": "film_or_drama",
+      "title": "Wings",
+      "canonical_subject": "Wings (1927 film)",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Wings_(1927).webm",
+      "source_kind": "public_domain_media",
+      "media_availability": "available",
+      "transcript_availability": "partial",
+      "duration_ms": 8318000,
+      "language": "en-intertitles",
+      "publication_or_release_date": "1927",
+      "accessed_at": "2026-07-30T17:30:00Z",
+      "content_hash": "8ce8f272865c21d93d38c6211edaa45f1983b30d5d659856ff0f48226caf793b",
+      "source_notes": [
+        "Wikimedia Commons public-domain file page; first 30 minutes fetched from its 240p transcode.",
+        "The hash identifies only the 00:00–30:00 analysis window, not the full film."
+      ],
+      "rights_notes": [
+        "The Commons page labels the film public domain in the United States.",
+        "Jurisdiction and soundtrack details may differ; this is not a legal conclusion."
+      ],
+      "selection_rationale": [
+        "The Academy identifies Wings as the first Best Picture winner.",
+        "Silent visual storytelling tests intertitle and visual-dependency handling."
+      ],
+      "expected_content_structure": [
+        "character introductions",
+        "romantic rivalry",
+        "war enlistment",
+        "training transition"
+      ],
+      "known_difficulties": [
+        "silent film",
+        "intertitles rather than continuous transcript",
+        "strong visual dependency",
+        "only the first 30 minutes are analyzed"
+      ],
+      "auto_task": {
+        "task_id": "film-wings-auto",
+        "control_mode": "auto",
+        "raw_instruction": "Only the source material is supplied; infer an appropriate task."
+      },
+      "directed_tasks": [
+        {
+          "task_id": "film-wings-conflict",
+          "control_mode": "directed",
+          "raw_instruction": "Select only the clearest rivalry conflict in the approved window.",
+          "desired_outcomes": ["conflict_only"],
+          "clip_constraints": {"target_count": 1, "target_duration_ms": 60000},
+          "hard_include_candidate_ids": ["film-wings-1927-c2"],
+          "hard_exclude_candidate_ids": ["film-wings-1927-c4"]
+        },
+        {
+          "task_id": "film-wings-chronology",
+          "control_mode": "directed",
+          "raw_instruction": "Keep three sequential beats that preserve the move from home life to military training.",
+          "desired_outcomes": ["chronological_story"],
+          "clip_constraints": {
+            "minimum_count": 3,
+            "maximum_count": 3,
+            "target_count": 3,
+            "target_duration_ms": 120000
+          },
+          "preserve_time_order": true,
+          "require_track_diversity": true,
+          "hard_include_candidate_ids": ["film-wings-1927-c4"]
+        }
+      ],
+      "execution_policy": {
+        "analysis_window": {"start_ms": 0, "end_ms": 1800000},
+        "plan_only": true,
+        "media_download_permitted": true,
+        "media_execution_permitted": false,
+        "network_provider_permitted": false,
+        "maximum_cost_minor_units": 0,
+        "currency": "USD",
+        "rationale": "Analyze only a 30-minute low-resolution public-domain window; never fetch the full film."
+      },
+      "evaluation_status": "ready"
+    },
+    {
+      "benchmark_id": "universal-cutup-standard",
+      "benchmark_version": "1.0.0",
+      "item_id": "film-all-quiet-1930",
+      "category": "film_or_drama",
+      "title": "All Quiet on the Western Front",
+      "canonical_subject": "All Quiet on the Western Front (1930 film)",
+      "source_url": "https://commons.wikimedia.org/wiki/File:All_Quiet_on_the_Western_Front_(1930,_sound_version).webm",
+      "source_kind": "public_domain_media",
+      "media_availability": "available",
+      "transcript_availability": "unavailable",
+      "duration_ms": 8002000,
+      "language": "en",
+      "publication_or_release_date": "1930",
+      "accessed_at": "2026-07-30T17:30:00Z",
+      "content_hash": "2abd01dad09cecc595b826cf32db6f100bc318204e8ef38b0d4b00eba3e8ba1e",
+      "source_notes": [
+        "Wikimedia Commons public-domain file page; first 30 minutes fetched from its 240p transcode.",
+        "The hash identifies only the 00:00–30:00 analysis window."
+      ],
+      "rights_notes": [
+        "The Commons page labels this copy PD-US-expired.",
+        "The label and analysis boundary are recorded without making a legal conclusion."
+      ],
+      "selection_rationale": [
+        "Academy Best Picture winner with a sound-era anti-war narrative.",
+        "Contrasts institutional persuasion, training and front-line transition."
+      ],
+      "expected_content_structure": [
+        "civilian wartime framing",
+        "teacher persuasion",
+        "enlistment",
+        "harsh training",
+        "front-line arrival"
+      ],
+      "known_difficulties": [
+        "ensemble cast",
+        "dialogue and visual action",
+        "no sidecar transcript retrieved",
+        "only the first 30 minutes are analyzed"
+      ],
+      "auto_task": {
+        "task_id": "film-all-quiet-auto",
+        "control_mode": "auto",
+        "raw_instruction": "Only the source material is supplied; infer an appropriate task."
+      },
+      "directed_tasks": [
+        {
+          "task_id": "film-all-quiet-conflict",
+          "control_mode": "directed",
+          "raw_instruction": "Select the strongest authority-versus-recruit conflict; exclude the transition montage.",
+          "desired_outcomes": ["conflict_only", "authority"],
+          "clip_constraints": {"target_count": 1, "target_duration_ms": 60000},
+          "hard_include_candidate_ids": ["film-all-quiet-1930-c2"],
+          "hard_exclude_candidate_ids": ["film-all-quiet-1930-c4"]
+        },
+        {
+          "task_id": "film-all-quiet-chronology",
+          "control_mode": "directed",
+          "raw_instruction": "Preserve three ordered beats from idealism through training to the front.",
+          "desired_outcomes": ["chronological_story", "loss_of_idealism"],
+          "clip_constraints": {
+            "minimum_count": 3,
+            "maximum_count": 3,
+            "target_count": 3,
+            "target_duration_ms": 120000
+          },
+          "preserve_time_order": true,
+          "require_track_diversity": true,
+          "hard_include_candidate_ids": ["film-all-quiet-1930-c4"]
+        }
+      ],
+      "execution_policy": {
+        "analysis_window": {"start_ms": 0, "end_ms": 1800000},
+        "plan_only": true,
+        "media_download_permitted": true,
+        "media_execution_permitted": false,
+        "network_provider_permitted": false,
+        "maximum_cost_minor_units": 0,
+        "currency": "USD",
+        "rationale": "Analyze only a 30-minute low-resolution public-domain window; never fetch the full film."
+      },
+      "evaluation_status": "ready"
+    },
+    {
+      "benchmark_id": "universal-cutup-standard",
+      "benchmark_version": "1.0.0",
+      "item_id": "film-parasite-trailer-2019",
+      "category": "film_or_drama",
+      "title": "Parasite — Official Trailer",
+      "canonical_subject": "Parasite (2019 film)",
+      "source_url": "https://www.youtube.com/watch?v=isOGD_7hNIY",
+      "source_kind": "official_trailer",
+      "media_availability": "available",
+      "transcript_availability": "partial",
+      "duration_ms": 137000,
+      "language": "ko",
+      "publication_or_release_date": "2019-08-14",
+      "accessed_at": "2026-07-30T17:30:00Z",
+      "content_hash": "7b0b88fa95df01d7892c13b85cb79750c75e2995eca1845eeaf032dd4f8552b0",
+      "source_notes": [
+        "Official NEON trailer; the complete 136.6-second trailer is the evaluation material.",
+        "The hash identifies the downloaded official trailer; subtitle retrieval hit HTTP 429."
+      ],
+      "rights_notes": [
+        "Copyrighted promotional material used only for local analysis; no redistribution.",
+        "This is a testing boundary and not a legal conclusion."
+      ],
+      "selection_rationale": [
+        "Cannes Palme d'Or and Academy Best Picture/International Feature winner.",
+        "Adds contemporary Korean-language, nonlinear promotional montage structure.",
+        "Prevents the film track from consisting only of old public-domain features."
+      ],
+      "expected_content_structure": [
+        "class contrast setup",
+        "infiltration montage",
+        "tone shift",
+        "threat escalation",
+        "critical title cards"
+      ],
+      "known_difficulties": [
+        "trailer rather than full narrative",
+        "rapid montage",
+        "embedded subtitles",
+        "visual and musical dependency"
+      ],
+      "auto_task": {
+        "task_id": "film-parasite-auto",
+        "control_mode": "auto",
+        "raw_instruction": "Only the source material is supplied; infer an appropriate task."
+      },
+      "directed_tasks": [
+        {
+          "task_id": "film-parasite-conflict",
+          "control_mode": "directed",
+          "raw_instruction": "Select the shortest self-contained class-conflict escalation; exclude the setup montage.",
+          "desired_outcomes": ["conflict_only", "class_tension"],
+          "clip_constraints": {"target_count": 1, "target_duration_ms": 30000},
+          "hard_include_candidate_ids": ["film-parasite-trailer-2019-c2"],
+          "hard_exclude_candidate_ids": ["film-parasite-trailer-2019-c4"]
+        },
+        {
+          "task_id": "film-parasite-order",
+          "control_mode": "directed",
+          "raw_instruction": "Keep three ordered trailer beats that preserve setup, infiltration and threat.",
+          "desired_outcomes": ["chronological_story"],
+          "clip_constraints": {
+            "minimum_count": 3,
+            "maximum_count": 3,
+            "target_count": 3,
+            "target_duration_ms": 30000
+          },
+          "preserve_time_order": true,
+          "require_track_diversity": true,
+          "hard_include_candidate_ids": ["film-parasite-trailer-2019-c4"]
+        }
+      ],
+      "execution_policy": {
+        "analysis_window": {"start_ms": 0, "end_ms": 137000},
+        "plan_only": true,
+        "media_download_permitted": true,
+        "media_execution_permitted": false,
+        "network_provider_permitted": false,
+        "maximum_cost_minor_units": 0,
+        "currency": "USD",
+        "rationale": "Analyze the official trailer only; do not access or download the feature film."
+      },
+      "evaluation_status": "ready"
+    },
+    {
+      "benchmark_id": "universal-cutup-standard",
+      "benchmark_version": "1.0.0",
+      "item_id": "education-fei-fei-li-computers-see",
+      "category": "education_or_knowledge",
+      "title": "Computers that See",
+      "canonical_subject": "Fei-Fei Li on computer vision",
+      "source_url": "https://www.youtube.com/watch?v=viwpTTvSQKM",
+      "source_kind": "youtube_video",
+      "media_availability": "available",
+      "transcript_availability": "available",
+      "duration_ms": 2065000,
+      "language": "en",
+      "publication_or_release_date": "2012-07-30",
+      "accessed_at": "2026-07-30T17:30:00Z",
+      "content_hash": "d2ea70453284e57524877c05e6c3267a20743d165d31e3e87adf4b9bbea7113b",
+      "source_notes": [
+        "Official Stanford University School of Engineering channel.",
+        "English VTT was retrieved without cookies; only the first 30 minutes are evaluated."
+      ],
+      "rights_notes": [
+        "Analysis-only educational benchmark; no media redistribution.",
+        "This records the testing boundary and is not a legal conclusion."
+      ],
+      "selection_rationale": [
+        "Directly covers the requested Fei-Fei Li priority.",
+        "Tests AI concept explanation, examples and visually supported research history."
+      ],
+      "expected_content_structure": [
+        "AI framing",
+        "computer-vision definition",
+        "research examples",
+        "technical challenges",
+        "future applications"
+      ],
+      "known_difficulties": [
+        "visual examples carry meaning",
+        "older automatic captions",
+        "approved window ends before the full talk"
+      ],
+      "auto_task": {
+        "task_id": "education-feifei-auto",
+        "control_mode": "auto",
+        "raw_instruction": "Only the source material is supplied; infer an appropriate task."
+      },
+      "directed_tasks": [
+        {
+          "task_id": "education-feifei-exam",
+          "control_mode": "directed",
+          "raw_instruction": "Select two concise exam-review points defining computer vision and its core challenge.",
+          "desired_outcomes": ["exam_points", "definitions"],
+          "clip_constraints": {"target_count": 2, "target_duration_ms": 60000},
+          "hard_include_candidate_ids": ["education-fei-fei-li-computers-see-c2"],
+          "hard_exclude_candidate_ids": ["education-fei-fei-li-computers-see-c4"]
+        },
+        {
+          "task_id": "education-feifei-reasoning",
+          "control_mode": "directed",
+          "raw_instruction": "Preserve one complete explanation from problem framing through evidence to conclusion.",
+          "desired_outcomes": ["complete_reasoning_chain"],
+          "clip_constraints": {"target_count": 1, "target_duration_ms": 180000},
+          "preserve_time_order": true,
+          "hard_include_candidate_ids": ["education-fei-fei-li-computers-see-c4"],
+          "hard_exclude_candidate_ids": ["education-fei-fei-li-computers-see-c2"]
+        }
+      ],
+      "execution_policy": {
+        "analysis_window": {"start_ms": 0, "end_ms": 1800000},
+        "plan_only": true,
+        "media_download_permitted": false,
+        "media_execution_permitted": false,
+        "network_provider_permitted": false,
+        "maximum_cost_minor_units": 0,
+        "currency": "USD",
+        "rationale": "Use captions from only the first 30 minutes; do not download the full lecture."
+      },
+      "evaluation_status": "ready"
+    },
+    {
+      "benchmark_id": "universal-cutup-standard",
+      "benchmark_version": "1.0.0",
+      "item_id": "education-mit-6006-algorithms",
+      "category": "education_or_knowledge",
+      "title": "MIT 6.006 Lecture 1: Algorithms and Computation",
+      "canonical_subject": "Jason Ku introduces algorithms and computation",
+      "source_url": "https://www.youtube.com/watch?v=ZA-tUyM_y7s",
+      "source_kind": "open_course_media",
+      "media_availability": "available",
+      "transcript_availability": "available",
+      "duration_ms": 2738000,
+      "language": "en",
+      "publication_or_release_date": "2021-09-13",
+      "accessed_at": "2026-07-30T17:30:00Z",
+      "content_hash": "48891b1927d2b7ba7164b69351dfc956df2e882ac3a824e2ba850d73cba42e1e",
+      "source_notes": [
+        "Official MIT OpenCourseWare channel and course page with transcript.",
+        "English VTT was retrieved without cookies; only the first 30 minutes are evaluated."
+      ],
+      "rights_notes": [
+        "MIT OCW identifies the material as CC BY-NC-SA; analysis only here.",
+        "This records source terms and is not a legal conclusion."
+      ],
+      "selection_rationale": [
+        "Top-university open course focused on reasoning, correctness and efficiency.",
+        "Provides formal concept and proof-oriented explanation distinct from AI and coding demo."
+      ],
+      "expected_content_structure": [
+        "course objective",
+        "problem definition",
+        "algorithm definition",
+        "correctness",
+        "efficiency",
+        "worked example"
+      ],
+      "known_difficulties": [
+        "formal terminology",
+        "board references",
+        "approved window ends before the full lecture"
+      ],
+      "auto_task": {
+        "task_id": "education-mit-auto",
+        "control_mode": "auto",
+        "raw_instruction": "Only the source material is supplied; infer an appropriate task."
+      },
+      "directed_tasks": [
+        {
+          "task_id": "education-mit-exam",
+          "control_mode": "directed",
+          "raw_instruction": "Select two exam-review definitions; exclude the extended worked example.",
+          "desired_outcomes": ["exam_points", "definitions"],
+          "clip_constraints": {"target_count": 2, "target_duration_ms": 60000},
+          "hard_include_candidate_ids": ["education-mit-6006-algorithms-c2"],
+          "hard_exclude_candidate_ids": ["education-mit-6006-algorithms-c4"]
+        },
+        {
+          "task_id": "education-mit-reasoning",
+          "control_mode": "directed",
+          "raw_instruction": "Preserve the complete reasoning chain for one computational example.",
+          "desired_outcomes": ["complete_reasoning_chain", "worked_example"],
+          "clip_constraints": {"target_count": 1, "target_duration_ms": 180000},
+          "preserve_time_order": true,
+          "hard_include_candidate_ids": ["education-mit-6006-algorithms-c4"],
+          "hard_exclude_candidate_ids": ["education-mit-6006-algorithms-c2"]
+        }
+      ],
+      "execution_policy": {
+        "analysis_window": {"start_ms": 0, "end_ms": 1800000},
+        "plan_only": true,
+        "media_download_permitted": false,
+        "media_execution_permitted": false,
+        "network_provider_permitted": false,
+        "maximum_cost_minor_units": 0,
+        "currency": "USD",
+        "rationale": "Use captions from only the first 30 minutes; do not download the full lecture."
+      },
+      "evaluation_status": "ready"
+    },
+    {
+      "benchmark_id": "universal-cutup-standard",
+      "benchmark_version": "1.0.0",
+      "item_id": "education-harvard-cs50-scratch",
+      "category": "education_or_knowledge",
+      "title": "CS50x 2025 Lecture 0: Scratch",
+      "canonical_subject": "David J. Malan introduces computer science",
+      "source_url": "https://www.youtube.com/watch?v=2WtPyqwTLKM",
+      "source_kind": "open_course_media",
+      "media_availability": "available",
+      "transcript_availability": "available",
+      "duration_ms": 7136000,
+      "language": "en",
+      "publication_or_release_date": "2024-09-04",
+      "accessed_at": "2026-07-30T17:30:00Z",
+      "content_hash": "997434643c60e224de9f6d57a9c276438b96a29726a871ea4a010ec1e1a9659c",
+      "source_notes": [
+        "Official CS50 channel and Harvard CS50 OpenCourseWare page with transcript.",
+        "English VTT was retrieved without cookies; only the first 30 minutes are evaluated."
+      ],
+      "rights_notes": [
+        "CS50 identifies the material as CC BY-NC-SA 4.0; analysis only here.",
+        "This records source terms and is not a legal conclusion."
+      ],
+      "selection_rationale": [
+        "Top-university open course with beginner-friendly stepwise teaching.",
+        "Provides procedural explanation and demonstrations distinct from formal algorithms."
+      ],
+      "expected_content_structure": [
+        "learner orientation",
+        "computational thinking",
+        "data representation",
+        "stepwise demonstrations",
+        "concept recap"
+      ],
+      "known_difficulties": [
+        "live audience interjections",
+        "visual demonstrations",
+        "first 30 minutes do not reach the Scratch section"
+      ],
+      "auto_task": {
+        "task_id": "education-cs50-auto",
+        "control_mode": "auto",
+        "raw_instruction": "Only the source material is supplied; infer an appropriate task."
+      },
+      "directed_tasks": [
+        {
+          "task_id": "education-cs50-exam",
+          "control_mode": "directed",
+          "raw_instruction": "Select two concise revision points on representation and binary.",
+          "desired_outcomes": ["exam_points", "binary"],
+          "clip_constraints": {"target_count": 2, "target_duration_ms": 60000},
+          "hard_include_candidate_ids": ["education-harvard-cs50-scratch-c2"],
+          "hard_exclude_candidate_ids": ["education-harvard-cs50-scratch-c4"]
+        },
+        {
+          "task_id": "education-cs50-method",
+          "control_mode": "directed",
+          "raw_instruction": "Preserve a complete step-by-step teaching sequence, not isolated definitions.",
+          "desired_outcomes": ["complete_method", "step_by_step"],
+          "clip_constraints": {"target_count": 1, "target_duration_ms": 180000},
+          "preserve_time_order": true,
+          "hard_include_candidate_ids": ["education-harvard-cs50-scratch-c4"],
+          "hard_exclude_candidate_ids": ["education-harvard-cs50-scratch-c2"]
+        }
+      ],
+      "execution_policy": {
+        "analysis_window": {"start_ms": 0, "end_ms": 1800000},
+        "plan_only": true,
+        "media_download_permitted": false,
+        "media_execution_permitted": false,
+        "network_provider_permitted": false,
+        "maximum_cost_minor_units": 0,
+        "currency": "USD",
+        "rationale": "Use captions from only the first 30 minutes; do not download the full lecture."
+      },
+      "evaluation_status": "ready"
+    }
+  ],
+  "extensions": {},
+  "required_extensions": []
+}

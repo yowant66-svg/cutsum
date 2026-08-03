@@ -1,0 +1,12 @@
+CutSum
+Copyright 2026 DXBATM
+
+Pre-release Alpha software. Benchmark rights notes and early private-reference
+provenance remain engineering records rather than legal conclusions.
+
+FFmpeg and ffprobe are external system dependencies and are not distributed
+with this project.
+
+On macOS systems whose FFmpeg lacks libass, local execution may use the
+installed Swift/AppKit runtime and a system font to rasterize subtitle overlays.
+No font files are distributed with this project.

@@ -1,0 +1,206 @@
+{
+  "curation_version": "1.0.0",
+  "created_at": "2026-07-30T17:30:00Z",
+  "provider": {
+    "provider_id": "codex-host-session",
+    "model_id": "gpt-5-codex-host-curation",
+    "operation": "public-source-profile-proposal-and-assessment-curation",
+    "cost_minor_units": 0,
+    "currency": "USD",
+    "warnings": [
+      "No external model API was called.",
+      "Scores are provisional benchmark judgments, not final weight calibration."
+    ]
+  },
+  "items": [
+    {
+      "item_id": "interview-elon-musk-ted-2022",
+      "content_types": ["interview"],
+      "primary_topic": "A proposed technology-driven future across energy, AI, robotics and space",
+      "subtopics": ["sustainable energy", "AI risk", "robotics", "Neuralink", "space"],
+      "structure_types": ["host-led multi-topic interview", "extended argument"],
+      "value_sources": ["independent_arguments", "future_scenarios", "quotable_positions"],
+      "density": {"narrative": 0.2, "knowledge": 0.7, "procedural": 0.3, "opinion": 0.9, "emotion": 0.4},
+      "dependencies": {"visual": 0.15, "audio": 0.9, "subtitle": 0.85},
+      "tracks": [
+        {"track_id": "energy", "label": "Energy transition", "topic": "Scaling sustainable energy"},
+        {"track_id": "ai", "label": "AI and robotics", "topic": "AI risk and humanoid robots"},
+        {"track_id": "interfaces", "label": "Human-machine interfaces", "topic": "Neuralink and abundance"}
+      ],
+      "candidates": [
+        {"candidate_id": "interview-elon-musk-ted-2022-c1", "start_ms": 164000, "end_ms": 224000, "track_id": "energy", "score_profile": "concept", "summary": "Explains why storage capacity is central to a sustainable-energy economy.", "transcript_paraphrase": "The answer connects generation, batteries and the scale of installed capacity."},
+        {"candidate_id": "interview-elon-musk-ted-2022-c2", "start_ms": 1394000, "end_ms": 1397000, "track_id": "ai", "score_profile": "hook", "summary": "A terse warning that powerful AI needs safeguards against dystopian outcomes.", "transcript_paraphrase": "The speaker pivots from robot potential to the need to avoid concentrated control."},
+        {"candidate_id": "interview-elon-musk-ted-2022-c3", "start_ms": 1690000, "end_ms": 1750000, "track_id": "interfaces", "score_profile": "concept", "summary": "Introduces brain-machine interfaces as a response to communication bandwidth limits.", "transcript_paraphrase": "The segment frames Neuralink as a possible way to improve human-machine communication."},
+        {"candidate_id": "interview-elon-musk-ted-2022-c4", "start_ms": 164000, "end_ms": 344000, "track_id": "energy", "score_profile": "complete", "summary": "A complete argument from climate urgency through generation, storage and manufacturing scale.", "transcript_paraphrase": "The extended answer builds the energy transition as a system problem with a scale estimate."}
+      ]
+    },
+    {
+      "item_id": "interview-jensen-huang-stanford-2024",
+      "content_types": ["interview"],
+      "primary_topic": "Building NVIDIA through first-principles decisions and non-consensus markets",
+      "subtopics": ["founding", "market creation", "resilience", "organization design", "AI"],
+      "structure_types": ["chronological founder interview", "principle-and-example"],
+      "value_sources": ["founder_lessons", "decision_frameworks", "leadership_principles"],
+      "density": {"narrative": 0.5, "knowledge": 0.65, "procedural": 0.35, "opinion": 0.8, "emotion": 0.45},
+      "dependencies": {"visual": 0.1, "audio": 0.9, "subtitle": 0.85},
+      "tracks": [
+        {"track_id": "founding", "label": "Founding NVIDIA", "topic": "Company formation and early dependencies"},
+        {"track_id": "markets", "label": "Creating markets", "topic": "Non-consensus products and market formation"},
+        {"track_id": "leadership", "label": "Leadership architecture", "topic": "First principles and unique contribution"}
+      ],
+      "candidates": [
+        {"candidate_id": "interview-jensen-huang-stanford-2024-c1", "start_ms": 60000, "end_ms": 120000, "track_id": "founding", "score_profile": "story", "summary": "Recounts the Denny's conversations that preceded NVIDIA's formation.", "transcript_paraphrase": "The founders use informal meetings to identify problems general-purpose computers could not solve."},
+        {"candidate_id": "interview-jensen-huang-stanford-2024-c2", "start_ms": 2693000, "end_ms": 2696000, "track_id": "leadership", "score_profile": "hook", "summary": "A compact call to make a unique contribution and live with purpose.", "transcript_paraphrase": "The closing advice connects purpose with doing work others cannot or will not do."},
+        {"candidate_id": "interview-jensen-huang-stanford-2024-c3", "start_ms": 540000, "end_ms": 600000, "track_id": "markets", "score_profile": "concept", "summary": "Explains why NVIDIA had to create both technology and a market that did not yet exist.", "transcript_paraphrase": "The company strategy is framed as creating technology, applications and demand together."},
+        {"candidate_id": "interview-jensen-huang-stanford-2024-c4", "start_ms": 2480000, "end_ms": 2660000, "track_id": "leadership", "score_profile": "complete", "summary": "A complete first-principles explanation of organization design as the CEO's architecture job.", "transcript_paraphrase": "The argument starts from current conditions and builds an organization where people can do their life's work."}
+      ]
+    },
+    {
+      "item_id": "talk-steve-jobs-stanford-2005",
+      "content_types": ["story", "talk"],
+      "primary_topic": "Three autobiographical stories about work, loss and mortality",
+      "subtopics": ["connecting the dots", "love and loss", "death", "life choices"],
+      "structure_types": ["three-story commencement address", "story-to-lesson"],
+      "value_sources": ["autobiographical_lessons", "quotable_conclusions", "emotional_arc"],
+      "density": {"narrative": 0.9, "knowledge": 0.35, "procedural": 0.1, "opinion": 0.65, "emotion": 0.8},
+      "dependencies": {"visual": 0.05, "audio": 0.9, "subtitle": 0.9},
+      "tracks": [
+        {"track_id": "dots", "label": "Connecting the dots", "topic": "Education choices and retrospective meaning"},
+        {"track_id": "loss", "label": "Love and loss", "topic": "Career setback and renewed purpose"},
+        {"track_id": "mortality", "label": "Mortality", "topic": "Death as a decision lens"}
+      ],
+      "candidates": [
+        {"candidate_id": "talk-steve-jobs-stanford-2005-c1", "start_ms": 52000, "end_ms": 112000, "track_id": "dots", "score_profile": "story", "summary": "Opens the first story by linking college departure to later creative choices.", "transcript_paraphrase": "The story establishes uncertainty, financial pressure and trust in a decision whose value appears later."},
+        {"candidate_id": "talk-steve-jobs-stanford-2005-c2", "start_ms": 879000, "end_ms": 882000, "track_id": "mortality", "score_profile": "hook", "summary": "The closing two-part imperative condenses the speech's attitude toward life.", "transcript_paraphrase": "The speaker ends with a short paired instruction about curiosity and courage."},
+        {"candidate_id": "talk-steve-jobs-stanford-2005-c3", "start_ms": 390000, "end_ms": 450000, "track_id": "loss", "score_profile": "story", "summary": "Turns being removed from Apple into a lesson about continuing work one loves.", "transcript_paraphrase": "The setback becomes the opening for a new creative period and eventual return."},
+        {"candidate_id": "talk-steve-jobs-stanford-2005-c4", "start_ms": 548000, "end_ms": 728000, "track_id": "mortality", "score_profile": "complete", "summary": "A complete mortality argument from daily self-questioning through illness and renewal.", "transcript_paraphrase": "The story uses mortality to remove external expectations and clarify meaningful choices."}
+      ]
+    },
+    {
+      "item_id": "film-wings-1927",
+      "content_types": ["story", "drama"],
+      "primary_topic": "Romantic rivalry transformed by enlistment and wartime training",
+      "subtopics": ["unrequited affection", "rivalry", "enlistment", "training"],
+      "structure_types": ["silent visual narrative", "parallel character setup", "transition to war"],
+      "value_sources": ["visual_story_beats", "character_conflict", "historical_form"],
+      "density": {"narrative": 0.95, "knowledge": 0.1, "procedural": 0.1, "opinion": 0.1, "emotion": 0.75},
+      "dependencies": {"visual": 0.98, "audio": 0.1, "subtitle": 0.35},
+      "tracks": [
+        {"track_id": "home", "label": "Home relationships", "topic": "Jack, Mary, David and Sylvia"},
+        {"track_id": "rivalry", "label": "Romantic rivalry", "topic": "Competing assumptions and affection"},
+        {"track_id": "war", "label": "War transition", "topic": "Enlistment, departure and training"}
+      ],
+      "candidates": [
+        {"candidate_id": "film-wings-1927-c1", "start_ms": 120000, "end_ms": 180000, "track_id": "home", "score_profile": "visual", "summary": "Visual character setup establishes affection that is not reciprocated.", "transcript_paraphrase": "Intertitles and reactions establish the relationship without continuous dialogue."},
+        {"candidate_id": "film-wings-1927-c2", "start_ms": 480000, "end_ms": 540000, "track_id": "rivalry", "score_profile": "conflict", "summary": "A mistaken romantic reading sharpens the rivalry between the two young men.", "transcript_paraphrase": "Looks, gestures and a brief intertitle reveal competing expectations."},
+        {"candidate_id": "film-wings-1927-c3", "start_ms": 900000, "end_ms": 960000, "track_id": "war", "score_profile": "emotion", "summary": "Farewell beats turn private relationships into wartime separation.", "transcript_paraphrase": "The departure sequence uses close reactions to shift the emotional stakes."},
+        {"candidate_id": "film-wings-1927-c4", "start_ms": 1200000, "end_ms": 1380000, "track_id": "war", "score_profile": "complete", "summary": "An ordered transition from enlistment to the physical discipline of military training.", "transcript_paraphrase": "The extended visual sequence moves from civilian identity into collective training."}
+      ]
+    },
+    {
+      "item_id": "film-all-quiet-1930",
+      "content_types": ["story", "drama"],
+      "primary_topic": "Young recruits move from patriotic idealism toward the realities of war",
+      "subtopics": ["civilian propaganda", "enlistment", "training", "front-line transition"],
+      "structure_types": ["ensemble anti-war drama", "idealism-to-disillusionment progression"],
+      "value_sources": ["dramatic_conflict", "historical_context", "ordered_transformation"],
+      "density": {"narrative": 0.95, "knowledge": 0.2, "procedural": 0.1, "opinion": 0.35, "emotion": 0.85},
+      "dependencies": {"visual": 0.85, "audio": 0.85, "subtitle": 0.2},
+      "tracks": [
+        {"track_id": "civilian", "label": "Civilian idealism", "topic": "Public enthusiasm and classroom rhetoric"},
+        {"track_id": "training", "label": "Military training", "topic": "Authority, discipline and humiliation"},
+        {"track_id": "front", "label": "Front line", "topic": "Material conditions and danger"}
+      ],
+      "candidates": [
+        {"candidate_id": "film-all-quiet-1930-c1", "start_ms": 120000, "end_ms": 180000, "track_id": "civilian", "score_profile": "concept", "summary": "Street celebration and classroom framing establish the social pressure to enlist.", "transcript_paraphrase": "Public spectacle and institutional rhetoric align before the students decide."},
+        {"candidate_id": "film-all-quiet-1930-c2", "start_ms": 480000, "end_ms": 540000, "track_id": "civilian", "score_profile": "conflict", "summary": "A teacher's patriotic appeal collides with the students' uncertainty and group pressure.", "transcript_paraphrase": "Authority turns sacrifice into an ideal while individual hesitation remains visible."},
+        {"candidate_id": "film-all-quiet-1930-c3", "start_ms": 1500000, "end_ms": 1560000, "track_id": "front", "score_profile": "emotion", "summary": "The recruits encounter the physical and emotional conditions of the war zone.", "transcript_paraphrase": "The environment replaces classroom abstraction with exhausted soldiers and darkness."},
+        {"candidate_id": "film-all-quiet-1930-c4", "start_ms": 900000, "end_ms": 1080000, "track_id": "training", "score_profile": "complete", "summary": "A complete training progression shows authority stripping away civilian confidence.", "transcript_paraphrase": "Repeated drills, punishment and group reactions convert enthusiasm into resentment."}
+      ]
+    },
+    {
+      "item_id": "film-parasite-trailer-2019",
+      "content_types": ["story", "drama", "trailer"],
+      "primary_topic": "Two families become entangled through class aspiration and deception",
+      "subtopics": ["poverty", "infiltration", "wealth", "threat", "class conflict"],
+      "structure_types": ["nonlinear promotional montage", "setup-to-tone-shift"],
+      "value_sources": ["visual_contrast", "conflict_escalation", "montage_rhythm"],
+      "density": {"narrative": 0.75, "knowledge": 0.05, "procedural": 0.1, "opinion": 0.2, "emotion": 0.9},
+      "dependencies": {"visual": 0.98, "audio": 0.9, "subtitle": 0.7},
+      "tracks": [
+        {"track_id": "setup", "label": "Family setup", "topic": "The Kim family's conditions and opportunity"},
+        {"track_id": "infiltration", "label": "Infiltration", "topic": "Entering the Park household"},
+        {"track_id": "threat", "label": "Threat", "topic": "Tone shift and conflict escalation"}
+      ],
+      "candidates": [
+        {"candidate_id": "film-parasite-trailer-2019-c1", "start_ms": 4000, "end_ms": 34000, "track_id": "setup", "score_profile": "visual", "summary": "The basement home and family behavior establish economic conditions with visual economy.", "transcript_paraphrase": "Images and brief subtitles introduce a resourceful family living below street level."},
+        {"candidate_id": "film-parasite-trailer-2019-c2", "start_ms": 93000, "end_ms": 123000, "track_id": "threat", "score_profile": "conflict", "summary": "Rapid escalation turns the opportunity story into a class conflict and threat montage.", "transcript_paraphrase": "The music, reactions and abrupt images signal that the arrangement is collapsing."},
+        {"candidate_id": "film-parasite-trailer-2019-c3", "start_ms": 36000, "end_ms": 66000, "track_id": "infiltration", "score_profile": "story", "summary": "The family members methodically enter the wealthy household under constructed roles.", "transcript_paraphrase": "A compact sequence shows the plan expanding from one tutor to multiple household positions."},
+        {"candidate_id": "film-parasite-trailer-2019-c4", "start_ms": 96000, "end_ms": 126000, "track_id": "threat", "score_profile": "complete", "summary": "The trailer's threat reversal forms a complete final narrative beat.", "transcript_paraphrase": "The ordered montage culminates in reactions and danger that reverse the apparent success."}
+      ]
+    },
+    {
+      "item_id": "education-fei-fei-li-computers-see",
+      "content_types": ["lecture", "knowledge"],
+      "primary_topic": "Computer vision as the effort to give machines visual intelligence",
+      "subtopics": ["artificial intelligence", "computer vision", "recognition", "object scale", "applications"],
+      "structure_types": ["concept lecture", "examples-to-research-challenge"],
+      "value_sources": ["definitions", "research_context", "technical_examples"],
+      "density": {"narrative": 0.25, "knowledge": 0.95, "procedural": 0.3, "opinion": 0.25, "emotion": 0.2},
+      "dependencies": {"visual": 0.75, "audio": 0.85, "subtitle": 0.8},
+      "tracks": [
+        {"track_id": "definition", "label": "Definition", "topic": "What computer vision attempts to do"},
+        {"track_id": "recognition", "label": "Recognition", "topic": "Objects, scenes and activities"},
+        {"track_id": "scale", "label": "Scale", "topic": "Many-category recognition and human comparison"}
+      ],
+      "candidates": [
+        {"candidate_id": "education-fei-fei-li-computers-see-c1", "start_ms": 180000, "end_ms": 240000, "track_id": "definition", "score_profile": "concept", "summary": "Places computer vision inside AI and distinguishes it by the goal of visual understanding.", "transcript_paraphrase": "The lecturer moves from a general AI example to the specific capabilities of visual systems."},
+        {"candidate_id": "education-fei-fei-li-computers-see-c2", "start_ms": 370000, "end_ms": 373000, "track_id": "definition", "score_profile": "hook", "summary": "A compact definition frames vision as understanding objects, scenes and movement.", "transcript_paraphrase": "The short line condenses the field into the kinds of visual meaning a system must recover."},
+        {"candidate_id": "education-fei-fei-li-computers-see-c3", "start_ms": 840000, "end_ms": 900000, "track_id": "recognition", "score_profile": "concept", "summary": "A research example connects images, object labels and recognition algorithms.", "transcript_paraphrase": "The demonstration explains how category labels support machine recognition."},
+        {"candidate_id": "education-fei-fei-li-computers-see-c4", "start_ms": 1290000, "end_ms": 1470000, "track_id": "scale", "score_profile": "complete", "summary": "A complete argument uses object-category scale to explain why recognition remains difficult.", "transcript_paraphrase": "The sequence contrasts small benchmark vocabularies with the far larger number humans recognize."}
+      ]
+    },
+    {
+      "item_id": "education-mit-6006-algorithms",
+      "content_types": ["lecture", "course", "knowledge"],
+      "primary_topic": "Defining computational problems, algorithms, correctness and efficiency",
+      "subtopics": ["problem definitions", "algorithms", "correctness", "efficiency", "birthday matching"],
+      "structure_types": ["formal concept lecture", "definition-to-worked-example"],
+      "value_sources": ["formal_definitions", "reasoning_chain", "worked_example"],
+      "density": {"narrative": 0.1, "knowledge": 0.98, "procedural": 0.65, "opinion": 0.1, "emotion": 0.05},
+      "dependencies": {"visual": 0.55, "audio": 0.9, "subtitle": 0.9},
+      "tracks": [
+        {"track_id": "goals", "label": "Course goals", "topic": "Solve, prove and communicate"},
+        {"track_id": "definitions", "label": "Definitions", "topic": "Problems and algorithms"},
+        {"track_id": "example", "label": "Worked example", "topic": "Birthday matching"}
+      ],
+      "candidates": [
+        {"candidate_id": "education-mit-6006-algorithms-c1", "start_ms": 55000, "end_ms": 115000, "track_id": "goals", "score_profile": "concept", "summary": "Defines the course's three goals: solve problems, prove correctness and argue efficiency.", "transcript_paraphrase": "The opening distinguishes finding a solution from communicating why it works well."},
+        {"candidate_id": "education-mit-6006-algorithms-c2", "start_ms": 565000, "end_ms": 568000, "track_id": "definitions", "score_profile": "hook", "summary": "A concise definition treats an algorithm as a deterministic mapping procedure.", "transcript_paraphrase": "The short definition separates an algorithm from a problem's set of acceptable outputs."},
+        {"candidate_id": "education-mit-6006-algorithms-c3", "start_ms": 180000, "end_ms": 240000, "track_id": "definitions", "score_profile": "concept", "summary": "Explains a computational problem as a relation between inputs and valid outputs.", "transcript_paraphrase": "The lecturer formalizes correctness using a predicate rather than enumerating all cases."},
+        {"candidate_id": "education-mit-6006-algorithms-c4", "start_ms": 360000, "end_ms": 540000, "track_id": "example", "score_profile": "complete", "summary": "A complete birthday-matching example moves from a room-sized question to a general algorithm.", "transcript_paraphrase": "The worked chain generalizes the input, states the procedure and connects it to correctness."}
+      ]
+    },
+    {
+      "item_id": "education-harvard-cs50-scratch",
+      "content_types": ["lecture", "course", "tutorial"],
+      "primary_topic": "Computational thinking and representing information with binary",
+      "subtopics": ["computer science", "unary", "binary", "bits", "ASCII"],
+      "structure_types": ["beginner lecture", "stepwise live demonstration"],
+      "value_sources": ["accessible_definitions", "step_by_step_examples", "learner_orientation"],
+      "density": {"narrative": 0.25, "knowledge": 0.9, "procedural": 0.85, "opinion": 0.1, "emotion": 0.2},
+      "dependencies": {"visual": 0.7, "audio": 0.9, "subtitle": 0.9},
+      "tracks": [
+        {"track_id": "orientation", "label": "Orientation", "topic": "Who the course is for"},
+        {"track_id": "binary", "label": "Binary", "topic": "Representing numbers with bits"},
+        {"track_id": "text", "label": "Text representation", "topic": "ASCII and characters"}
+      ],
+      "candidates": [
+        {"candidate_id": "education-harvard-cs50-scratch-c1", "start_ms": 75000, "end_ms": 135000, "track_id": "orientation", "score_profile": "story", "summary": "An approachable personal introduction lowers the barrier for first-time learners.", "transcript_paraphrase": "The instructor explains that he once avoided computer science before discovering the course."},
+        {"candidate_id": "education-harvard-cs50-scratch-c2", "start_ms": 766000, "end_ms": 769000, "track_id": "binary", "score_profile": "hook", "summary": "A compact transition names binary as the two-symbol representation system.", "transcript_paraphrase": "The line pivots from unary counting to a system built from zeros and ones."},
+        {"candidate_id": "education-harvard-cs50-scratch-c3", "start_ms": 1420000, "end_ms": 1480000, "track_id": "text", "score_profile": "concept", "summary": "Connects eight-bit patterns to letters through the ASCII mapping.", "transcript_paraphrase": "The explanation shows how a numeric pattern becomes a textual character."},
+        {"candidate_id": "education-harvard-cs50-scratch-c4", "start_ms": 580000, "end_ms": 760000, "track_id": "binary", "score_profile": "complete", "summary": "A complete step-by-step progression moves from unary counting to binary place values.", "transcript_paraphrase": "The demonstration builds representation incrementally and checks the audience's conversions."}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+{
+  "schema_version": "0.1.0",
+  "document_type": "four_track_evaluation_manifest",
+  "created_at": "2026-07-31T00:00:00Z",
+  "created_by": "universal-cutup-maintainers",
+  "extensions": {},
+  "required_extensions": [],
+  "suite_id": "universal-cutup-four-track",
+  "suite_version": "1.0.0",
+  "cases": [
+    {
+      "case_id": "interview-standard-v1",
+      "track": "interview",
+      "evaluation_type": "regression",
+      "evidence_class": "curated_protocol",
+      "runner": "standard_v1_interview",
+      "input_refs": [
+        "benchmarks/standard-v1/manifest.json",
+        "benchmarks/standard-v1/curated-inputs.json"
+      ],
+      "supplemental_artifact_refs": [
+        "local-evidence://gate-h/blind-results"
+      ],
+      "limitations": [
+        "standard-v1 uses curated protocol inputs and is not a blind content-quality test",
+        "Gate H local evidence is supplemental and still requires maintainer review"
+      ]
+    },
+    {
+      "case_id": "drama-standard-v1",
+      "track": "drama",
+      "evaluation_type": "regression",
+      "evidence_class": "curated_protocol",
+      "runner": "standard_v1_drama",
+      "input_refs": [
+        "benchmarks/standard-v1/manifest.json",
+        "benchmarks/standard-v1/curated-inputs.json"
+      ],
+      "supplemental_artifact_refs": [
+        "local-evidence://gate-h/blind-results"
+      ],
+      "limitations": [
+        "standard-v1 uses curated visual or paraphrased evidence and is not a blind content-quality test",
+        "film samples remain subject to source and rights limitations"
+      ]
+    },
+    {
+      "case_id": "education-v1-strategy",
+      "track": "education",
+      "evaluation_type": "capability",
+      "evidence_class": "synthetic",
+      "runner": "educational_v1",
+      "input_refs": [
+        "evaluation/educational-v1-cases.json"
+      ],
+      "supplemental_artifact_refs": [
+        "local-evidence://education-v1/final-verified"
+      ],
+      "limitations": [
+        "deterministic regression input is synthetic",
+        "MIT local media execution is real-local supplemental evidence but has not received final human quality approval"
+      ]
+    },
+    {
+      "case_id": "sports-alpha-strategy",
+      "track": "sports",
+      "evaluation_type": "capability",
+      "evidence_class": "synthetic",
+      "runner": "sports_alpha",
+      "input_refs": [
+        "evaluation/sports-alpha-observations.json"
+      ],
+      "supplemental_artifact_refs": [
+        "local-evidence://sports-alpha"
+      ],
+      "limitations": [
+        "sports media and observations are synthetic",
+        "real detector and real licensed sports-event quality remain unverified"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/yowant66-svg/cutsum/security/policy
+    about: Report vulnerabilities privately instead of opening a public issue.
+  - name: 5–10 minute quickstart
+    url: https://github.com/yowant66-svg/cutsum/blob/main/docs/quickstart.md
+    about: Run the rights-safe local demonstration before filing trial feedback.

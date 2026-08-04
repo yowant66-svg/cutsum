@@ -67,19 +67,24 @@ def test_public_quickstart_runs_all_tracks_and_writes_shareable_report(tmp_path:
     if shutil.which("ffmpeg") is None or shutil.which("ffprobe") is None:
         pytest.skip("FFmpeg runtime is unavailable")
     output = tmp_path / "quickstart"
-    subprocess.run(
+    completed = subprocess.run(
         [
             sys.executable,
             str(REPOSITORY_ROOT / "examples" / "run_quickstart.py"),
             str(output),
         ],
         cwd=REPOSITORY_ROOT,
-        env={**os.environ, "PYTHONPATH": str(REPOSITORY_ROOT / "src")},
-        check=True,
+        env={
+            **os.environ,
+            "PYTHONPATH": str(REPOSITORY_ROOT / "src"),
+            "PYTHONUTF8": "1",
+        },
+        check=False,
         capture_output=True,
-        text=True,
+        encoding="utf-8",
         timeout=170,
     )
+    assert completed.returncode == 0, f"stdout:\n{completed.stdout}\n\nstderr:\n{completed.stderr}"
 
     report = json.loads((output / "quickstart-report.json").read_text(encoding="utf-8"))
     assert report["result"] == "success"

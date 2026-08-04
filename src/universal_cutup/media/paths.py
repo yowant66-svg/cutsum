@@ -17,7 +17,8 @@ class SafePathPolicy:
         posix_path = PurePosixPath(relative_path)
         windows_path = PureWindowsPath(relative_path)
         if (
-            posix_path.is_absolute()
+            relative_path.startswith(("/", "\\"))
+            or posix_path.is_absolute()
             or ".." in posix_path.parts
             or windows_path.is_absolute()
             or bool(windows_path.drive)

@@ -54,7 +54,7 @@ def test_source_sidecar_formats(
         height=720,
     )
 
-    content = output.read_text()
+    content = output.read_text(encoding="utf-8")
     assert content.startswith(expected_header)
     assert expected_timestamp in content
     assert SOURCE_CUES[0].text in content
@@ -85,7 +85,7 @@ def test_bilingual_sidecar_keeps_one_semantic_timeline(
         height=720,
     )
 
-    content = output.read_text()
+    content = output.read_text(encoding="utf-8")
     assert PAIRS[0].source_text in content
     assert PAIRS[0].translation_text in content
     assert content.count("00:00:02") <= 1

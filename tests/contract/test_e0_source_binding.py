@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -56,4 +57,5 @@ def test_portable_cut_plan_round_trips_without_runtime_binding(tmp_path: Path) -
             local_path=str(tmp_path / "same-content.mp4"),
         ),
     )
-    assert str(tmp_path / "same-content.mp4") in runtime
+    runtime_payload = json.loads(runtime)
+    assert runtime_payload["binding"]["local_path"] == str(tmp_path / "same-content.mp4")

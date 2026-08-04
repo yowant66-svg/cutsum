@@ -28,7 +28,7 @@ def _unit(case_id: str, index: int, payload: dict[str, Any]) -> SubtitleDisplayU
 
 
 def test_subtitle_readability_cases_match_expected_human_failure_classes() -> None:
-    payload = json.loads(CASES_PATH.read_text())
+    payload = json.loads(CASES_PATH.read_text(encoding="utf-8"))
 
     for case in payload["cases"]:
         units = tuple(

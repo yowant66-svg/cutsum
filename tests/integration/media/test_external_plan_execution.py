@@ -176,7 +176,7 @@ def test_external_plan_produces_verified_artifacts(
     assert synthetic_media.stat().st_mtime_ns == before_mtime
     if subtitle_mode == "sidecar":
         assert any(artifact.artifact_type == "subtitle" for artifact in execution.artifacts)
-        subtitle_text = (output_root / "subtitles/candidate-1.srt").read_text()
+        subtitle_text = (output_root / "subtitles/candidate-1.srt").read_text(encoding="utf-8")
         assert "00:00:00,000 --> 00:00:00,750" in subtitle_text
         assert "00:00:01,250 --> 00:00:02,000" in subtitle_text
         assert "first cue, not the summary" in subtitle_text
@@ -263,7 +263,7 @@ def test_bilingual_vtt_sidecar_uses_one_timeline(
     )
 
     sidecar = output_root / "subtitles/candidate-1.vtt"
-    content = sidecar.read_text()
+    content = sidecar.read_text(encoding="utf-8")
     assert execution.status == "success"
     assert "subtitle_backend" not in execution.steps[0].details
     assert content.startswith("WEBVTT")

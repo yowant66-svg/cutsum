@@ -50,7 +50,8 @@ def redact_command(arguments: list[str]) -> tuple[str, ...]:
         if argument == home:
             redacted.append("<HOME>")
         elif argument.startswith(f"{home}/") or argument.startswith(f"{home}\\"):
-            redacted.append(f"<HOME>{argument[len(home) :]}")
+            home_relative = argument[len(home) :].replace("\\", "/")
+            redacted.append(f"<HOME>{home_relative}")
         else:
             redacted.append(argument)
     return tuple(redacted)

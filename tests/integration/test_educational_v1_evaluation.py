@@ -44,7 +44,7 @@ def _transcript(payload: dict[str, object]) -> TranscriptArtifact:
 
 
 def test_auto_and_natural_language_directed_runs_start_from_raw_transcript() -> None:
-    payload = json.loads(CASES_PATH.read_text())
+    payload = json.loads(CASES_PATH.read_text(encoding="utf-8"))
     candidates = propose_educational_candidates(_transcript(payload))
 
     assert candidates
@@ -86,7 +86,7 @@ def test_auto_and_natural_language_directed_runs_start_from_raw_transcript() -> 
 
 
 def test_educational_plan_is_portable_and_covers_every_proposed_candidate() -> None:
-    payload = json.loads(CASES_PATH.read_text())
+    payload = json.loads(CASES_PATH.read_text(encoding="utf-8"))
     transcript = _transcript(payload)
     request = resolve_educational_request(ControlMode.AUTO, "")
     source = MediaSource(

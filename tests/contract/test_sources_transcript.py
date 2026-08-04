@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import json
 from datetime import UTC, datetime
+from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
@@ -44,7 +46,7 @@ def test_transcript_segments_are_monotonic_and_hash_addressed() -> None:
         )
 
 
-def test_portable_source_keeps_identity_without_private_path() -> None:
+def test_portable_source_keeps_identity_without_private_path(tmp_path: Path) -> None:
     source = MediaSource(
         source_id="source-1",
         media_id="media-1",
@@ -53,13 +55,12 @@ def test_portable_source_keeps_identity_without_private_path() -> None:
         basename_hint="input.mp4",
         rights_attestation=RightsAttestation.OWNED,
     )
-    binding = MediaBinding(
-        source_id=source.source_id,
-        local_path="/private-home/alice/Videos/input.mp4",
-    )
+    private_path = tmp_path / "private-home" / "alice" / "Videos" / "input.mp4"
+    binding = MediaBinding(source_id=source.source_id, local_path=str(private_path))
     portable = serialize_document(source, profile=SerializationProfile.PORTABLE)
     runtime = serialize_document(binding, profile=SerializationProfile.RUNTIME)
     assert "private-home" not in portable
     assert "source-1" in portable and SOURCE_HASH in portable
-    assert "/private-home/alice/Videos/input.mp4" in runtime
+    runtime_payload = json.loads(runtime)
+    assert runtime_payload["document"]["local_path"] == str(private_path)
     validate_serialized_identity(portable)

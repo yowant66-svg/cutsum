@@ -17,8 +17,8 @@
 | 9:16 | 基础能力已运行 | 四种确定性模式、结构化构图元数据、平台安全区和 synthetic 可播放成片；真实人物跟踪仍不可用 |
 | 四轨评测框架 | 已运行 | 四轨三次确定性回归 `pass^3=1.00`；证据等级与盲测身份冻结已运行 |
 | 四轨内容质量 | 待人工复核 | 自动报告明确禁止质量声明；访谈/剧情为 curated protocol，教育/体育固定回归为 synthetic |
-| 跨平台 | CI 已配置、云端待运行 | 三平台完整测试 workflow 与 Python 3.11–3.13 已有本地合同；macOS 实跑，禁止推送期间不声称 Linux/Windows 云端通过 |
-| 许可证与 REUSE | 工程检查通过、法律确认开放 | 版权主体 `DXBATM`、CutSum 名称、联系人、DCO 1.1 与 Contributor Covenant 2.1 已配置；早期参考、benchmark 权利和名称/商标仍待人工或法律确认 |
-| 安装和外部文档 | 本地候选完成 | README、治理、安全和贡献政策已更新为 CutSum；Python 3.12 fresh wheel 的 `cutsum` / `cutup` 双入口与 site-packages 导入已验证 |
+| 跨平台 | 远端 CI 已运行 | GitHub-hosted Ubuntu、macOS、Windows Python 3.11 全通过；Ubuntu Python 3.12/3.13、静态检查、构建和 85% branch coverage 门禁全通过 |
+| 许可证与 REUSE | Alpha 工程边界批准 | 版权主体 `DXBATM`、完整 Apache-2.0、DCO 1.1、Contributor Covenant 2.1 与维护者批准记录已配置；不宣称法律确权或不侵权保证 |
+| 安装和外部文档 | 公开 Alpha 完成 | README、治理、安全、贡献政策和三类 synthetic 示例已发布；fresh wheel 双入口、site-packages 导入和真实 FFmpeg 裁切已验证 |
 | 内部 RC | 已达到并冻结 | 历史 `universal-cutup 0.1.0rc2` 证据保持不变；体育最终补丁提交 `37ea6bf` 已定向复核通过 |
-| 公开 Alpha 候选 | 本地完成、尚未发布 | `cutsum 0.1.0a1`：293 tests、87.76% coverage、22 Schema 无漂移、可复现 wheel/sdist；远端 CI、权利复核、维护者成片复核和公开仓库设置仍是发布前门槛 |
+| 公开 Alpha | GitHub Release | `cutsum 0.1.0a1`：完整测试与覆盖率门禁、22 Schema、wheel/sdist、CycloneDX SBOM、SHA-256、Release manifest 和 fresh-wheel 成片链路；未上传 PyPI |

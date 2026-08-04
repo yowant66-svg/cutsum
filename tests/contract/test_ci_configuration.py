@@ -46,3 +46,16 @@ def test_ci_covers_supported_platforms_and_python_versions_without_publish_permi
         "astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b",
     ):
         assert action_reference in workflow_text
+
+
+def test_pull_requests_require_dco_signoff_without_write_permissions() -> None:
+    workflow_path = Path(__file__).parents[2] / ".github/workflows/dco.yml"
+    workflow = yaml.load(workflow_path.read_text(encoding="utf-8"), Loader=yaml.BaseLoader)
+
+    assert workflow["permissions"] == {"contents": "read"}
+    assert "pull_request" in workflow["on"]
+    signoff_job = workflow["jobs"]["signoff"]
+    assert signoff_job["name"] == "DCO sign-off"
+    workflow_text = workflow_path.read_text(encoding="utf-8")
+    assert "fetch-depth: 0" in workflow_text
+    assert 'python scripts/check_dco.py "$BASE_SHA" "$HEAD_SHA"' in workflow_text

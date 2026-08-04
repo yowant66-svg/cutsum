@@ -5,9 +5,9 @@ clip plans, and rendering verified media outputs. It is designed for creators, c
 teams, developers, automation workflows, and AI agents that need the same “find the right segment
 and cut it” capability without coupling the workflow to one model or one video platform.
 
-> Status: prepared `0.1.0a1` public Alpha candidate. The repository has not been published yet.
-> Cross-platform remote CI, final release-artifact review, benchmark wording approval, and
-> maintainer content-quality review remain open before the first public release.
+> Current release: [`0.1.0a1` public Alpha](https://github.com/yowant66-svg/cutsum/releases/tag/v0.1.0a1).
+> The release is intentionally conservative: automated evidence proves engineering behavior, not
+> universal editorial quality. Sports support remains transcript-only heuristic Alpha.
 
 ## What works now
 
@@ -43,16 +43,20 @@ cutsum capabilities
 cutsum subtitle-capabilities
 ```
 
-## Install locally
+## Install
 
-The project is not on PyPI. Install a reviewed local wheel:
+CutSum is not on PyPI. Install the reviewed wheel from the GitHub Alpha Release:
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate  # Windows PowerShell: .venv\Scripts\Activate.ps1
-python -m pip install dist/cutsum-0.1.0a1-py3-none-any.whl
+python -m pip install \
+  https://github.com/yowant66-svg/cutsum/releases/download/v0.1.0a1/cutsum-0.1.0a1-py3-none-any.whl
 cutsum --help
 ```
+
+Verify downloaded assets against `SHA256SUMS.txt` on the Release page before installation when the
+distribution path is security-sensitive.
 
 For development from a source checkout:
 
@@ -157,6 +161,13 @@ model to understand full transcripts while leaving validation, aggregation, sele
 and media execution to this package. The Skill does not contain a second ranking formula and does
 not grant permission to download, publish, access credentials, or call paid Providers.
 
+## Rights-safe examples
+
+[`examples/`](examples/) contains three reproducible local workflows for interview-style,
+educational, and sports-transcript planning. The examples use FFmpeg-generated test media and
+maintainer-authored synthetic transcripts, so no downloaded media or third-party transcript is
+required.
+
 ## Architecture and evidence
 
 The dependency direction is:
@@ -206,5 +217,6 @@ uv build
 git diff --check
 ```
 
-The checked-in CI is read-only and contains no publish or release job. Until it actually runs on a
-remote repository, Linux and Windows remain configured-but-unverified claims.
+The checked-in CI is read-only and contains no PyPI publish job. GitHub-hosted Ubuntu, macOS, and
+Windows runs verify Python 3.11, while Ubuntu additionally verifies Python 3.12 and 3.13. A separate
+job enforces at least 85% branch coverage, and pull requests require DCO sign-off.

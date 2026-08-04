@@ -1,0 +1,23 @@
+1
+00:00:00,000 --> 00:00:10,000
+A binary search finds a target in sorted data by repeatedly cutting the possible interval in half.
+
+2
+00:00:10,000 --> 00:00:20,000
+First compare the target with the middle value, then discard the half that cannot contain it.
+
+3
+00:00:20,000 --> 00:00:30,000
+For example, to find seven from one through fifteen, compare eight and continue in the lower half.
+
+4
+00:00:30,000 --> 00:00:40,000
+The important invariant is that the remaining interval is sorted and still contains every possible answer.
+
+5
+00:00:40,000 --> 00:00:50,000
+A common mistake is using binary search on unsorted data, where discarding half is not logically valid.
+
+6
+00:00:50,000 --> 00:01:00,000
+In summary, the sorted invariant makes each comparison safe and repeated halving gives logarithmic complexity.

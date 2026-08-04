@@ -49,20 +49,21 @@ effect of any reference use still need human or legal confirmation.
   import namespace remains `universal_cutup`. Existing protocol and evidence identifiers are not
   silently renamed.
 
-On 2026-08-03, preliminary exact-name checks found no PyPI project at `cutsum` and no exact GitHub
-repository-name search result. These checks are time-bound engineering observations, not trademark
-clearance or a guarantee that the names remain available.
+The maintainer approved use of `CutSum` / `cutsum` for this Alpha under the engineering boundary in
+`docs/maintainer-release-approval.md`. This is not trademark clearance or a legal opinion.
 
-## Must resolve before public release
+## Public Alpha controls
 
-1. Complete a human or legal name/trademark review for `CutSum` where appropriate.
-2. Review every record in `provenance/ledger.yaml`, especially the private predecessor references,
-   and approve its public wording.
-3. Confirm benchmark URL, metadata, paraphrase, and timestamp use; remove any item that lacks an
-   acceptable public-test basis. Do not publish downloaded media or transcripts by default.
-4. Run the configured CI on an actual remote Linux/macOS/Windows matrix and preserve results.
-5. Configure DCO enforcement and private vulnerability reporting on the future GitHub repository.
-6. Complete maintainer viewing of real output packs before making editorial-quality claims.
+1. The maintainer approved the name, provenance wording, and benchmark-use boundary for this Alpha.
+2. Downloaded media and complete third-party transcripts remain excluded from the repository and
+   release assets.
+3. GitHub-hosted Linux, macOS, and Windows CI, DCO enforcement, protected `main`, secret scanning,
+   dependency alerts, and private vulnerability reporting are enabled.
+4. Public examples use generated media and synthetic transcripts only.
+5. The release continues to prohibit editorial-quality claims because personal viewing was not
+   separately attested.
+6. Future real-media benchmarks require their own rights record and human review before any
+   precision, recall, or quality statement.
 
 REUSE success, dependency audit success, and this inventory are necessary engineering evidence;
 none establishes judicial originality, non-infringement, or final permission to publish.

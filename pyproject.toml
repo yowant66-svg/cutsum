@@ -41,7 +41,7 @@ packages = ["src/universal_cutup"]
 addopts = "-ra --strict-config --strict-markers"
 testpaths = ["tests"]
 timeout = 30
-pythonpath = ["src"]
+pythonpath = ["src", "."]
 
 [tool.ruff]
 target-version = "py311"

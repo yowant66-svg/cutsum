@@ -1,8 +1,8 @@
 # Contributing
 
-Contributions to CutSum are welcome through issues and pull requests once the public repository is
-available. Before contributing, read the Code of Conduct, security policy, source-material rights
-boundary, and Developer Certificate of Origin (DCO) 1.1.
+Contributions to CutSum are welcome through issues and pull requests. Before contributing, read the
+Code of Conduct, security policy, source-material rights boundary, and Developer Certificate of
+Origin (DCO) 1.1.
 
 1. Inspect the relevant protocol, tests, provenance, and runtime path before editing.
 2. Keep changes narrow and preserve the `domain → application/strategies → media/providers →

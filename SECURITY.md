@@ -33,5 +33,6 @@ fix timeline is guaranteed for this pre-release project.
 
 ## Supported versions
 
-No version is publicly supported until an explicit release. The prepared public Alpha is
-`0.1.0a1`; security fixes may change its schemas and behavior before release.
+The public `0.1.0a1` Alpha receives best-effort security fixes. Alpha security fixes may change
+schemas or behavior when preserving the previous behavior would keep a vulnerability. Older
+internal RC identifiers are not publicly supported releases.

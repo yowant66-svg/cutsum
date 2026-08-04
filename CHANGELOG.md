@@ -2,7 +2,7 @@
 
 All notable changes will be documented here.
 
-## 0.1.0a1 — Prepared public Alpha, not yet released
+## 0.1.0a1 — 2026-08-04
 
 - Adopted the public project and distribution identity `CutSum` / `cutsum`, with `DXBATM` as the
   copyright holder and `yowant66@gmail.com` as the maintainer and security contact.
@@ -11,8 +11,11 @@ All notable changes will be documented here.
   protocol/evidence identifiers for compatibility.
 - Carried forward the frozen transcript-only heuristic Sports Alpha after its final six-case context
   regression and 293-test review.
-- This entry describes a local release candidate only; no public repository, tag, or package has
-  been published.
+- Added verified Ubuntu, macOS, and Windows CI, an explicit 85% branch-coverage gate, DCO
+  enforcement, protected-main governance, and GitHub security reporting.
+- Added three rights-safe public examples, deterministic release manifests, CycloneDX 1.6 SBOM,
+  SHA-256 checksums, and fresh-wheel media execution evidence.
+- Published wheel and source distribution on GitHub. No PyPI package is published by this release.
 
 ## 0.1.0rc2 — Internal sports-hardening candidate, not publicly released
 

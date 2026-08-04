@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import importlib.metadata
 import json
+import os
 import platform
 import shutil
 import subprocess
@@ -31,7 +32,8 @@ def _run_cli(arguments: list[str], *, timeout_seconds: int = 300) -> dict[str, A
         command,
         check=False,
         capture_output=True,
-        text=True,
+        encoding="utf-8",
+        env={**os.environ, "PYTHONUTF8": "1"},
         timeout=timeout_seconds,
     )
     if completed.returncode != 0:
@@ -62,7 +64,7 @@ def _probe_video(path: Path, *, report_root: Path) -> dict[str, Any]:
         ],
         check=True,
         capture_output=True,
-        text=True,
+        encoding="utf-8",
         timeout=30,
     )
     probe = json.loads(completed.stdout)

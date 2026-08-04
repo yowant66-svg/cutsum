@@ -11,6 +11,16 @@ From the repository root, generate one 60-second source file:
 python examples/generate_demo_media.py examples/demo-source.mp4
 ```
 
+To run and verify all three workflows with one command instead, use:
+
+```bash
+python examples/run_quickstart.py cutsum-demo
+```
+
+This creates playable outputs plus `cutsum-demo/quickstart-report.json`, whose artifact paths are
+relative and whose media entries include SHA-256, codec, dimensions, and duration. See the
+[complete quickstart](../docs/quickstart.md) for installation and troubleshooting.
+
 ## Interview-style deterministic cut
 
 ```bash

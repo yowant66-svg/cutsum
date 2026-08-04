@@ -1,0 +1,70 @@
+name: Trial feedback
+description: Report a real CutSum quickstart result, including partial runs and failures.
+title: "[Trial]: "
+labels:
+  - trial-feedback
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        Report only what you personally ran and inspected. Do not include credentials, cookies,
+        private media, sensitive transcripts, terminal history, or unredacted home-directory paths.
+  - type: dropdown
+    id: result
+    attributes:
+      label: Overall result
+      options:
+        - Success
+        - Partial
+        - Failed
+    validations:
+      required: true
+  - type: input
+    id: time_to_clip
+    attributes:
+      label: Time to first playable clip
+      placeholder: e.g. 8 minutes
+    validations:
+      required: true
+  - type: checkboxes
+    id: tracks
+    attributes:
+      label: Tracks run
+      options:
+        - label: Interview
+        - label: Education
+        - label: Sports transcript Alpha
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Operating system, Python, FFmpeg, and CutSum versions.
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed result
+      description: State which outputs you personally opened and what succeeded or failed.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Use the synthetic quickstart or clearly shareable input only.
+  - type: textarea
+    id: usability
+    attributes:
+      label: What was confusing or unnecessarily difficult?
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Confirmation
+      options:
+        - label: I reported a run I personally performed.
+          required: true
+        - label: I reviewed attachments for private or sensitive information.
+          required: true

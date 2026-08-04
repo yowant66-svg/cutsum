@@ -17,6 +17,9 @@ REQUIRED_GOVERNANCE_FILES = (
     "CHANGELOG.md",
     "CODE_OF_CONDUCT.md",
     "DCO",
+    "docs/quickstart.md",
+    "docs/trial-kit/README.md",
+    ".github/ISSUE_TEMPLATE/trial_feedback.yml",
 )
 FORBIDDEN_PROJECT_PATHS = (
     "output",
@@ -122,3 +125,18 @@ def test_public_alpha_identity_and_version_are_consistent() -> None:
     assert __version__ == "0.1.0a1"
     assert project["project"]["version"] == __version__
     assert locked_project["version"] == __version__
+
+
+def test_trial_feedback_template_requires_real_run_and_privacy_confirmation() -> None:
+    template = yaml.safe_load(
+        (PROJECT_ROOT / ".github" / "ISSUE_TEMPLATE" / "trial_feedback.yml").read_text(
+            encoding="utf-8"
+        )
+    )
+    fields = {item.get("id"): item for item in template["body"] if "id" in item}
+
+    assert template["labels"] == ["trial-feedback"]
+    assert fields["result"]["validations"]["required"] is True
+    assert fields["environment"]["validations"]["required"] is True
+    confirmations = fields["confirmation"]["attributes"]["options"]
+    assert all(option["required"] is True for option in confirmations)

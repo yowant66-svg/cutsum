@@ -66,7 +66,20 @@ uv run cutsum capabilities
 uv run pytest -q
 ```
 
-## Quickstart: education plan and real cut
+## 5–10 minute rights-safe quickstart
+
+Clone the repository after installing the reviewed Alpha wheel, then run one command to generate
+owned synthetic media and produce playable interview, education, and sports examples:
+
+```bash
+python examples/run_quickstart.py cutsum-demo
+```
+
+The runner makes no network Provider calls and writes a shareable, machine-readable
+`quickstart-report.json`. Follow the complete [5–10 minute quickstart](docs/quickstart.md) for
+macOS, Linux, Windows PowerShell, expected outputs, and troubleshooting.
+
+## Plan and cut your own authorized media
 
 Use media you own or are authorized to edit. `--rights` is self-attestation and is not a legal
 determination.
@@ -166,7 +179,8 @@ not grant permission to download, publish, access credentials, or call paid Prov
 [`examples/`](examples/) contains three reproducible local workflows for interview-style,
 educational, and sports-transcript planning. The examples use FFmpeg-generated test media and
 maintainer-authored synthetic transcripts, so no downloaded media or third-party transcript is
-required.
+required. Real testers can use the [public trial kit](docs/trial-kit/README.md) to record what they
+personally ran and inspected without sharing private source material.
 
 ## Architecture and evidence
 

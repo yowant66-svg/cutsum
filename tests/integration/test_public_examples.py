@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+import os
 import shutil
 import subprocess
 import sys
@@ -58,3 +60,33 @@ def test_public_demo_generator_creates_decodable_owned_synthetic_media(tmp_path:
     )
     assert output.is_file()
     assert 0.8 <= float(probe.stdout.strip()) <= 1.2
+
+
+@pytest.mark.timeout(180)
+def test_public_quickstart_runs_all_tracks_and_writes_shareable_report(tmp_path: Path) -> None:
+    if shutil.which("ffmpeg") is None or shutil.which("ffprobe") is None:
+        pytest.skip("FFmpeg runtime is unavailable")
+    output = tmp_path / "quickstart"
+    subprocess.run(
+        [
+            sys.executable,
+            str(REPOSITORY_ROOT / "examples" / "run_quickstart.py"),
+            str(output),
+        ],
+        cwd=REPOSITORY_ROOT,
+        env={**os.environ, "PYTHONPATH": str(REPOSITORY_ROOT / "src")},
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=170,
+    )
+
+    report = json.loads((output / "quickstart-report.json").read_text(encoding="utf-8"))
+    assert report["result"] == "success"
+    assert report["network_provider_calls"] == 0
+    assert report["third_party_media_included"] is False
+    assert set(report["tracks"]) == {"interview", "education", "sports"}
+    assert all(track["status"] == "success" for track in report["tracks"].values())
+    assert all(track["artifact_count"] >= 1 for track in report["tracks"].values())
+    serialized = json.dumps(report, ensure_ascii=False)
+    assert str(tmp_path) not in serialized

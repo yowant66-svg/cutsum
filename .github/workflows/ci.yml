@@ -103,7 +103,7 @@ jobs:
       - name: Ruff
         run: uv run ruff format --check . && uv run ruff check .
       - name: Mypy
-        run: uv run mypy src tests scripts
+        run: uv run mypy src tests scripts examples
       - name: REUSE
         run: uv run reuse lint
       - name: Dependency audit

@@ -4,6 +4,10 @@ Contributions to CutSum are welcome through issues and pull requests. Before con
 Code of Conduct, security policy, source-material rights boundary, and Developer Certificate of
 Origin (DCO) 1.1.
 
+New users can start with the [5–10 minute quickstart](docs/quickstart.md). Issues labelled
+[`good first issue`](https://github.com/yowant66-svg/cutsum/labels/good%20first%20issue) include a
+bounded acceptance checklist and are intended to be approachable without changing core protocols.
+
 1. Inspect the relevant protocol, tests, provenance, and runtime path before editing.
 2. Keep changes narrow and preserve the `domain → application/strategies → media/providers →
    SDK/CLI/Skill` dependency direction.

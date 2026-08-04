@@ -17,19 +17,25 @@ local item does not imply legal clearance, public adoption, or Codex for Open So
 - [x] Sports Alpha frozen as transcript-only heuristic functionality.
 - [x] Clean public Git history starts on `main` with one DCO-signed root commit.
 - [x] CI includes a dedicated branch-coverage job with an explicit 85% failure threshold.
+- [x] Maintainer release approval is recorded in `docs/maintainer-release-approval.md`.
+- [x] Three public examples use generated media and maintainer-authored synthetic transcripts.
 
 ## Required before public release
 
-- [ ] Maintainer or legal review of the CutSum name/trademark boundary.
-- [ ] Maintainer approval of every public provenance-ledger statement.
-- [ ] Maintainer approval of benchmark metadata, URLs, paraphrases, and rights notes.
-- [ ] Maintainer viewing of representative output packs before editorial-quality claims.
-- [ ] Create the GitHub repository under the maintainer-controlled account from the clean public
+- [x] Maintainer accepted the documented CutSum name/trademark engineering boundary for this Alpha.
+- [x] Maintainer approved the public provenance-ledger wording as engineering evidence.
+- [x] Maintainer approved the benchmark metadata, URL, paraphrase, and rights-note boundary.
+- [x] Editorial-quality claims remain prohibited because personal viewing was not separately attested.
+- [x] Create the GitHub repository under the maintainer-controlled account from the clean public
   repository only; never push the private complete-history bundle or old branches.
-- [ ] Configure branch protection, required CI checks, DCO enforcement, and private vulnerability
+- [x] Configure branch protection, required CI checks, DCO enforcement, and private vulnerability
   reporting on GitHub.
-- [ ] Run the checked-in Linux, macOS, and Windows CI remotely and preserve the successful evidence.
-- [ ] Review the final wheel, sdist, SBOM, release manifest, and signed tag before upload.
+- [x] Run the checked-in Linux, macOS, and Windows CI remotely and preserve the successful evidence.
+- [x] Review the final wheel, sdist, SBOM, release manifest, checksums, and annotated tag before upload.
+
+The annotated tag is not a cryptographic Git signature. Release authenticity is bounded by the
+protected `main` branch, required GitHub checks, the GitHub Release record, and published SHA-256
+checksums.
 
 ## Required before a Codex for Open Source application
 

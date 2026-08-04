@@ -3,7 +3,7 @@
 | ID | 风险 | 当前等级 | 控制措施 | 状态 |
 |---|---|---:|---|---|
 | R-001 | 真实体育素材版权或平台访问限制 | 高 | Alpha 已用 synthetic 素材；后续仅公共领域/明确许可，不使用 Cookie、DRM 或私人账号 | 持续控制 |
-| R-002 | 非 macOS 字幕 fallback 无实机验证 | 中 | CI 矩阵、能力探测、libass 合同测试；文档明确未实机验证 | 开放 |
+| R-002 | 非 macOS 字幕 fallback 可用性差异 | 中 | Ubuntu/Windows 远端 FFmpeg 实跑、能力探测和 libass 合同测试；运行时继续显式报告能力 | 持续控制 |
 | R-003 | 词级时间缺失时被误称为真实同步 | 高 | 协议记录 `exact|estimated`；估算路径不得标记 exact | 已控制 |
 | R-004 | 教育视觉依赖已有协议但尚无自动视觉检测 | 中 | 已支持板书/幻灯片/代码/公式/图表依赖及证据引用；后续接多模态 Provider | 部分控制 |
 | R-008 | ASR 碎词或错误转写降低教育候选质量 | 中 | source burn-in 使用语义 span；AUTO 排除上下文不足、陈述过短和明显重复词候选 | 持续控制 |
@@ -16,6 +16,6 @@
 | R-012 | 把固定焦点基础构图误写为人物检测或跟踪 | 高 | capability 明示 `tracked_focus` unavailable；记录 `no_detection/no_tracking` 构图理由；Skill 禁止能力夸大 | 已控制 |
 | R-013 | 确定性 9:16 裁切丢失非居中主体或关键画面 | 中 | 提供 manual focus 与 fit background；记录裁剪几何并要求人工复核；后续真实跟踪作为独立可选能力 | 持续控制 |
 | R-014 | 多文件发布冲突或异常清理误删其他运行的文件 | 高 | 全计划预检；hard-link no-overwrite；仅按本次发布保存的设备号/inode 回滚；竞争与替换测试 | 已控制 |
-| R-015 | CI 文件存在但 Linux/Windows 尚未在 GitHub runner 实跑 | 中 | readiness 明示 configured-not-run；未来公开仓库首次推送后以实际 workflow 结果更新，不提前宣称通过 | 开放 |
-| R-016 | CutSum 名称/商标、早期私有参考或 benchmark 权利表述未经最终确认 | 高 | 版权主体 `DXBATM`、联系邮箱和 DCO 已确定；其余项目由 `open-source-readiness` 列为公开前强制人工/法律项；不把 REUSE/溯源审计写成法律确权 | 开放 |
+| R-015 | 远端跨平台 CI 回归 | 低 | GitHub-hosted Ubuntu、macOS、Windows 与 Python 3.11–3.13 已实际通过；required checks 已保护 `main` | 已控制 |
+| R-016 | CutSum 名称/商标、早期私有参考或 benchmark 权利表述风险 | 中 | 维护者已批准 Alpha 工程边界与公开措辞；完整 Apache-2.0、NOTICE、REUSE、溯源账本和 benchmark 限制已发布；不声称法律确权或不侵权保证 | 持续控制 |
 | R-017 | 完全离线安装缺少匹配 Python/OS/架构的二进制依赖 | 中 | 记录 Python 3.11 缓存失败与 3.12 成功；发布离线包时必须生成并核验目标平台 wheelhouse | 持续控制 |

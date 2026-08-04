@@ -17,3 +17,6 @@ reports/red-phase/
 reports/test-output/
 reports/*.txt
 tests/fixtures/generated/
+examples/demo-source.mp4
+examples/*-plan.json
+examples/output-*/

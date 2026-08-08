@@ -47,6 +47,8 @@ def test_repo_skill_routes_education_and_semantic_subtitle_display() -> None:
     assert "candidate IDs or reference timestamps" in skill
     assert "educational-task-request.schema.json" in reference
     assert "15–60 seconds" in reference  # noqa: RUF001
+    assert "--topic-group" in skill
+    assert "fail closed" in skill
 
 
 def test_repo_skill_discloses_sports_observation_boundary() -> None:

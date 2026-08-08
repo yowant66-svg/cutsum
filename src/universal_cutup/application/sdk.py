@@ -484,9 +484,14 @@ def plan_educational_content(
     *,
     control_mode: ControlMode,
     raw_instruction: str,
+    required_topic_groups: tuple[tuple[str, ...], ...] = (),
     output_spec: OutputSpec | None = None,
 ) -> EducationalPlanningResult:
-    request = resolve_educational_request(control_mode, raw_instruction)
+    request = resolve_educational_request(
+        control_mode,
+        raw_instruction,
+        required_topic_groups=required_topic_groups,
+    )
     candidates = tuple(
         prepared
         for candidate in propose_educational_candidates(transcript)

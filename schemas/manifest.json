@@ -10,7 +10,7 @@
   "cut-plan.schema.json": "2403282e83253d6556ddd3fc092496b1e8784007f1c35e4191d37ae5f2bbcc8d",
   "cut-request.schema.json": "a70296bf8c8b869dacac44daac02ef456b81292bc8a667860b6b1f6424f3c8e9",
   "educational-selection-result.schema.json": "20174715da4d76a1d234145a18ff9d4dcfc8a5efa479f51b27c405cbe2305c3f",
-  "educational-task-request.schema.json": "1c6f20c622f64979ea90d881eadb59048137c510b653cfbe32dc2ddbed39c435",
+  "educational-task-request.schema.json": "508d8cd108d1b3ba68ca75065c5b76904e0246f419b703b6c521a3566b061a34",
   "execution-record.schema.json": "d59ea8f142bf11666f1f3c8a5970dafd6132d7606638d1226bb1f7909d2e4f36",
   "four-track-evaluation-manifest.schema.json": "a9b367f20bc4cccb98c495cfa6e7168b6c1bb10077b7b3760cfaad15503e7b79",
   "four-track-evaluation-report.schema.json": "67e8a9eebf7c40554bef2f451e81a54c1cde77d1e257e7129668db6bb99d7915",

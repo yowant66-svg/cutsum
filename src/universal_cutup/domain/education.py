@@ -137,9 +137,24 @@ class EducationalTaskRequest(FrozenModel):
     required_types: tuple[EducationSignalType, ...] = ()
     forbidden_types: tuple[EducationSignalType, ...] = ()
     target_count: int | None = Field(default=None, ge=1)
+    required_topic_groups: tuple[tuple[str, ...], ...] = ()
+    maximum_duration_ms: int | None = Field(default=None, gt=0)
+    unresolved_semantic_instruction: bool = False
 
     @model_validator(mode="after")
     def validate_request(self) -> EducationalTaskRequest:
         if set(self.required_types) & set(self.forbidden_types):
             raise ValueError("educational type cannot be both required and forbidden")
+        if any(not group for group in self.required_topic_groups):
+            raise ValueError("educational topic groups cannot be empty")
+        normalized_groups = tuple(
+            tuple(term.strip().casefold() for term in group)
+            for group in self.required_topic_groups
+        )
+        if any(not term for group in normalized_groups for term in group):
+            raise ValueError("educational topic terms cannot be blank")
+        if any(len(group) != len(set(group)) for group in normalized_groups):
+            raise ValueError("educational topic alternatives must be unique")
+        if len(normalized_groups) != len(set(normalized_groups)):
+            raise ValueError("educational topic groups must be unique")
         return self

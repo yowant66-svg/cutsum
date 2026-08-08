@@ -30,9 +30,12 @@ from universal_cutup.domain.selection import (
 )
 from universal_cutup.domain.sources import MediaSource
 from universal_cutup.domain.specs import OutputSpec
+from universal_cutup.domain.subtitles import SubtitleSemanticSpan
 from universal_cutup.domain.transcript import SubtitleCue, TranscriptArtifact
 from universal_cutup.strategies.educational import (
     attach_education_signals,
+    build_educational_profile,
+    extract_education_signals,
     select_educational_candidates,
 )
 
@@ -66,27 +69,111 @@ COUNT_MARKERS = {
     "五个": 5,
 }
 MINIMUM_EDUCATIONAL_CANDIDATE_DURATION_MS = 15_000
+MAXIMUM_DURATION_PATTERN = re.compile(
+    r"(?:最多|最长|不超过)\s*(\d+)\s*(秒|分钟)|"
+    r"(?:at most|maximum|max|no more than)\s*(\d+)\s*(seconds?|minutes?)",
+    flags=re.IGNORECASE,
+)
+DIRECTED_CONTROL_MARKERS = (
+    "只保留",
+    "只要",
+    "不要",
+    "不需要",
+    "排除",
+    "保留",
+    "提取",
+    "选择",
+    "完整",
+    "连续",
+    "独立",
+    "知识片段",
+    "片段",
+    "能够",
+    "能",
+    "包含",
+    "并",
+    "的",
+    "only",
+    "keep",
+    "select",
+    "extract",
+    "exclude",
+    "without",
+    "not",
+    "complete",
+    "self-contained",
+    "clip",
+    "segment",
+    "and",
+)
 
 
-def _expand_cues_for_minimum_duration(
-    cues: tuple[SubtitleCue, ...],
-    source_cue_ids: tuple[str, ...],
-) -> tuple[SubtitleCue, ...]:
-    positions = {cue.cue_id: index for index, cue in enumerate(cues)}
-    first = min(positions[cue_id] for cue_id in source_cue_ids)
-    last = max(positions[cue_id] for cue_id in source_cue_ids)
-    while cues[last].end_ms - cues[first].start_ms < MINIMUM_EDUCATIONAL_CANDIDATE_DURATION_MS and (
-        first > 0 or last < len(cues) - 1
+def _has_unresolved_directed_semantics(
+    control_mode: ControlMode,
+    normalized_instruction: str,
+    *,
+    required_topic_groups: tuple[tuple[str, ...], ...],
+) -> bool:
+    if (
+        control_mode is not ControlMode.DIRECTED
+        or not normalized_instruction.strip()
+        or required_topic_groups
     ):
-        previous_gap = cues[first].start_ms - cues[first - 1].end_ms if first > 0 else None
-        following_gap = (
-            cues[last + 1].start_ms - cues[last].end_ms if last < len(cues) - 1 else None
-        )
-        if previous_gap is not None and (following_gap is None or previous_gap <= following_gap):
+        return False
+    residual = MAXIMUM_DURATION_PATTERN.sub("", normalized_instruction)
+    removable = {
+        *COUNT_MARKERS,
+        *DIRECTED_CONTROL_MARKERS,
+        *(
+            marker
+            for markers in EDUCATIONAL_INTENT_MARKERS.values()
+            for marker in markers
+        ),
+    }
+    for marker in sorted(removable, key=len, reverse=True):
+        residual = residual.replace(marker, "")
+    residual = re.sub(r"[\W_\d]+", "", residual, flags=re.UNICODE)
+    return bool(residual)
+
+
+def _weak_semantic_boundary(span: SubtitleSemanticSpan) -> bool:
+    return len(re.findall(r"[A-Za-z0-9\u3400-\u9fff]+", span.text)) < 3
+
+
+def _expand_semantic_spans(
+    spans: tuple[SubtitleSemanticSpan, ...],
+    index: int,
+) -> tuple[SubtitleSemanticSpan, ...]:
+    first = last = index
+    while (
+        spans[last].end_ms - spans[first].start_ms
+        < MINIMUM_EDUCATIONAL_CANDIDATE_DURATION_MS
+    ) and (
+        first > 0 or last < len(spans) - 1
+    ):
+        options: list[tuple[bool, int, str]] = []
+        if first > 0:
+            options.append(
+                (
+                    _weak_semantic_boundary(spans[first - 1]),
+                    max(0, spans[first].start_ms - spans[first - 1].end_ms),
+                    "previous",
+                )
+            )
+        if last < len(spans) - 1:
+            options.append(
+                (
+                    _weak_semantic_boundary(spans[last + 1]),
+                    max(0, spans[last + 1].start_ms - spans[last].end_ms),
+                    "following",
+                )
+            )
+        direction = min(options, key=lambda item: item[:2])[2]
+        if direction == "previous":
             first -= 1
         else:
             last += 1
-    return cues[first : last + 1]
+    return spans[first : last + 1]
 
 
 def propose_educational_candidates(
@@ -111,43 +198,57 @@ def propose_educational_candidates(
         maximum_display_duration_ms=30_000,
     )
     candidates: list[CutCandidate] = []
-    for span in transcript_semantic_spans:
-        covered_cues = _expand_cues_for_minimum_duration(
-            cues,
-            span.source_cue_ids,
+    cues_by_id = {cue.cue_id: cue for cue in cues}
+    for span_index, span in enumerate(transcript_semantic_spans):
+        context_semantic_spans = _expand_semantic_spans(
+            transcript_semantic_spans,
+            span_index,
         )
-        context_semantic_spans = semantic_source_spans(covered_cues)
+        covered_cue_ids = tuple(
+            dict.fromkeys(
+                cue_id
+                for semantic_span in context_semantic_spans
+                for cue_id in semantic_span.source_cue_ids
+            )
+        )
+        covered_cues = tuple(cues_by_id[cue_id] for cue_id in covered_cue_ids)
         segment_ids = tuple(
             dict.fromkeys(
                 segment_id for cue in covered_cues for segment_id in cue.source_segment_ids
             )
         )
-        evidence_text = " ".join(cue.text.strip() for cue in covered_cues)
+        evidence_text = " ".join(item.text.strip() for item in context_semantic_spans)
         evidence_hash = hashlib.sha256(evidence_text.encode()).hexdigest()
-        candidate = prepare_educational_candidate(
-            CutCandidate(
-                candidate_id=f"education-{span.semantic_span_id}",
-                source_id=transcript.source_id,
-                start_ms=min(cue.start_ms for cue in covered_cues),
-                end_ms=max(cue.end_ms for cue in covered_cues),
-                summary=span.text,
-                evidence_refs=(
-                    EvidenceRef(
-                        evidence_id=(f"evidence-{span.semantic_span_id}-{evidence_hash[:8]}"),
-                        artifact_id=transcript.transcript_id,
-                        segment_ids=segment_ids,
-                        start_ms=min(cue.start_ms for cue in covered_cues),
-                        end_ms=max(cue.end_ms for cue in covered_cues),
-                        text_sha256=evidence_hash,
-                        snapshot=evidence_text,
-                    ),
+        candidate = CutCandidate(
+            candidate_id=f"education-{span.semantic_span_id}",
+            source_id=transcript.source_id,
+            start_ms=context_semantic_spans[0].start_ms,
+            end_ms=context_semantic_spans[-1].end_ms,
+            summary=span.text,
+            evidence_refs=(
+                EvidenceRef(
+                    evidence_id=(f"evidence-{span.semantic_span_id}-{evidence_hash[:8]}"),
+                    artifact_id=transcript.transcript_id,
+                    segment_ids=segment_ids,
+                    start_ms=context_semantic_spans[0].start_ms,
+                    end_ms=context_semantic_spans[-1].end_ms,
+                    text_sha256=evidence_hash,
+                    snapshot=evidence_text,
                 ),
-                subtitle_cues=covered_cues,
-                subtitle_semantic_spans=(span,),
-                tags=("education", "semantic-proposal"),
-            )
+            ),
+            subtitle_cues=covered_cues,
+            subtitle_semantic_spans=context_semantic_spans,
+            tags=("education", "semantic-proposal"),
         )
-        candidate = candidate.model_copy(update={"subtitle_semantic_spans": context_semantic_spans})
+        signal_source = candidate.model_copy(
+            update={"subtitle_semantic_spans": (span,)}
+        )
+        candidate = candidate.model_copy(
+            update={"education_signals": extract_education_signals(signal_source)}
+        )
+        candidate = candidate.model_copy(
+            update={"educational_profile": build_educational_profile(candidate)}
+        )
         profile = candidate.educational_profile
         if profile is not None and (set(profile.signal_types) & STRUCTURAL_EDUCATION_SIGNAL_TYPES):
             candidates.append(candidate)
@@ -161,6 +262,8 @@ def prepare_educational_candidate(candidate: CutCandidate) -> CutCandidate:
 def resolve_educational_request(
     control_mode: ControlMode,
     raw_instruction: str,
+    *,
+    required_topic_groups: tuple[tuple[str, ...], ...] = (),
 ) -> EducationalTaskRequest:
     normalized = raw_instruction.casefold()
     required: list[EducationSignalType] = []
@@ -182,12 +285,25 @@ def resolve_educational_request(
         (count for marker, count in COUNT_MARKERS.items() if marker in normalized),
         None,
     )
+    duration_match = MAXIMUM_DURATION_PATTERN.search(normalized)
+    maximum_duration_ms = None
+    if duration_match is not None:
+        value = int(duration_match.group(1) or duration_match.group(3))
+        unit = duration_match.group(2) or duration_match.group(4)
+        maximum_duration_ms = value * (60_000 if unit in {"分钟", "minute", "minutes"} else 1000)
     return EducationalTaskRequest(
         control_mode=control_mode,
         raw_instruction=raw_instruction,
         required_types=tuple(dict.fromkeys(required)),
         forbidden_types=tuple(dict.fromkeys(forbidden)),
         target_count=target_count,
+        required_topic_groups=required_topic_groups,
+        maximum_duration_ms=maximum_duration_ms,
+        unresolved_semantic_instruction=_has_unresolved_directed_semantics(
+            control_mode,
+            normalized,
+            required_topic_groups=required_topic_groups,
+        ),
     )
 
 
@@ -216,11 +332,28 @@ def select_educational_for_request(
             for candidate in prepared
         )
         required_count = max(1, min(3, eligible_count))
-    return select_educational_candidates(
+    result = select_educational_candidates(
         prepared,
         required_types=request.required_types,
         forbidden_types=request.forbidden_types,
         required_count=required_count,
+        required_topic_groups=request.required_topic_groups,
+        maximum_duration_ms=request.maximum_duration_ms,
+        semantic_constraints_resolved=not request.unresolved_semantic_instruction,
+    )
+    if not request.unresolved_semantic_instruction:
+        return result
+    return result.model_copy(
+        update={
+            "unsatisfied_requirements": tuple(
+                dict.fromkeys(
+                    (
+                        *result.unsatisfied_requirements,
+                        "educational_topic_constraints_unresolved",
+                    )
+                )
+            )
+        }
     )
 
 

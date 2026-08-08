@@ -542,16 +542,34 @@ def education_plan(
     rights: RightsAttestation = RightsAttestation.ANALYSIS_ONLY,
     quality_preset: QualityPreset = QualityPreset.REVIEW,
     resolution_mode: ResolutionMode = ResolutionMode.P720,
+    topic_group: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--topic-group",
+            help="Repeatable group of equivalent host-resolved terms separated by '|'.",
+        ),
+    ] = None,
 ) -> None:
     """Create an education AUTO/DIRECTED CutPlan from raw local transcript evidence."""
     try:
         inspection = inspect_source(media, rights_attestation=rights)
         parsed = _transcript(transcript, inspection.source.source_id)
+        required_topic_groups = tuple(
+            tuple(term.strip() for term in value.split("|") if term.strip())
+            for value in (topic_group or [])
+        )
+        if any(not group for group in required_topic_groups):
+            raise CutupError(
+                ErrorCode.PROTOCOL_INVALID,
+                "education topic groups require at least one non-blank term",
+                step="education_plan",
+            )
         result = plan_educational_content(
             inspection.source,
             parsed,
             control_mode=mode,
             raw_instruction=instruction,
+            required_topic_groups=required_topic_groups,
             output_spec=OutputSpec(
                 render=RenderSpec(
                     quality_preset=quality_preset,

@@ -124,6 +124,28 @@ def test_reframe_rejects_non_vertical_target_and_tracked_focus() -> None:
     assert tracked.value.code is ErrorCode.CAPABILITY_UNAVAILABLE
 
 
+def test_explicit_vertical_dimensions_reject_instead_of_silently_shrinking() -> None:
+    with pytest.raises(CutupError) as conflict:
+        resolve_reframe(
+            RenderSpec(
+                target_width=720,
+                target_height=1280,
+                allow_upscale=False,
+            ),
+            ReframeSpec(mode="fit_background"),
+            source_width=640,
+            source_height=360,
+        )
+
+    assert conflict.value.code is ErrorCode.CAPABILITY_CONFLICT
+    assert conflict.value.details == {
+        "requested_width": 720,
+        "requested_height": 1280,
+        "maximum_without_upscale_width": 202,
+        "maximum_without_upscale_height": 360,
+    }
+
+
 def test_odd_source_dimensions_still_produce_even_codec_safe_geometry() -> None:
     decision = resolve_reframe(
         RenderSpec(resolution_mode=ResolutionMode.P720),

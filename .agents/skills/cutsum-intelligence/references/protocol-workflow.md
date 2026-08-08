@@ -76,7 +76,13 @@ without a structural teaching signal. `EducationalCandidateProfile` records key 
 roles, completeness confidence, and visual dependency types. A transcript proposal may retain an
 unqualified candidate for audit, but AUTO selection rejects missing context and insufficient
 statements. The default education window is 15–60 seconds; required context may extend to 120
-seconds with an explicit reason, and longer material becomes ordered Parts.
+seconds with an explicit reason, and longer material becomes ordered Parts. Topic-specific
+DIRECTED education requests carry `required_topic_groups`. Every group is required, while terms
+inside one group are alternatives in the transcript language. Topic qualification normally uses
+the candidate's core semantic statement. A dependent statement such as one beginning with
+`because` may also use the immediately required complete context, but an ordinary candidate cannot
+borrow a topic from neighboring text added only for a clean media boundary. Unresolved topic
+instructions and missing groups are explicit unsatisfied requirements.
 
 `SportsObservationBundle` is detector output, not a selection verdict. Each observation records
 modality, temporal role, confidence, correlation key, and Provider record. The core aggregates

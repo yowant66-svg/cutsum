@@ -41,10 +41,15 @@ media feature exists.
    candidate IDs or reference timestamps as proposal input. Use `resolve_educational_request` for
    AUTO or pure natural-language DIRECTED intent, then `create_educational_plan` for a portable
    plan. AUTO must prefer distinct, self-contained knowledge types rather than repeated mentions of
-   the same concept.
+   the same concept. For a topic-specific DIRECTED request, resolve each required concept into one
+   group of transcript-language alternatives and repeat `--topic-group` for every required concept;
+   separate alternatives inside a group with `|`. This is semantic qualification, not candidate
+   steering: never supply candidate IDs or timestamps. If the host cannot resolve the topic groups,
+   leave them absent and preserve the explicit `educational_topic_constraints_unresolved` result;
+   the engine must fail closed instead of selecting an unrelated structural match.
    For a local planning entrypoint, use `cutsum education-plan MEDIA TRANSCRIPT` with `--mode auto`,
-   or `--mode directed --instruction "..."`. `--output` writes the portable CutPlan; stdout retains
-   the full request/candidates/selection/plan result.
+   or `--mode directed --instruction "..." --topic-group "term|equivalent"`. `--output` writes the
+   portable CutPlan; stdout retains the full request/candidates/selection/plan result.
 7. Generate cross-segment candidates and all 14 evidence-backed assessments. Mark an inapplicable
    dimension unavailable; never give it a zero merely because it is not applicable. Education
    eligibility and structure remain authoritative; Highlight14 is supplementary.

@@ -365,6 +365,35 @@ def test_dependent_reasoning_statement_can_use_its_required_previous_topic_conte
     assert "base two" in snapshot.casefold()
 
 
+def test_internal_discourse_marker_does_not_make_complete_window_context_dependent() -> None:
+    candidates = propose_educational_candidates(
+        _transcript(
+            (
+                "Base two represents information with two possible states.",
+                "But this complete transition remains inside the selected window.",
+                "Because each bit has two states, it can therefore encode a binary choice.",
+                "This complete sentence closes the explanation.",
+            )
+        )
+    )
+    request = resolve_educational_request(
+        ControlMode.DIRECTED,
+        "只保留一个二进制推理片段。",
+        required_topic_groups=(("binary", "base two"),),
+    )
+
+    result = select_educational_for_request(candidates, request)
+
+    assert result.selected_candidate_ids
+    selected = next(
+        candidate
+        for candidate in candidates
+        if candidate.candidate_id in result.selected_candidate_ids
+    )
+    assert selected.educational_profile is not None
+    assert selected.educational_profile.qualified is True
+
+
 def test_candidate_cannot_borrow_an_education_signal_from_neighboring_context() -> None:
     candidates = propose_educational_candidates(
         _transcript(

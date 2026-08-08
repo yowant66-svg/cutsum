@@ -269,12 +269,15 @@ def build_educational_profile(candidate: CutCandidate) -> EducationalCandidatePr
         or tuple(unit.source_text for unit in candidate.subtitle_display_units)
         or tuple(cue.text for cue in candidate.subtitle_cues)
     )
-    if any(FOLLOWING_CONTEXT_PATTERN.search(text) for text in candidate_texts):
+    first_candidate_text = candidate_texts[0] if candidate_texts else candidate.summary
+    last_candidate_text = candidate_texts[-1] if candidate_texts else candidate.summary
+    if FOLLOWING_CONTEXT_PATTERN.search(last_candidate_text):
         context_roles = (*context_roles, EducationContextRole.REQUIRES_FOLLOWING)
-    if any(text.rstrip().endswith((",", ";", ":", "，", "；", "：")) for text in candidate_texts):  # noqa: RUF001
+    if last_candidate_text.rstrip().endswith((",", ";", ":", "，", "；", "：")):  # noqa: RUF001
         context_roles = (*context_roles, EducationContextRole.REQUIRES_FOLLOWING)
-    if EducationSignalType.DEFINITION not in signal_types and any(
-        PREVIOUS_CONTEXT_PATTERN.search(text) for text in candidate_texts
+    if (
+        EducationSignalType.DEFINITION not in signal_types
+        and PREVIOUS_CONTEXT_PATTERN.search(first_candidate_text)
     ):
         context_roles = (*context_roles, EducationContextRole.REQUIRES_PREVIOUS)
     context_roles = tuple(

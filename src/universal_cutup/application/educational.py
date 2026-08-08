@@ -74,6 +74,22 @@ MAXIMUM_DURATION_PATTERN = re.compile(
     r"(?:at most|maximum|max|no more than)\s*(\d+)\s*(seconds?|minutes?)",
     flags=re.IGNORECASE,
 )
+DEPENDENT_SEMANTIC_START_PATTERN = re.compile(
+    (
+        r"^\s*(?:(?:and\s+)?(?:then|similarly|likewise|therefore|thus|so)|"
+        r"but|however|instead|also|because of this|this|that|these|those|"
+        r"assume\s+(?:the\s+)?(?:inductive\s+)?hypothesis|"
+        r"然后|接着|同样|类似地|但是|不过|因此|所以|由此)\b"
+    ),
+    flags=re.IGNORECASE,
+)
+REFERENTIAL_SEMANTIC_PATTERN = re.compile(
+    (
+        r"\b(?:this|that|these|those)\s+(?:one|ones|guy|guys|edge|edges|"
+        r"input|inputs|output|outputs|thing|things)\b"
+    ),
+    flags=re.IGNORECASE,
+)
 DIRECTED_CONTROL_MARKERS = (
     "只保留",
     "只要",
@@ -140,6 +156,17 @@ def _weak_semantic_boundary(span: SubtitleSemanticSpan) -> bool:
     return len(re.findall(r"[A-Za-z0-9\u3400-\u9fff]+", span.text)) < 3
 
 
+def _dependent_semantic_boundary(span: SubtitleSemanticSpan) -> bool:
+    return bool(
+        DEPENDENT_SEMANTIC_START_PATTERN.search(span.text)
+        or REFERENTIAL_SEMANTIC_PATTERN.search(span.text)
+    )
+
+
+def _unsafe_previous_boundary(span: SubtitleSemanticSpan) -> bool:
+    return _weak_semantic_boundary(span) or _dependent_semantic_boundary(span)
+
+
 def _expand_semantic_spans(
     spans: tuple[SubtitleSemanticSpan, ...],
     index: int,
@@ -155,7 +182,7 @@ def _expand_semantic_spans(
         if first > 0:
             options.append(
                 (
-                    _weak_semantic_boundary(spans[first - 1]),
+                    _unsafe_previous_boundary(spans[first - 1]),
                     max(0, spans[first].start_ms - spans[first - 1].end_ms),
                     "previous",
                 )
@@ -163,7 +190,7 @@ def _expand_semantic_spans(
         if last < len(spans) - 1:
             options.append(
                 (
-                    _weak_semantic_boundary(spans[last + 1]),
+                    False,
                     max(0, spans[last + 1].start_ms - spans[last].end_ms),
                     "following",
                 )
@@ -173,6 +200,15 @@ def _expand_semantic_spans(
             first -= 1
         else:
             last += 1
+    while first > 0 and _dependent_semantic_boundary(spans[first]):
+        previous = first - 1
+        while previous >= 0 and _weak_semantic_boundary(spans[previous]):
+            previous -= 1
+        if previous < 0:
+            break
+        first = previous
+    while last < len(spans) - 1 and _weak_semantic_boundary(spans[last]):
+        last += 1
     return spans[first : last + 1]
 
 

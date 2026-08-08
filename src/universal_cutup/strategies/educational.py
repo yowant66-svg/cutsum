@@ -125,8 +125,9 @@ KNOWN_EDUCATION_TERMS = (
 )
 PREVIOUS_CONTEXT_PATTERN = re.compile(
     (
-        r"^\s*(?:therefore|thus|because of this|"
-        r"so(?!\s+let'?s say)|this|that|these|those|因此|所以|由此)\b"
+        r"^\s*(?:(?:and\s+)?(?:then|similarly|likewise|therefore|thus)|"
+        r"but|however|instead|also|because of this|so(?!\s+let'?s say)|"
+        r"this|that|these|those|然后|接着|同样|类似地|但是|不过|因此|所以|由此)\b"
     ),
     flags=re.IGNORECASE,
 )

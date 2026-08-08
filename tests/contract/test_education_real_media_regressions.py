@@ -57,13 +57,17 @@ def _candidate(
     )
 
 
-def _transcript(texts: tuple[str, ...]) -> TranscriptArtifact:
+def _transcript(
+    texts: tuple[str, ...],
+    *,
+    segment_duration_ms: int = 4_000,
+) -> TranscriptArtifact:
     segments = tuple(
         TranscriptSegment(
             segment_id=f"segment-{index:04d}",
             source_id="source-real-regression",
-            start_ms=(index - 1) * 4_000,
-            end_ms=index * 4_000,
+            start_ms=(index - 1) * segment_duration_ms,
+            end_ms=index * segment_duration_ms,
             text=text,
             text_sha256=hashlib.sha256(text.encode()).hexdigest(),
         )
@@ -225,6 +229,79 @@ def test_candidate_expansion_uses_complete_semantic_boundaries() -> None:
     assert not snapshot.startswith("algorithm.")
     assert snapshot.rstrip().endswith(".")
     assert definition.end_ms - definition.start_ms >= 15_000
+
+
+def test_candidate_expansion_does_not_start_on_a_dependent_context_sentence() -> None:
+    candidates = propose_educational_candidates(
+        _transcript(
+            (
+                "This complete sentence establishes the surrounding lesson context.",
+                "Similarly, this comparison",
+                "still depends on",
+                "the preceding statement.",
+                "For example, binary search halves the remaining search space.",
+                "This complete sentence closes the worked example.",
+            )
+        )
+    )
+    example = next(
+        candidate
+        for candidate in candidates
+        if "binary search" in candidate.summary.casefold()
+    )
+
+    snapshot = example.evidence_refs[0].snapshot
+    assert snapshot is not None
+    assert snapshot.startswith("This complete sentence establishes")
+    assert example.end_ms - example.start_ms >= 15_000
+
+
+def test_long_dependent_core_still_expands_to_an_independent_start() -> None:
+    candidates = propose_educational_candidates(
+        _transcript(
+            (
+                "This complete sentence establishes the preceding algorithm context.",
+                "And then, an algorithm is a function from inputs to valid outputs.",
+                "This complete sentence closes the definition.",
+            ),
+            segment_duration_ms=16_000,
+        )
+    )
+    definition = next(
+        candidate
+        for candidate in candidates
+        if "algorithm is a function" in candidate.summary.casefold()
+    )
+
+    snapshot = definition.evidence_refs[0].snapshot
+    assert snapshot is not None
+    assert snapshot.startswith("This complete sentence establishes")
+
+
+def test_expansion_prefers_forward_context_over_a_dependent_previous_chain() -> None:
+    candidates = propose_educational_candidates(
+        _transcript(
+            (
+                "Similarly, this comparison",
+                "still depends on",
+                "the preceding statement.",
+                "An algorithm is a function from inputs to valid outputs.",
+                "Okay.",
+                "The mapping rejects every invalid output.",
+                "This complete sentence closes the explanation.",
+            )
+        )
+    )
+    definition = next(
+        candidate
+        for candidate in candidates
+        if "algorithm is a function" in candidate.summary.casefold()
+    )
+
+    snapshot = definition.evidence_refs[0].snapshot
+    assert snapshot is not None
+    assert snapshot.startswith("An algorithm is a function")
+    assert snapshot.endswith("explanation.")
 
 
 def test_topic_qualification_uses_core_statement_not_neighboring_context() -> None:

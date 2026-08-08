@@ -84,10 +84,7 @@ DEPENDENT_SEMANTIC_START_PATTERN = re.compile(
     flags=re.IGNORECASE,
 )
 REFERENTIAL_SEMANTIC_PATTERN = re.compile(
-    (
-        r"\b(?:this|that|these|those)\s+(?:one|ones|guy|guys|edge|edges|"
-        r"input|inputs|output|outputs|thing|things)\b"
-    ),
+    r"\b(?:this|that|these|those)\s+[A-Za-z][A-Za-z-]*\b",
     flags=re.IGNORECASE,
 )
 DIRECTED_CONTROL_MARKERS = (

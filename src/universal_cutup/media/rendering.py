@@ -200,6 +200,29 @@ def resolve_reframe(
     available_width = source_width if reframe_spec.mode == "fit_background" else crop_width
     available_height = source_height if reframe_spec.mode == "fit_background" else crop_height
     scale = min(available_width / desired_width, available_height / desired_height)
+    explicit_dimensions = (
+        render_spec.target_width is not None and render_spec.target_height is not None
+    )
+    if explicit_dimensions and not render_spec.allow_upscale and scale < 1:
+        raise CutupError(
+            ErrorCode.CAPABILITY_CONFLICT,
+            "explicit reframe dimensions require upscaling beyond the source",
+            category="capability",
+            step="reframe",
+            recoverable=True,
+            details={
+                "requested_width": desired_width,
+                "requested_height": desired_height,
+                "maximum_without_upscale_width": _bounded_even(
+                    desired_width * scale,
+                    available_width,
+                ),
+                "maximum_without_upscale_height": _bounded_even(
+                    desired_height * scale,
+                    available_height,
+                ),
+            },
+        )
     if render_spec.allow_upscale or scale >= 1:
         output_width, output_height = desired_width, desired_height
     else:

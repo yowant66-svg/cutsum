@@ -22,6 +22,10 @@ SIGNAL_PATTERNS: dict[EducationSignalType, tuple[str, ...]] = {
             r"\b(?:algorithm|problem|function|recurrence|theorem|rule|formula|"
             r"concept|term)\s+is\s+(?:an?|the)\b"
         ),
+        r"\b[A-Za-z][A-Za-z -]{1,60},?\s+which\s+is\s+the\s+study\s+of\b",
+        r"\b[A-Za-z][A-Za-z -]{1,60}\s+is\s+the\s+study\s+of\b",
+        r"\b(?:it|this|that|[A-Za-z][A-Za-z -]{1,60})\s+refers\s+to\b",
+        r"\bby\s+[A-Za-z][A-Za-z -]{1,40}\s+(?:we|I)\s+mean\b",
         r"定义",
         r"是指",
     ),
@@ -128,6 +132,10 @@ PREVIOUS_CONTEXT_PATTERN = re.compile(
 )
 FOLLOWING_CONTEXT_PATTERN = re.compile(
     r"(?:\bbecause|\bif|\bwhen|\bwhich|\bthat|因为|如果|当|也就是说)\s*[,:，：]?\s*$",  # noqa: RUF001
+    flags=re.IGNORECASE,
+)
+DEPENDENT_TOPIC_CONTEXT_PATTERN = re.compile(
+    r"^\s*(?:because|therefore|thus|so\b|this\b|that\b|because of this|因此|所以|因为)",
     flags=re.IGNORECASE,
 )
 TOKEN_PATTERN = re.compile(r"[A-Za-z0-9]+(?:-[A-Za-z]+)?")
@@ -322,6 +330,9 @@ def qualify_educational_candidate(
     candidate: CutCandidate,
     *,
     required_types: tuple[EducationSignalType, ...],
+    required_topic_groups: tuple[tuple[str, ...], ...] = (),
+    maximum_duration_ms: int | None = None,
+    semantic_constraints_resolved: bool = True,
 ) -> EducationalQualification:
     matched = tuple(dict.fromkeys(signal.signal_type for signal in candidate.education_signals))
     matched_set = set(matched)
@@ -339,9 +350,26 @@ def qualify_educational_candidate(
         reasons.append("requires_previous_context")
     if EducationContextRole.REQUIRES_FOLLOWING in profile.context_roles:
         reasons.append("requires_following_context")
+    candidate_text = candidate.summary.casefold()
+    if (
+        DEPENDENT_TOPIC_CONTEXT_PATTERN.search(candidate.summary)
+        and candidate.evidence_refs
+        and candidate.evidence_refs[0].snapshot is not None
+    ):
+        candidate_text = candidate.evidence_refs[0].snapshot.casefold()
+    for group in required_topic_groups:
+        if not any(term.casefold() in candidate_text for term in group):
+            reasons.append(f"missing_topic_group:{'|'.join(group)}")
+    if (
+        maximum_duration_ms is not None
+        and candidate.end_ms - candidate.start_ms > maximum_duration_ms
+    ):
+        reasons.append(f"exceeds_maximum_duration_ms:{maximum_duration_ms}")
+    if not semantic_constraints_resolved:
+        reasons.append("topic_constraints_require_host_resolution")
     return EducationalQualification(
         candidate_id=candidate.candidate_id,
-        qualified=not missing and has_structural_signal and profile.qualified,
+        qualified=not reasons and has_structural_signal and profile.qualified,
         matched_types=matched,
         missing_types=missing,
         reasons=tuple(reasons),
@@ -354,6 +382,9 @@ def select_educational_candidates(
     required_types: tuple[EducationSignalType, ...],
     required_count: int,
     forbidden_types: tuple[EducationSignalType, ...] = (),
+    required_topic_groups: tuple[tuple[str, ...], ...] = (),
+    maximum_duration_ms: int | None = None,
+    semantic_constraints_resolved: bool = True,
 ) -> EducationalSelectionResult:
     if required_count < 1:
         raise ValueError("required_count must be at least one")
@@ -363,6 +394,9 @@ def select_educational_candidates(
         qualification = qualify_educational_candidate(
             candidate,
             required_types=required_types,
+            required_topic_groups=required_topic_groups,
+            maximum_duration_ms=maximum_duration_ms,
+            semantic_constraints_resolved=semantic_constraints_resolved,
         )
         matched_set = set(qualification.matched_types)
         if matched_set & forbidden_set:

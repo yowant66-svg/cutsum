@@ -39,9 +39,33 @@
       "title": "Forbidden Types",
       "type": "array"
     },
+    "maximum_duration_ms": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Maximum Duration Ms"
+    },
     "raw_instruction": {
       "title": "Raw Instruction",
       "type": "string"
+    },
+    "required_topic_groups": {
+      "default": [],
+      "items": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "title": "Required Topic Groups",
+      "type": "array"
     },
     "required_types": {
       "default": [],
@@ -63,6 +87,11 @@
       ],
       "default": null,
       "title": "Target Count"
+    },
+    "unresolved_semantic_instruction": {
+      "default": false,
+      "title": "Unresolved Semantic Instruction",
+      "type": "boolean"
     }
   },
   "required": [

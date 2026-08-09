@@ -430,6 +430,47 @@ def test_external_plan_produces_verified_artifacts(
         assert "Gate D synthetic subtitle" not in subtitle_text
 
 
+@pytest.mark.parametrize(
+    ("sidecar_format", "expected_mime_type"),
+    [
+        (SubtitleSidecarFormat.SRT, "application/x-subrip"),
+        (SubtitleSidecarFormat.VTT, "text/vtt"),
+        (SubtitleSidecarFormat.ASS, "text/x-ssa"),
+    ],
+)
+def test_sidecar_artifact_reports_format_specific_mime_type(
+    synthetic_media: Path,
+    tmp_path: Path,
+    sidecar_format: SubtitleSidecarFormat,
+    expected_mime_type: str,
+) -> None:
+    base = make_plan(synthetic_media, subtitle_mode="sidecar")
+    plan = base.model_copy(
+        update={
+            "output_spec": base.output_spec.model_copy(
+                update={
+                    "subtitle": base.output_spec.subtitle.model_copy(
+                        update={"sidecar_format": sidecar_format}
+                    )
+                }
+            )
+        }
+    )
+
+    execution = execute_external_plan(
+        plan,
+        binding=MediaBinding(source_id="source-1", local_path=str(synthetic_media)),
+        output_root=tmp_path / sidecar_format.value,
+    )
+
+    subtitle_artifact = next(
+        artifact for artifact in execution.artifacts if artifact.artifact_type == "subtitle"
+    )
+    assert execution.status == "success"
+    assert subtitle_artifact.relative_path.endswith(f".{sidecar_format.value}")
+    assert subtitle_artifact.mime_type == expected_mime_type
+
+
 def test_bilingual_burn_in_is_visible_and_preserves_timed_cues(
     synthetic_media: Path,
     tmp_path: Path,

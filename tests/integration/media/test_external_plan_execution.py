@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import hashlib
+import json
+import os
 import shutil
 import subprocess
 from datetime import UTC, datetime
@@ -9,11 +11,13 @@ from threading import Event
 from typing import Literal
 
 import pytest
+from typer.testing import CliRunner
 
 from universal_cutup.application.subtitle_display import (
     materialize_display_units,
     source_group_text,
 )
+from universal_cutup.cli import app
 from universal_cutup.domain.candidates import (
     CutCandidate,
     EvidenceArtifactIdentity,
@@ -1008,3 +1012,60 @@ def test_cancelled_and_timed_out_attempts_return_records(
     assert execution.status == execution_status
     assert execution.steps[0].error_code == error_code.value
     assert not tuple((tmp_path / process_status.value).glob(".cutup-*"))
+
+
+@pytest.mark.skipif(os.name == "nt", reason="POSIX permission bits required")
+def test_read_only_output_root_is_rejected_during_preflight(
+    synthetic_media: Path,
+    tmp_path: Path,
+) -> None:
+    plan = make_plan(synthetic_media, subtitle_mode="sidecar")
+    output_root = tmp_path / "read-only-output"
+    output_root.mkdir()
+    output_root.chmod(0o500)
+
+    try:
+        execution = execute_external_plan(
+            plan,
+            binding=MediaBinding(source_id="source-1", local_path=str(synthetic_media)),
+            output_root=output_root,
+        )
+    finally:
+        output_root.chmod(0o700)
+
+    assert execution.status == "failed"
+    assert execution.artifacts == ()
+    assert len(execution.steps) == 1
+    assert execution.steps[0].step_id == "preflight-output"
+    assert execution.steps[0].error_code == ErrorCode.OUTPUT_NOT_WRITABLE.value
+    assert not tuple(output_root.iterdir())
+
+
+@pytest.mark.skipif(os.name == "nt", reason="POSIX permission bits required")
+def test_cut_cli_emits_failed_record_when_read_only_root_cannot_store_it(
+    synthetic_media: Path,
+    tmp_path: Path,
+) -> None:
+    plan = make_plan(synthetic_media, subtitle_mode="sidecar")
+    plan_path = tmp_path / "plan.json"
+    plan_path.write_text(plan.model_dump_json(), encoding="utf-8")
+    output_root = tmp_path / "read-only-cli-output"
+    output_root.mkdir()
+    output_root.chmod(0o500)
+
+    try:
+        result = CliRunner().invoke(
+            app,
+            ["cut", str(plan_path), str(synthetic_media), str(output_root)],
+        )
+    finally:
+        output_root.chmod(0o700)
+
+    assert result.exit_code == 4
+    assert result.stderr == ""
+    payload = json.loads(result.stdout)
+    assert payload["status"] == "failed"
+    assert payload["artifacts"] == []
+    assert payload["steps"][0]["step_id"] == "preflight-output"
+    assert payload["steps"][0]["error_code"] == ErrorCode.OUTPUT_NOT_WRITABLE.value
+    assert not tuple(output_root.iterdir())

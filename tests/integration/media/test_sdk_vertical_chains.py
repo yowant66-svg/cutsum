@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import json
+import os
 from datetime import UTC, datetime
 from pathlib import Path
 
+import pytest
 from typer.testing import CliRunner
 
 from universal_cutup.adapters.transcripts import TranscriptParseContext, parse_srt
@@ -170,6 +172,39 @@ def test_cli_full_refuses_to_exceed_explicit_clip_limit_before_writing(
         "selected_clip_count": 2,
     }
     assert not output_root.exists()
+
+
+@pytest.mark.skipif(os.name == "nt", reason="POSIX permission bits required")
+def test_cli_full_emits_failed_result_when_read_only_root_cannot_store_record(
+    synthetic_media: Path,
+    tmp_path: Path,
+) -> None:
+    transcript_path = tmp_path / "read-only.srt"
+    transcript_path.write_text(
+        "1\n00:00:00,500 --> 00:00:01,500\nComplete cue.\n",
+        encoding="utf-8",
+    )
+    output_root = tmp_path / "read-only-full-output"
+    output_root.mkdir()
+    output_root.chmod(0o500)
+
+    try:
+        result = CliRunner().invoke(
+            app,
+            ["full", str(synthetic_media), str(transcript_path), str(output_root)],
+        )
+    finally:
+        output_root.chmod(0o700)
+
+    assert result.exit_code == 4, (result.stdout, result.stderr, result.exception)
+    assert result.stderr == ""
+    payload = json.loads(result.stdout)
+    assert payload["execution"]["status"] == "failed"
+    assert payload["execution"]["artifacts"] == []
+    step = payload["execution"]["steps"][0]
+    assert step["step_id"] == "preflight-output"
+    assert step["error_code"] == "OUTPUT_NOT_WRITABLE"
+    assert not tuple(output_root.iterdir())
 
 
 def test_cli_inspect_rejects_corrupt_media_with_structured_error(tmp_path: Path) -> None:

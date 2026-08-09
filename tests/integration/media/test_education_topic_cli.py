@@ -40,9 +40,7 @@ def test_cli_accepts_host_resolved_topic_groups_for_directed_education(
 
     assert result.exit_code == 0, result.stderr
     payload = json.loads(result.stdout)
-    assert payload["request"]["required_topic_groups"] == [
-        ["binary", "base two", "zeros and ones"]
-    ]
+    assert payload["request"]["required_topic_groups"] == [["binary", "base two", "zeros and ones"]]
     selected_ids = set(payload["selection"]["selected_candidate_ids"])
     selected = [
         candidate

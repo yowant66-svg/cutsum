@@ -148,8 +148,7 @@ class EducationalTaskRequest(FrozenModel):
         if any(not group for group in self.required_topic_groups):
             raise ValueError("educational topic groups cannot be empty")
         normalized_groups = tuple(
-            tuple(term.strip().casefold() for term in group)
-            for group in self.required_topic_groups
+            tuple(term.strip().casefold() for term in group) for group in self.required_topic_groups
         )
         if any(not term for group in normalized_groups for term in group):
             raise ValueError("educational topic terms cannot be blank")

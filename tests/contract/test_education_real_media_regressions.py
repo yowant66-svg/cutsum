@@ -245,9 +245,7 @@ def test_candidate_expansion_does_not_start_on_a_dependent_context_sentence() ->
         )
     )
     example = next(
-        candidate
-        for candidate in candidates
-        if "binary search" in candidate.summary.casefold()
+        candidate for candidate in candidates if "binary search" in candidate.summary.casefold()
     )
 
     snapshot = example.evidence_refs[0].snapshot

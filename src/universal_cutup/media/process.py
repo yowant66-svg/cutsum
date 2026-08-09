@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+import re
 import subprocess
 import time
 from contextlib import suppress
 from dataclasses import dataclass
 from enum import StrEnum
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 from threading import Event
 
 from universal_cutup.domain.execution import StepResult
@@ -28,6 +29,19 @@ SENSITIVE_FLAGS = frozenset(
         "--token",
     }
 )
+FILTER_PATH_PATTERN = re.compile(r"(filename=')([^']+)(')")
+
+
+def _redact_filter_path(match: re.Match[str]) -> str:
+    raw_path = match.group(2)
+    if raw_path.startswith("<HOME>"):
+        return match.group(0)
+    path = Path(raw_path)
+    windows_path = PureWindowsPath(raw_path)
+    if not path.is_absolute() and not windows_path.is_absolute():
+        return match.group(0)
+    basename = windows_path.name if windows_path.is_absolute() else path.name
+    return f"{match.group(1)}<ABSOLUTE_PATH>/{basename or '<root>'}{match.group(3)}"
 
 
 def redact_command(arguments: list[str]) -> tuple[str, ...]:
@@ -52,8 +66,16 @@ def redact_command(arguments: list[str]) -> tuple[str, ...]:
         elif argument.startswith(f"{home}/") or argument.startswith(f"{home}\\"):
             home_relative = argument[len(home) :].replace("\\", "/")
             redacted.append(f"<HOME>{home_relative}")
+        elif Path(argument).is_absolute() or PureWindowsPath(argument).is_absolute():
+            basename = (
+                PureWindowsPath(argument).name
+                if PureWindowsPath(argument).is_absolute()
+                else Path(argument).name
+            )
+            redacted.append(f"<ABSOLUTE_PATH>/{basename or '<root>'}")
         else:
-            redacted.append(argument)
+            home_redacted = argument.replace(home, "<HOME>")
+            redacted.append(FILTER_PATH_PATTERN.sub(_redact_filter_path, home_redacted))
     return tuple(redacted)
 
 

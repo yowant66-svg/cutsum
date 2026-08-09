@@ -275,9 +275,8 @@ def build_educational_profile(candidate: CutCandidate) -> EducationalCandidatePr
         context_roles = (*context_roles, EducationContextRole.REQUIRES_FOLLOWING)
     if last_candidate_text.rstrip().endswith((",", ";", ":", "，", "；", "：")):  # noqa: RUF001
         context_roles = (*context_roles, EducationContextRole.REQUIRES_FOLLOWING)
-    if (
-        EducationSignalType.DEFINITION not in signal_types
-        and PREVIOUS_CONTEXT_PATTERN.search(first_candidate_text)
+    if EducationSignalType.DEFINITION not in signal_types and PREVIOUS_CONTEXT_PATTERN.search(
+        first_candidate_text
     ):
         context_roles = (*context_roles, EducationContextRole.REQUIRES_PREVIOUS)
     context_roles = tuple(

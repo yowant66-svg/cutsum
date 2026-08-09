@@ -2,6 +2,16 @@
 
 All notable changes will be documented here.
 
+## Unreleased
+
+- Normalize quarter-turn video rotation metadata before resolution planning so rendered dimensions
+  and `ExecutionRecord` provenance agree with the displayed media orientation.
+- Reject candidates that materially exceed the declared source duration while allowing a 250 ms
+  container-rounding tolerance.
+- Redact standalone and embedded absolute filesystem paths from auditable process-error commands.
+- Add real FFmpeg pressure coverage for HEVC/AAC, AV1/Opus, variable frame rate, Unicode paths,
+  rotation metadata, corrupt media, and media/transcript duration mismatch.
+
 ## 0.1.0a1 — 2026-08-04
 
 - Adopted the public project and distribution identity `CutSum` / `cutsum`, with `DXBATM` as the

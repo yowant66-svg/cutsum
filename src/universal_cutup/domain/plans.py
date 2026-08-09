@@ -11,6 +11,8 @@ from .selection import SelectionResult
 from .sources import MediaBinding, MediaSource
 from .specs import OutputSpec
 
+SOURCE_DURATION_TOLERANCE_MS = 250
+
 
 class CutRequest(DocumentHeader):
     request_id: str
@@ -54,6 +56,11 @@ class CutPlan(DocumentHeader):
         for candidate in self.candidates:
             if candidate.source_id != self.source.source_id:
                 raise ValueError("candidate source_id must match CutPlan source_id")
+            if (
+                self.source.duration_ms is not None
+                and candidate.end_ms > self.source.duration_ms + SOURCE_DURATION_TOLERANCE_MS
+            ):
+                raise ValueError("candidate range exceeds source duration")
             for evidence in candidate.evidence_refs:
                 artifact = artifacts_by_id.get(evidence.artifact_id)
                 if artifact is None:

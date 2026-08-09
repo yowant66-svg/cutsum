@@ -1,23 +1,47 @@
 1
-00:00:00,000 --> 00:00:10,000
-The turning point was realizing that speed is not the same thing as progress.
+00:00:00,000 --> 00:00:05,000
+The turning point was realizing that
 
 2
-00:00:10,000 --> 00:00:20,000
-We were shipping more features every week, but users were taking longer to reach a useful result.
+00:00:05,000 --> 00:00:10,000
+speed is not the same thing as progress.
 
 3
-00:00:20,000 --> 00:00:30,000
-So we replaced the feature target with one question: can a new person succeed in ten minutes?
+00:00:10,000 --> 00:00:15,000
+We were shipping more features every week,
 
 4
-00:00:30,000 --> 00:00:40,000
-That constraint felt slower at first because it forced us to remove work we had already completed.
+00:00:15,000 --> 00:00:20,000
+but users were taking longer to reach a useful result.
 
 5
-00:00:40,000 --> 00:00:50,000
-Within a month, support requests fell and the team spent less time explaining the product.
+00:00:20,000 --> 00:00:25,000
+So we replaced the feature target with one question:
 
 6
-00:00:50,000 --> 00:01:00,000
-The lesson is simple: progress is the distance removed between a person and a meaningful outcome.
+00:00:25,000 --> 00:00:30,000
+can a new person succeed in ten minutes?
+
+7
+00:00:30,000 --> 00:00:35,000
+That constraint felt slower at first
+
+8
+00:00:35,000 --> 00:00:40,000
+because it forced us to remove work we had already completed.
+
+9
+00:00:40,000 --> 00:00:45,000
+Within a month, support requests fell
+
+10
+00:00:45,000 --> 00:00:50,000
+and the team spent less time explaining the product.
+
+11
+00:00:50,000 --> 00:00:55,000
+The lesson is simple: progress is the distance removed
+
+12
+00:00:55,000 --> 00:01:00,000
+between a person and a meaningful outcome.

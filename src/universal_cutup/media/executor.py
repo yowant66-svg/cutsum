@@ -10,6 +10,7 @@ from typing import Literal
 from uuid import uuid4
 
 from universal_cutup.application.subtitle_readability import (
+    MAXIMUM_STANDARD_SUBTITLE_CUE_DURATION_MS,
     subtitle_characters_per_second,
     subtitle_cps_limit,
 )
@@ -109,9 +110,29 @@ def _validate_cue_track_readability(
     language: str | None,
 ) -> None:
     for index, cue in enumerate(cues, start=1):
+        duration_ms = cue.end_ms - cue.start_ms
+        if duration_ms > MAXIMUM_STANDARD_SUBTITLE_CUE_DURATION_MS:
+            raise CutupError(
+                ErrorCode.CAPABILITY_CONFLICT,
+                (
+                    f"subtitle cue duration limit exceeded for {candidate_id} "
+                    f"{track} cue {index}: {duration_ms / 1000:.2f}s > "
+                    f"{MAXIMUM_STANDARD_SUBTITLE_CUE_DURATION_MS / 1000:.2f}s"
+                ),
+                category="capability",
+                step="subtitle-readability-preflight",
+                recoverable=True,
+                details={
+                    "candidate_id": candidate_id,
+                    "track": track,
+                    "cue_index": index,
+                    "observed_duration_ms": duration_ms,
+                    "maximum_duration_ms": MAXIMUM_STANDARD_SUBTITLE_CUE_DURATION_MS,
+                },
+            )
         observed = subtitle_characters_per_second(
             cue.text,
-            duration_ms=cue.end_ms - cue.start_ms,
+            duration_ms=duration_ms,
         )
         limit = subtitle_cps_limit(language=language, text=cue.text)
         if observed > limit:

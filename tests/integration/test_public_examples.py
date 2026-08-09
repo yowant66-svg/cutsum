@@ -16,8 +16,14 @@ REPOSITORY_ROOT = Path(__file__).parents[2]
 TRANSCRIPT_ROOT = REPOSITORY_ROOT / "examples" / "transcripts"
 
 
-@pytest.mark.parametrize("name", ["interview.srt", "education.srt", "sports.srt"])
-def test_public_example_transcripts_are_valid_and_bounded(name: str) -> None:
+@pytest.mark.parametrize(
+    ("name", "expected_segment_count"),
+    [("interview.srt", 12), ("education.srt", 6), ("sports.srt", 6)],
+)
+def test_public_example_transcripts_are_valid_and_bounded(
+    name: str,
+    expected_segment_count: int,
+) -> None:
     transcript = parse_srt(
         (TRANSCRIPT_ROOT / name).read_text(encoding="utf-8"),
         context=TranscriptParseContext(
@@ -28,7 +34,7 @@ def test_public_example_transcripts_are_valid_and_bounded(name: str) -> None:
         ),
     )
 
-    assert len(transcript.segments) == 6
+    assert len(transcript.segments) == expected_segment_count
     assert transcript.segments[0].start_ms == 0
     assert transcript.segments[-1].end_ms == 60_000
 

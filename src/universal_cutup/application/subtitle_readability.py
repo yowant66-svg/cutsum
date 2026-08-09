@@ -12,6 +12,25 @@ from universal_cutup.domain.subtitles import (
 )
 
 CJK_CONTENT_PATTERN = re.compile(r"[\u3400-\u9fff]")
+CHINESE_MAX_CHARACTERS_PER_SECOND = 10.0
+ENGLISH_MAX_CHARACTERS_PER_SECOND = 20.0
+
+
+def subtitle_character_count(text: str) -> int:
+    return len("".join(text.split()))
+
+
+def subtitle_characters_per_second(text: str, *, duration_ms: int) -> float:
+    if duration_ms <= 0:
+        raise ValueError("duration_ms must be positive")
+    return subtitle_character_count(text) / (duration_ms / 1000)
+
+
+def subtitle_cps_limit(*, language: str | None, text: str) -> float:
+    normalized_language = (language or "").lower()
+    if normalized_language.startswith(("zh", "cmn", "yue")) or CJK_CONTENT_PATTERN.search(text):
+        return CHINESE_MAX_CHARACTERS_PER_SECOND
+    return ENGLISH_MAX_CHARACTERS_PER_SECOND
 
 
 def assess_subtitle_readability(
@@ -35,7 +54,7 @@ def assess_subtitle_readability(
             (unit.source_language, unit.source_text),
             (unit.translation_language, unit.translated_text),
         ):
-            character_count = len("".join(text.split()))
+            character_count = subtitle_character_count(text)
             characters_per_second = character_count / duration_seconds
             maximum_characters_per_second = max(
                 maximum_characters_per_second,

@@ -9,6 +9,11 @@ from tempfile import TemporaryDirectory
 from typing import Literal
 from uuid import uuid4
 
+from universal_cutup.application.subtitle_readability import (
+    subtitle_characters_per_second,
+    subtitle_cps_limit,
+)
+from universal_cutup.domain.candidates import CutCandidate
 from universal_cutup.domain.errors import CutupError, ErrorCode
 from universal_cutup.domain.execution import (
     CutArtifact,
@@ -32,6 +37,7 @@ from .probe import probe_media
 from .process import ProcessRunner
 from .rendering import ReframeDecision, ResolutionDecision, resolve_reframe, resolve_resolution
 from .subtitles import (
+    RelativeBilingualCue,
     RelativeSubtitleCue,
     burn_in_subtitle,
     clip_cues_to_candidate,
@@ -79,6 +85,143 @@ TRANSLATED_MODES = frozenset(
         SubtitleMode.TRANSLATED_BURN_IN,
     }
 )
+
+
+@dataclass(frozen=True, slots=True)
+class _CandidateSubtitleTracks:
+    source_cues: tuple[RelativeSubtitleCue, ...]
+    effective_source_cues: tuple[RelativeSubtitleCue, ...]
+    translated_cues: tuple[RelativeSubtitleCue, ...]
+    display_pairs: tuple[RelativeBilingualCue, ...]
+    display_source_cues: tuple[RelativeSubtitleCue, ...]
+    display_translated_cues: tuple[RelativeSubtitleCue, ...]
+
+
+def _first_language(*languages: str | None) -> str | None:
+    return next((language for language in languages if language), None)
+
+
+def _validate_cue_track_readability(
+    cues: tuple[RelativeSubtitleCue, ...],
+    *,
+    candidate_id: str,
+    track: Literal["source", "translation"],
+    language: str | None,
+) -> None:
+    for index, cue in enumerate(cues, start=1):
+        observed = subtitle_characters_per_second(
+            cue.text,
+            duration_ms=cue.end_ms - cue.start_ms,
+        )
+        limit = subtitle_cps_limit(language=language, text=cue.text)
+        if observed > limit:
+            language_label = language or ("zh" if limit == 10 else "und")
+            raise CutupError(
+                ErrorCode.CAPABILITY_CONFLICT,
+                (
+                    f"subtitle readability limit exceeded for {candidate_id} "
+                    f"{track} cue {index} ({language_label}): "
+                    f"{observed:.2f} CPS > {limit:.2f} CPS"
+                ),
+                category="capability",
+                step="subtitle-readability-preflight",
+                recoverable=True,
+                details={
+                    "candidate_id": candidate_id,
+                    "track": track,
+                    "cue_index": index,
+                    "language": language_label,
+                    "observed_characters_per_second": observed,
+                    "limit_characters_per_second": limit,
+                },
+            )
+
+
+def _candidate_subtitle_tracks(candidate: CutCandidate) -> _CandidateSubtitleTracks:
+    source_cues = clip_cues_to_candidate(
+        candidate.subtitle_cues,
+        candidate_start_ms=candidate.start_ms,
+        candidate_end_ms=candidate.end_ms,
+    )
+    semantic_source_cues = clip_semantic_spans_to_candidate(
+        candidate.subtitle_semantic_spans,
+        candidate_start_ms=candidate.start_ms,
+        candidate_end_ms=candidate.end_ms,
+    )
+    display_pairs = clip_display_units_to_candidate(
+        candidate.subtitle_display_units,
+        candidate_start_ms=candidate.start_ms,
+        candidate_end_ms=candidate.end_ms,
+    )
+    display_source_cues = tuple(
+        RelativeSubtitleCue(
+            start_ms=cue.start_ms,
+            end_ms=cue.end_ms,
+            text=cue.source_text,
+        )
+        for cue in display_pairs
+    )
+    translated_cues = clip_cues_to_candidate(
+        candidate.translated_subtitle_cues,
+        candidate_start_ms=candidate.start_ms,
+        candidate_end_ms=candidate.end_ms,
+    )
+    display_translated_cues = tuple(
+        RelativeSubtitleCue(
+            start_ms=cue.start_ms,
+            end_ms=cue.end_ms,
+            text=cue.translation_text,
+        )
+        for cue in display_pairs
+    )
+    return _CandidateSubtitleTracks(
+        source_cues=source_cues,
+        effective_source_cues=semantic_source_cues or source_cues,
+        translated_cues=translated_cues,
+        display_pairs=display_pairs,
+        display_source_cues=display_source_cues,
+        display_translated_cues=display_translated_cues,
+    )
+
+
+def _validate_candidate_subtitle_readability(
+    candidate: CutCandidate,
+    *,
+    subtitle_mode: SubtitleMode,
+    source_language: str | None,
+    translation_language: str | None,
+) -> None:
+    if subtitle_mode is SubtitleMode.NONE:
+        return
+    tracks = _candidate_subtitle_tracks(candidate)
+    if subtitle_mode not in TRANSLATED_MODES:
+        _validate_cue_track_readability(
+            tracks.display_source_cues
+            or (
+                tracks.source_cues
+                if subtitle_mode in BILINGUAL_MODES
+                else tracks.effective_source_cues
+            ),
+            candidate_id=candidate.candidate_id,
+            track="source",
+            language=_first_language(
+                source_language,
+                *(unit.source_language for unit in candidate.subtitle_display_units),
+                *(span.language for span in candidate.subtitle_semantic_spans),
+                *(cue.language for cue in candidate.subtitle_cues),
+            ),
+        )
+    if subtitle_mode in TRANSLATED_MODES or subtitle_mode in BILINGUAL_MODES:
+        _validate_cue_track_readability(
+            tracks.display_translated_cues or tracks.translated_cues,
+            candidate_id=candidate.candidate_id,
+            track="translation",
+            language=_first_language(
+                translation_language,
+                *(unit.translation_language for unit in candidate.subtitle_display_units),
+                *(cue.language for cue in candidate.translated_subtitle_cues),
+            ),
+        )
 
 
 def _file_sha256(path: Path) -> str:
@@ -233,6 +376,12 @@ def execute_external_plan(
     steps: list[StepResult] = []
     warnings: list[str] = []
     process_runner = runner or ProcessRunner()
+    candidates_by_id = {candidate.candidate_id: candidate for candidate in plan.candidates}
+    selected_decisions = [
+        decision
+        for decision in plan.selection_result.decisions
+        if decision.status is SelectionStatus.SELECTED
+    ]
 
     def finish(status: ExecutionStatus) -> ExecutionRecord:
         completed_at = datetime.now(UTC)
@@ -268,6 +417,13 @@ def execute_external_plan(
                 step="preflight",
             )
         source_path, source_hash, source_mtime_ns = _validate_source(plan, binding)
+        for decision in selected_decisions:
+            _validate_candidate_subtitle_readability(
+                candidates_by_id[decision.candidate_id],
+                subtitle_mode=plan.output_spec.subtitle.mode,
+                source_language=plan.output_spec.subtitle.language,
+                translation_language=plan.output_spec.subtitle.translation_language,
+            )
         output_root.mkdir(parents=True, exist_ok=True)
         resolved_output_root = output_root.resolve(strict=True)
         path_policy = SafePathPolicy(output_root=resolved_output_root)
@@ -279,7 +435,7 @@ def execute_external_plan(
         )
         steps.append(
             StepResult(
-                step_id="preflight",
+                step_id=cutup_error.step or "preflight",
                 status="failed",
                 error_code=cutup_error.code.value,
                 message=str(cutup_error),
@@ -288,7 +444,6 @@ def execute_external_plan(
         )
         return finish(ExecutionStatus.FAILED)
 
-    candidates_by_id = {candidate.candidate_id: candidate for candidate in plan.candidates}
     try:
         source_probe = probe_media(source_path)
         reframe = (
@@ -327,11 +482,6 @@ def execute_external_plan(
             )
         )
         return finish(ExecutionStatus.FAILED)
-    selected_decisions = [
-        decision
-        for decision in plan.selection_result.decisions
-        if decision.status is SelectionStatus.SELECTED
-    ]
     candidate_output_paths: dict[str, tuple[Path, Path | None]] = {}
     try:
         extension = plan.output_spec.render.container
@@ -372,48 +522,12 @@ def execute_external_plan(
             subtitle_mode = plan.output_spec.subtitle.mode
             duration_ms = candidate.end_ms - candidate.start_ms
             sidecar_format = plan.output_spec.subtitle.sidecar_format
-            source_cues = clip_cues_to_candidate(
-                candidate.subtitle_cues,
-                candidate_start_ms=candidate.start_ms,
-                candidate_end_ms=candidate.end_ms,
-            )
-            semantic_source_cues = clip_semantic_spans_to_candidate(
-                candidate.subtitle_semantic_spans,
-                candidate_start_ms=candidate.start_ms,
-                candidate_end_ms=candidate.end_ms,
-            )
-            effective_source_cues = semantic_source_cues or source_cues
-            translated_cues = clip_cues_to_candidate(
-                candidate.translated_subtitle_cues,
-                candidate_start_ms=candidate.start_ms,
-                candidate_end_ms=candidate.end_ms,
-            )
-            display_pairs = clip_display_units_to_candidate(
-                candidate.subtitle_display_units,
-                candidate_start_ms=candidate.start_ms,
-                candidate_end_ms=candidate.end_ms,
-            )
-            display_source_cues = tuple(
-                RelativeSubtitleCue(
-                    start_ms=cue.start_ms,
-                    end_ms=cue.end_ms,
-                    text=cue.source_text,
-                )
-                for cue in display_pairs
-            )
-            display_translated_cues = tuple(
-                RelativeSubtitleCue(
-                    start_ms=cue.start_ms,
-                    end_ms=cue.end_ms,
-                    text=cue.translation_text,
-                )
-                for cue in display_pairs
-            )
+            tracks = _candidate_subtitle_tracks(candidate)
             bilingual_pairs = (
                 (
-                    display_pairs
-                    if display_pairs
-                    else pair_bilingual_cues(source_cues, translated_cues)
+                    tracks.display_pairs
+                    if tracks.display_pairs
+                    else pair_bilingual_cues(tracks.source_cues, tracks.translated_cues)
                 )
                 if subtitle_mode in BILINGUAL_MODES
                 else ()
@@ -429,9 +543,9 @@ def execute_external_plan(
                 )
                 if bilingual_pairs
                 else (
-                    (display_translated_cues or translated_cues)
+                    (tracks.display_translated_cues or tracks.translated_cues)
                     if subtitle_mode in TRANSLATED_MODES
-                    else (display_source_cues or effective_source_cues)
+                    else (tracks.display_source_cues or tracks.effective_source_cues)
                 )
             )
             with TemporaryDirectory(
@@ -451,9 +565,9 @@ def execute_external_plan(
                 )
                 temporary_sidecar = temporary_root / (f"subtitle.{temporary_sidecar_format.value}")
                 active_cues = (
-                    (display_translated_cues or translated_cues)
+                    (tracks.display_translated_cues or tracks.translated_cues)
                     if subtitle_mode in TRANSLATED_MODES
-                    else (display_source_cues or effective_source_cues)
+                    else (tracks.display_source_cues or tracks.effective_source_cues)
                 )
                 if subtitle_mode is SubtitleMode.BILINGUAL_BURN_IN:
                     if resolution is None:

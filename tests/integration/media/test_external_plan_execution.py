@@ -87,7 +87,7 @@ def make_plan(
                 source_id="source-1",
                 start_ms=250,
                 end_ms=1250,
-                text="first cue, not the summary",
+                text="first cue",
                 source_segment_ids=("segment-1",),
             ),
             SubtitleCue(
@@ -142,6 +142,125 @@ def make_plan(
     )
 
 
+def plan_with_subtitle_text(
+    plan: CutPlan,
+    *,
+    source_text: str,
+    source_language: str,
+    translated_text: str | None = None,
+    translation_language: str | None = None,
+) -> CutPlan:
+    candidate = plan.candidates[0]
+    source_cues = tuple(
+        cue.model_copy(
+            update={
+                "text": source_text if index == 0 else "OK",
+                "language": source_language,
+            }
+        )
+        for index, cue in enumerate(candidate.subtitle_cues)
+    )
+    translated_cues = (
+        tuple(
+            cue.model_copy(
+                update={
+                    "cue_id": f"translated-{cue.cue_id}",
+                    "text": translated_text if index == 0 else "好",
+                    "language": translation_language,
+                }
+            )
+            for index, cue in enumerate(candidate.subtitle_cues)
+        )
+        if translated_text is not None
+        else ()
+    )
+    return plan.model_copy(
+        update={
+            "candidates": (
+                candidate.model_copy(
+                    update={
+                        "subtitle_cues": source_cues,
+                        "translated_subtitle_cues": translated_cues,
+                    }
+                ),
+            )
+        }
+    )
+
+
+@pytest.mark.parametrize(
+    ("text", "language"),
+    [
+        ("This subtitle is far too long for its short display window", "en"),
+        ("这是一条明显超过每秒十个汉字硬限制的字幕", "zh-CN"),
+    ],
+)
+def test_external_plan_rejects_unreadable_source_subtitles_before_output(
+    synthetic_media: Path,
+    tmp_path: Path,
+    text: str,
+    language: str,
+) -> None:
+    plan = plan_with_subtitle_text(
+        make_plan(synthetic_media, subtitle_mode="sidecar"),
+        source_text=text,
+        source_language=language,
+    )
+    output_root = tmp_path / "unreadable-source"
+
+    execution = execute_external_plan(
+        plan,
+        binding=MediaBinding(source_id=plan.source.source_id, local_path=str(synthetic_media)),
+        output_root=output_root,
+    )
+
+    assert execution.status == "failed"
+    assert execution.artifacts == ()
+    assert execution.steps[-1].step_id == "subtitle-readability-preflight"
+    assert execution.steps[-1].error_code == ErrorCode.CAPABILITY_CONFLICT.value
+    assert not output_root.exists()
+
+
+def test_external_plan_checks_bilingual_languages_independently_before_output(
+    synthetic_media: Path,
+    tmp_path: Path,
+) -> None:
+    base_plan = make_plan(synthetic_media, subtitle_mode="sidecar")
+    plan = plan_with_subtitle_text(
+        base_plan,
+        source_text="Goal",
+        source_language="en",
+        translated_text="这是一条明显超过每秒十个汉字硬限制的翻译字幕",
+        translation_language="zh-CN",
+    ).model_copy(
+        update={
+            "output_spec": base_plan.output_spec.model_copy(
+                update={
+                    "subtitle": SubtitleSpec(
+                        mode=SubtitleMode.BILINGUAL_SIDECAR,
+                        language="en",
+                        translation_language="zh-CN",
+                    )
+                }
+            )
+        }
+    )
+    output_root = tmp_path / "unreadable-bilingual"
+
+    execution = execute_external_plan(
+        plan,
+        binding=MediaBinding(source_id=plan.source.source_id, local_path=str(synthetic_media)),
+        output_root=output_root,
+    )
+
+    assert execution.status == "failed"
+    assert execution.artifacts == ()
+    assert execution.steps[-1].step_id == "subtitle-readability-preflight"
+    assert execution.steps[-1].error_code == ErrorCode.CAPABILITY_CONFLICT.value
+    assert "zh-CN" in execution.steps[-1].message
+    assert not output_root.exists()
+
+
 @pytest.mark.parametrize("subtitle_mode", ["sidecar", "burn_in"])
 def test_external_plan_produces_verified_artifacts(
     synthetic_media: Path,
@@ -180,7 +299,7 @@ def test_external_plan_produces_verified_artifacts(
         subtitle_text = (output_root / "subtitles/candidate-1.srt").read_text(encoding="utf-8")
         assert "00:00:00,000 --> 00:00:00,750" in subtitle_text
         assert "00:00:01,250 --> 00:00:02,000" in subtitle_text
-        assert "first cue, not the summary" in subtitle_text
+        assert "first cue" in subtitle_text
         assert "Gate D synthetic subtitle" not in subtitle_text
 
 
@@ -194,7 +313,7 @@ def test_bilingual_burn_in_is_visible_and_preserves_timed_cues(
         cue.model_copy(
             update={
                 "cue_id": f"{cue.cue_id}-zh",
-                "text": "对应的中文逐句字幕",
+                "text": "中文字幕",
                 "language": "zh-CN",
             }
         )
@@ -236,7 +355,7 @@ def test_bilingual_vtt_sidecar_uses_one_timeline(
         cue.model_copy(
             update={
                 "cue_id": f"{cue.cue_id}-zh",
-                "text": "对应的中文逐句字幕",
+                "text": "中文字幕",
                 "language": "zh-CN",
             }
         )
@@ -268,7 +387,7 @@ def test_bilingual_vtt_sidecar_uses_one_timeline(
     assert execution.status == "success"
     assert "subtitle_backend" not in execution.steps[0].details
     assert content.startswith("WEBVTT")
-    assert "first cue, not the summary\n对应的中文逐句字幕" in content
+    assert "first cue\n中文字幕" in content
 
 
 def test_bilingual_burn_in_prefers_semantic_display_units_over_micro_cue_pairing(
@@ -278,7 +397,7 @@ def test_bilingual_burn_in_prefers_semantic_display_units_over_micro_cue_pairing
     plan = make_plan(synthetic_media, subtitle_mode="burn_in")
     candidate = plan.candidates[0]
     source_text = source_group_text(candidate.subtitle_cues)
-    translation = "算法是一个函数，它把输入映射为满足问题要求的输出。"  # noqa: RUF001
+    translation = "算法把输入映射为正确输出。"
     translation_record = ContextualTranslationRecord(
         translation_record_id="translation-semantic-1",
         provider_record_ref="provider-translation",

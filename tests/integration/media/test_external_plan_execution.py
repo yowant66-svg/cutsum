@@ -931,6 +931,63 @@ def test_audio_only_source_produces_audio_artifact(
     assert media_artifact.mime_type == "audio/mp4"
 
 
+class FailIfMediaProcessingStarts(ProcessRunner):
+    def __init__(self) -> None:
+        self.calls = 0
+
+    def run(
+        self,
+        arguments: list[str],
+        *,
+        timeout_seconds: float,
+        cancellation: Event | None = None,
+        cwd: Path | None = None,
+    ) -> ProcessOutcome:
+        self.calls += 1
+        raise AssertionError(f"media processing started unexpectedly: {arguments[0]}")
+
+
+@pytest.mark.parametrize(
+    "subtitle_mode",
+    [
+        SubtitleMode.BURN_IN,
+        SubtitleMode.SOURCE_BURN_IN,
+        SubtitleMode.TRANSLATED_BURN_IN,
+        SubtitleMode.BILINGUAL_BURN_IN,
+    ],
+)
+def test_audio_burn_in_is_rejected_before_media_processing(
+    synthetic_audio: Path,
+    tmp_path: Path,
+    subtitle_mode: SubtitleMode,
+) -> None:
+    base = make_plan(synthetic_audio, subtitle_mode="sidecar", kind="audio")
+    plan = base.model_copy(
+        update={
+            "output_spec": base.output_spec.model_copy(
+                update={"subtitle": SubtitleSpec(mode=subtitle_mode)}
+            )
+        }
+    )
+    runner = FailIfMediaProcessingStarts()
+    output_root = tmp_path / subtitle_mode.value
+
+    execution = execute_external_plan(
+        plan,
+        binding=MediaBinding(source_id="source-1", local_path=str(synthetic_audio)),
+        output_root=output_root,
+        runner=runner,
+    )
+
+    assert execution.status == "failed"
+    assert execution.artifacts == ()
+    assert len(execution.steps) == 1
+    assert execution.steps[0].step_id == "preflight"
+    assert execution.steps[0].error_code == ErrorCode.CAPABILITY_UNAVAILABLE.value
+    assert runner.calls == 0
+    assert not output_root.exists()
+
+
 def test_candidate_failure_after_success_returns_partial_record(
     synthetic_media: Path,
     tmp_path: Path,

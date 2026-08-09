@@ -205,6 +205,56 @@ def _candidate_subtitle_tracks(candidate: CutCandidate) -> _CandidateSubtitleTra
     )
 
 
+def _validate_candidate_translation_provenance(
+    candidate: CutCandidate,
+    *,
+    provider_record_ids: set[str],
+) -> None:
+    records_by_id = {
+        record.translation_record_id: record for record in candidate.contextual_translation_records
+    }
+    display_units = candidate.subtitle_display_units
+    if not display_units or not records_by_id:
+        raise CutupError(
+            ErrorCode.PROVIDER_REQUIRED,
+            "translated subtitle output requires provenance-bearing display units",
+            category="provider",
+            step="translation-provenance-preflight",
+            recoverable=True,
+            details={"candidate_id": candidate.candidate_id},
+        )
+    used_record_ids = {unit.translation_record_ref for unit in display_units}
+    if not used_record_ids <= set(records_by_id) or any(
+        records_by_id[record_id].provider_record_ref not in provider_record_ids
+        for record_id in used_record_ids
+    ):
+        raise CutupError(
+            ErrorCode.PROVIDER_REQUIRED,
+            "translated subtitle output references unavailable translation provenance",
+            category="provider",
+            step="translation-provenance-preflight",
+            recoverable=True,
+            details={"candidate_id": candidate.candidate_id},
+        )
+    source_cue_ids = {cue.cue_id for cue in candidate.subtitle_cues}
+    covered_source_cue_id_list = [
+        cue_id for unit in display_units for cue_id in unit.source_cue_ids
+    ]
+    if (
+        not source_cue_ids
+        or set(covered_source_cue_id_list) != source_cue_ids
+        or len(covered_source_cue_id_list) != len(source_cue_ids)
+    ):
+        raise CutupError(
+            ErrorCode.SUBTITLE_CUES_REQUIRED,
+            "provenance-bearing translation must cover every source subtitle cue",
+            category="validation",
+            step="translation-provenance-preflight",
+            recoverable=True,
+            details={"candidate_id": candidate.candidate_id},
+        )
+
+
 def _validate_output_root_writable(output_root: Path) -> None:
     try:
         with TemporaryDirectory(prefix=".cutup-write-probe-", dir=output_root):
@@ -459,6 +509,16 @@ def execute_external_plan(
                 category="capability",
                 step="preflight",
             )
+        if (
+            plan.output_spec.subtitle.mode in TRANSLATED_MODES
+            or plan.output_spec.subtitle.mode in BILINGUAL_MODES
+        ):
+            provider_record_ids = {record.provider_record_id for record in plan.provider_records}
+            for decision in selected_decisions:
+                _validate_candidate_translation_provenance(
+                    candidates_by_id[decision.candidate_id],
+                    provider_record_ids=provider_record_ids,
+                )
         source_path, source_hash, source_mtime_ns = _validate_source(plan, binding)
         for decision in selected_decisions:
             _validate_candidate_subtitle_readability(

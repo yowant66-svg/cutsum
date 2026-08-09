@@ -11,6 +11,7 @@ from typing import Literal
 import pytest
 from typer.testing import CliRunner
 
+from universal_cutup.application.subtitle_display import materialize_display_units
 from universal_cutup.cli import app
 from universal_cutup.domain.candidates import (
     CutCandidate,
@@ -18,6 +19,7 @@ from universal_cutup.domain.candidates import (
     EvidenceRef,
 )
 from universal_cutup.domain.plans import CutPlan
+from universal_cutup.domain.records import ProviderRecord
 from universal_cutup.domain.selection import (
     SelectionDecision,
     SelectionResult,
@@ -38,6 +40,10 @@ from universal_cutup.domain.specs import (
     SubtitleSafeAreaSpec,
     SubtitleSidecarFormat,
     SubtitleSpec,
+)
+from universal_cutup.domain.subtitles import (
+    ContextualTranslationRecord,
+    subtitle_text_sha256,
 )
 from universal_cutup.domain.transcript import SubtitleCue
 from universal_cutup.media.executor import execute_external_plan
@@ -147,6 +153,50 @@ def _plan(source_path: Path) -> CutPlan:
                 ),
             ),
         ),
+    )
+
+
+def _with_translation_provenance(plan: CutPlan, translated_text: str) -> CutPlan:
+    candidate = plan.candidates[0]
+    source_text = " ".join(cue.text.strip() for cue in candidate.subtitle_cues)
+    record = ContextualTranslationRecord(
+        translation_record_id="translation-vertical",
+        provider_record_ref="provider-translation-vertical",
+        source_language="en",
+        translation_language="zh-CN",
+        source_cue_ids=tuple(cue.cue_id for cue in candidate.subtitle_cues),
+        source_text=source_text,
+        translated_text=translated_text,
+        source_text_sha256=subtitle_text_sha256(source_text),
+        translation_sha256=subtitle_text_sha256(translated_text),
+    )
+    provider = ProviderRecord(
+        provider_record_id="provider-translation-vertical",
+        provider_id="test-host",
+        operation="translate_semantic_subtitle_unit",
+        input_hashes=(record.source_text_sha256,),
+        output_hashes=(record.translation_sha256,),
+        cost_minor_units=0,
+        currency="USD",
+        started_at=datetime(2026, 8, 1, tzinfo=UTC),
+        completed_at=datetime(2026, 8, 1, tzinfo=UTC),
+    )
+    return plan.model_copy(
+        update={
+            "candidates": (
+                candidate.model_copy(
+                    update={
+                        "contextual_translation_records": (record,),
+                        "subtitle_display_units": materialize_display_units(
+                            candidate.subtitle_cues,
+                            (record,),
+                            source_id=candidate.source_id,
+                        ),
+                    }
+                ),
+            ),
+            "provider_records": (provider,),
+        }
     )
 
 
@@ -353,21 +403,7 @@ def test_vertical_burn_in_actual_pixels_meet_subtitle_safe_area_and_block_height
     )
     base = _plan(source)
     if translation_text is not None:
-        candidate = base.candidates[0]
-        translated_cue = candidate.subtitle_cues[0].model_copy(
-            update={
-                "cue_id": "cue-vertical-translation",
-                "text": translation_text,
-                "language": "zh-CN",
-            }
-        )
-        base = base.model_copy(
-            update={
-                "candidates": (
-                    candidate.model_copy(update={"translated_subtitle_cues": (translated_cue,)}),
-                )
-            }
-        )
+        base = _with_translation_provenance(base, translation_text)
     plan = base.model_copy(
         update={
             "output_spec": OutputSpec(

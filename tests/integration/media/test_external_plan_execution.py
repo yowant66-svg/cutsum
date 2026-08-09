@@ -192,6 +192,58 @@ def plan_with_subtitle_text(
     )
 
 
+def plan_with_translation_provenance(
+    plan: CutPlan,
+    *,
+    translated_text: str,
+    source_language: str = "en",
+    translation_language: str = "zh-CN",
+) -> CutPlan:
+    candidate = plan.candidates[0]
+    source_text = source_group_text(candidate.subtitle_cues)
+    translation_record = ContextualTranslationRecord(
+        translation_record_id="translation-test-1",
+        provider_record_ref="provider-translation-test",
+        source_language=source_language,
+        translation_language=translation_language,
+        source_cue_ids=tuple(cue.cue_id for cue in candidate.subtitle_cues),
+        source_text=source_text,
+        translated_text=translated_text,
+        source_text_sha256=subtitle_text_sha256(source_text),
+        translation_sha256=subtitle_text_sha256(translated_text),
+    )
+    display_units = materialize_display_units(
+        candidate.subtitle_cues,
+        (translation_record,),
+        source_id=candidate.source_id,
+    )
+    provider_record = ProviderRecord(
+        provider_record_id="provider-translation-test",
+        provider_id="test-host",
+        operation="translate_semantic_subtitle_unit",
+        input_hashes=(translation_record.source_text_sha256,),
+        output_hashes=(translation_record.translation_sha256,),
+        cost_minor_units=0,
+        currency="USD",
+        started_at=FIXED_TIME,
+        completed_at=FIXED_TIME,
+    )
+    return plan.model_copy(
+        update={
+            "candidates": (
+                candidate.model_copy(
+                    update={
+                        "translated_subtitle_cues": (),
+                        "contextual_translation_records": (translation_record,),
+                        "subtitle_display_units": display_units,
+                    }
+                ),
+            ),
+            "provider_records": (provider_record,),
+        }
+    )
+
+
 @pytest.mark.parametrize(
     ("text", "language"),
     [
@@ -230,11 +282,14 @@ def test_external_plan_checks_bilingual_languages_independently_before_output(
     tmp_path: Path,
 ) -> None:
     base_plan = make_plan(synthetic_media, subtitle_mode="sidecar")
-    plan = plan_with_subtitle_text(
-        base_plan,
-        source_text="Goal",
+    plan = plan_with_translation_provenance(
+        plan_with_subtitle_text(
+            base_plan,
+            source_text="Goal",
+            source_language="en",
+        ),
+        translated_text="这是一条明显超过每秒十个汉字硬限制的翻译字幕 好",
         source_language="en",
-        translated_text="这是一条明显超过每秒十个汉字硬限制的翻译字幕",
         translation_language="zh-CN",
     ).model_copy(
         update={
@@ -380,21 +435,11 @@ def test_bilingual_burn_in_is_visible_and_preserves_timed_cues(
     tmp_path: Path,
 ) -> None:
     plan = make_plan(synthetic_media, subtitle_mode="burn_in")
-    candidate = plan.candidates[0]
-    translated = tuple(
-        cue.model_copy(
-            update={
-                "cue_id": f"{cue.cue_id}-zh",
-                "text": "中文字幕",
-                "language": "zh-CN",
-            }
-        )
-        for cue in candidate.subtitle_cues
-    )
-    bilingual_candidate = candidate.model_copy(update={"translated_subtitle_cues": translated})
-    bilingual_plan = plan.model_copy(
+    bilingual_plan = plan_with_translation_provenance(
+        plan,
+        translated_text="中文字幕",
+    ).model_copy(
         update={
-            "candidates": (bilingual_candidate,),
             "output_spec": OutputSpec(
                 render=RenderSpec(),
                 subtitle=SubtitleSpec(
@@ -422,20 +467,11 @@ def test_bilingual_vtt_sidecar_uses_one_timeline(
     tmp_path: Path,
 ) -> None:
     plan = make_plan(synthetic_media, subtitle_mode="sidecar")
-    candidate = plan.candidates[0]
-    translated = tuple(
-        cue.model_copy(
-            update={
-                "cue_id": f"{cue.cue_id}-zh",
-                "text": "中文字幕",
-                "language": "zh-CN",
-            }
-        )
-        for cue in candidate.subtitle_cues
-    )
-    bilingual_plan = plan.model_copy(
+    bilingual_plan = plan_with_translation_provenance(
+        plan,
+        translated_text="中文字幕",
+    ).model_copy(
         update={
-            "candidates": (candidate.model_copy(update={"translated_subtitle_cues": translated}),),
             "output_spec": OutputSpec(
                 subtitle=SubtitleSpec(
                     mode=SubtitleMode.BILINGUAL_SIDECAR,
@@ -459,7 +495,7 @@ def test_bilingual_vtt_sidecar_uses_one_timeline(
     assert execution.status == "success"
     assert "subtitle_backend" not in execution.steps[0].details
     assert content.startswith("WEBVTT")
-    assert "first cue\n中文字幕" in content
+    assert "first cue second cue\n中文字幕" in content
 
 
 def test_bilingual_burn_in_prefers_semantic_display_units_over_micro_cue_pairing(
@@ -1026,6 +1062,7 @@ def test_candidate_failure_after_success_returns_partial_record(
 class FixedOutcomeRunner(ProcessRunner):
     def __init__(self, status: ProcessStatus) -> None:
         self.status = status
+        self.calls = 0
 
     def run(
         self,
@@ -1035,6 +1072,7 @@ class FixedOutcomeRunner(ProcessRunner):
         cancellation: Event | None = None,
         cwd: Path | None = None,
     ) -> ProcessOutcome:
+        self.calls += 1
         return ProcessOutcome(
             status=self.status,
             return_code=None,
@@ -1043,6 +1081,208 @@ class FixedOutcomeRunner(ProcessRunner):
             redacted_command=tuple(arguments),
             recoverable=True,
         )
+
+
+@pytest.mark.parametrize(
+    "subtitle_mode",
+    [
+        SubtitleMode.TRANSLATED_SIDECAR,
+        SubtitleMode.BILINGUAL_SIDECAR,
+        SubtitleMode.TRANSLATED_BURN_IN,
+        SubtitleMode.BILINGUAL_BURN_IN,
+    ],
+)
+def test_translation_output_rejects_legacy_cues_without_provenance_before_media_processing(
+    synthetic_media: Path,
+    tmp_path: Path,
+    subtitle_mode: SubtitleMode,
+) -> None:
+    base = make_plan(synthetic_media, subtitle_mode="sidecar")
+    candidate = base.candidates[0]
+    legacy_translated_cues = tuple(
+        cue.model_copy(
+            update={
+                "cue_id": f"legacy-translation-{cue.cue_id}",
+                "text": "完整译文。",
+                "language": "zh-CN",
+            }
+        )
+        for cue in candidate.subtitle_cues
+    )
+    plan = base.model_copy(
+        update={
+            "candidates": (
+                candidate.model_copy(update={"translated_subtitle_cues": legacy_translated_cues}),
+            ),
+            "output_spec": base.output_spec.model_copy(
+                update={
+                    "subtitle": SubtitleSpec(
+                        mode=subtitle_mode,
+                        language="en",
+                        translation_language="zh-CN",
+                    )
+                }
+            ),
+        }
+    )
+    runner = FixedOutcomeRunner(ProcessStatus.FAILED)
+    output_root = tmp_path / subtitle_mode.value
+
+    execution = execute_external_plan(
+        plan,
+        binding=MediaBinding(source_id="source-1", local_path=str(synthetic_media)),
+        output_root=output_root,
+        runner=runner,
+    )
+
+    assert execution.status == "failed"
+    assert execution.artifacts == ()
+    assert len(execution.steps) == 1
+    assert execution.steps[0].step_id == "translation-provenance-preflight"
+    assert execution.steps[0].error_code == ErrorCode.PROVIDER_REQUIRED.value
+    assert execution.steps[0].recoverable is True
+    assert runner.calls == 0
+    assert not output_root.exists()
+
+
+def test_translation_output_rejects_incomplete_provenance_coverage_before_media_processing(
+    synthetic_media: Path,
+    tmp_path: Path,
+) -> None:
+    base = make_plan(synthetic_media, subtitle_mode="sidecar")
+    candidate = base.candidates[0]
+    first_cue = candidate.subtitle_cues[0]
+    translation_record = ContextualTranslationRecord(
+        translation_record_id="translation-partial-1",
+        provider_record_ref="provider-translation-partial",
+        source_language="en",
+        translation_language="zh-CN",
+        source_cue_ids=(first_cue.cue_id,),
+        source_text=first_cue.text,
+        translated_text="仅翻译第一条。",
+        source_text_sha256=subtitle_text_sha256(first_cue.text),
+        translation_sha256=subtitle_text_sha256("仅翻译第一条。"),
+    )
+    partial_display_units = materialize_display_units(
+        candidate.subtitle_cues,
+        (translation_record,),
+        source_id=candidate.source_id,
+    )
+    provider_record = ProviderRecord(
+        provider_record_id="provider-translation-partial",
+        provider_id="test-host",
+        operation="translate_semantic_subtitle_unit",
+        input_hashes=(translation_record.source_text_sha256,),
+        output_hashes=(translation_record.translation_sha256,),
+        cost_minor_units=0,
+        currency="USD",
+        started_at=FIXED_TIME,
+        completed_at=FIXED_TIME,
+    )
+    plan = base.model_copy(
+        update={
+            "candidates": (
+                candidate.model_copy(
+                    update={
+                        "contextual_translation_records": (translation_record,),
+                        "subtitle_display_units": partial_display_units,
+                    }
+                ),
+            ),
+            "provider_records": (provider_record,),
+            "output_spec": base.output_spec.model_copy(
+                update={
+                    "subtitle": SubtitleSpec(
+                        mode=SubtitleMode.TRANSLATED_SIDECAR,
+                        language="en",
+                        translation_language="zh-CN",
+                    )
+                }
+            ),
+        }
+    )
+    runner = FixedOutcomeRunner(ProcessStatus.FAILED)
+    output_root = tmp_path / "partial-translation"
+
+    execution = execute_external_plan(
+        plan,
+        binding=MediaBinding(source_id="source-1", local_path=str(synthetic_media)),
+        output_root=output_root,
+        runner=runner,
+    )
+
+    assert execution.status == "failed"
+    assert execution.artifacts == ()
+    assert len(execution.steps) == 1
+    assert execution.steps[0].step_id == "translation-provenance-preflight"
+    assert execution.steps[0].error_code == ErrorCode.SUBTITLE_CUES_REQUIRED.value
+    assert execution.steps[0].recoverable is True
+    assert runner.calls == 0
+    assert not output_root.exists()
+
+
+def test_translation_output_rejects_duplicate_provenance_coverage_before_media_processing(
+    synthetic_media: Path,
+    tmp_path: Path,
+) -> None:
+    base = plan_with_translation_provenance(
+        make_plan(synthetic_media, subtitle_mode="sidecar"),
+        translated_text="完整译文。",
+    )
+    candidate = base.candidates[0]
+    first_record = candidate.contextual_translation_records[0]
+    duplicate_record = first_record.model_copy(
+        update={"translation_record_id": "translation-test-duplicate"}
+    )
+    first_unit = candidate.subtitle_display_units[0]
+    duplicate_unit = first_unit.model_copy(
+        update={
+            "display_unit_id": "display-duplicate",
+            "translation_record_ref": duplicate_record.translation_record_id,
+        }
+    )
+    plan = base.model_copy(
+        update={
+            "candidates": (
+                candidate.model_copy(
+                    update={
+                        "contextual_translation_records": (
+                            first_record,
+                            duplicate_record,
+                        ),
+                        "subtitle_display_units": (first_unit, duplicate_unit),
+                    }
+                ),
+            ),
+            "output_spec": base.output_spec.model_copy(
+                update={
+                    "subtitle": SubtitleSpec(
+                        mode=SubtitleMode.TRANSLATED_SIDECAR,
+                        language="en",
+                        translation_language="zh-CN",
+                    )
+                }
+            ),
+        }
+    )
+    runner = FixedOutcomeRunner(ProcessStatus.FAILED)
+    output_root = tmp_path / "duplicate-translation"
+
+    execution = execute_external_plan(
+        plan,
+        binding=MediaBinding(source_id="source-1", local_path=str(synthetic_media)),
+        output_root=output_root,
+        runner=runner,
+    )
+
+    assert execution.status == "failed"
+    assert execution.artifacts == ()
+    assert len(execution.steps) == 1
+    assert execution.steps[0].step_id == "translation-provenance-preflight"
+    assert execution.steps[0].error_code == ErrorCode.SUBTITLE_CUES_REQUIRED.value
+    assert execution.steps[0].recoverable is True
+    assert runner.calls == 0
+    assert not output_root.exists()
 
 
 @pytest.mark.parametrize(

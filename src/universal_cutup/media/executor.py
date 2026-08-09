@@ -452,6 +452,13 @@ def execute_external_plan(
                 category="capability",
                 step="preflight",
             )
+        if plan.output_spec.subtitle.mode in BURN_IN_MODES and plan.source.kind != "video":
+            raise CutupError(
+                ErrorCode.CAPABILITY_UNAVAILABLE,
+                "burn-in subtitles require a video source",
+                category="capability",
+                step="preflight",
+            )
         source_path, source_hash, source_mtime_ns = _validate_source(plan, binding)
         for decision in selected_decisions:
             _validate_candidate_subtitle_readability(

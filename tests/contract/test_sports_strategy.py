@@ -212,6 +212,41 @@ def test_directed_natural_language_selects_one_save_without_replay() -> None:
     assert selected.sports_event.event_type is SportsEventType.SAVE
 
 
+def test_directed_word_count_is_not_reused_as_a_sports_event() -> None:
+    request = resolve_sports_request(ControlMode.DIRECTED, "Give me six saves")
+
+    assert request.required_event_types == (SportsEventType.SAVE,)
+    assert request.target_count == 6
+
+    result = select_sports_for_request(
+        propose_sports_candidates(_bundle(), media_duration_ms=60_000),
+        request,
+    )
+    assert len(result.selected_candidate_ids) == 1
+    assert result.unsatisfied_requirements == ("sports_required_count:6",)
+
+
+def test_directed_multi_digit_count_is_parsed_as_a_whole_number() -> None:
+    request = resolve_sports_request(ControlMode.DIRECTED, "Top 10 saves")
+
+    assert request.required_event_types == (SportsEventType.SAVE,)
+    assert request.target_count == 10
+
+
+def test_existing_chinese_two_count_remains_supported() -> None:
+    request = resolve_sports_request(ControlMode.DIRECTED, "只要两个扑救。")
+
+    assert request.required_event_types == (SportsEventType.SAVE,)
+    assert request.target_count == 2
+
+
+def test_cricket_six_remains_a_score_event_when_not_used_as_a_count() -> None:
+    request = resolve_sports_request(ControlMode.DIRECTED, "Show me the six")
+
+    assert request.required_event_types == (SportsEventType.SCORE,)
+    assert request.target_count is None
+
+
 def test_sports_plan_is_portable_and_carries_provider_provenance() -> None:
     bundle = _bundle()
     source = MediaSource(

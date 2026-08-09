@@ -9,6 +9,8 @@ All notable changes will be documented here.
 - Reject candidates that materially exceed the declared source duration while allowing a 250 ms
   container-rounding tolerance.
 - Redact standalone and embedded absolute filesystem paths from auditable process-error commands.
+- Parse DIRECTED sports counts as whole, event-bound quantities so phrases such as `six saves`
+  cannot also request a cricket score event and multi-digit counts remain intact.
 - Add real FFmpeg pressure coverage for HEVC/AAC, AV1/Opus, variable frame rate, Unicode paths,
   rotation metadata, corrupt media, and media/transcript duration mismatch.
 

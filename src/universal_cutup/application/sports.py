@@ -62,17 +62,40 @@ EVENT_MARKERS: dict[SportsEventType, tuple[str, ...]] = {
     SportsEventType.CELEBRATION: ("celebration", "庆祝"),
     SportsEventType.CONTROVERSY: ("controversy", "penalty call", "争议", "判罚"),
 }
-COUNT_MARKERS = {
-    "1": 1,
+COUNT_WORD_VALUES = {
     "one": 1,
-    "一个": 1,
-    "2": 2,
     "two": 2,
-    "两个": 2,
-    "3": 3,
     "three": 3,
-    "三个": 3,
+    "four": 4,
+    "five": 5,
+    "six": 6,
+    "seven": 7,
+    "eight": 8,
+    "nine": 9,
+    "ten": 10,
+    "一": 1,
+    "二": 2,
+    "两": 2,
+    "三": 3,
+    "四": 4,
+    "五": 5,
+    "六": 6,
+    "七": 7,
+    "八": 8,
+    "九": 9,
+    "十": 10,
 }
+ENGLISH_COUNTED_EVENT_PATTERN = re.compile(
+    r"(?<![\w-])(?P<count>[1-9]\d*|one|two|three|four|five|six|seven|eight|nine|ten)"
+    r"(?![\w-])(?=\s+(?:scores?|goals?|touchdowns?|aces?|sixes|three-pointers?|"
+    r"attempts?|shots?|saves?|blocks?|overtakes?|finishes?|wickets?|celebrations?|"
+    r"controvers(?:y|ies)|penalty calls?)(?![\w-]))"
+)
+CHINESE_COUNTED_EVENT_PATTERN = re.compile(
+    r"(?P<count>[1-9]\d*|一|二|两|三|四|五|六|七|八|九|十)(?:个)?"
+    r"(?=\s*(?:得分|进球|扣篮|达阵|绝杀|压哨|三分|六分球|射门|尝试|扑救|盖帽|"
+    r"封堵|超越|终场|冲线|出局|庆祝|争议|判罚))"
+)
 NARRATIVE_CUE_MARKERS: dict[SportsNarrativeCue, tuple[str, ...]] = {
     SportsNarrativeCue.DECISIVE_SCORE: (
         "buzzer beater",
@@ -83,29 +106,42 @@ NARRATIVE_CUE_MARKERS: dict[SportsNarrativeCue, tuple[str, ...]] = {
 }
 
 
+def _extract_target_count(normalized: str) -> tuple[int | None, str]:
+    for pattern in (ENGLISH_COUNTED_EVENT_PATTERN, CHINESE_COUNTED_EVENT_PATTERN):
+        match = pattern.search(normalized)
+        if match is None:
+            continue
+        marker = match.group("count")
+        count = int(marker) if marker.isascii() and marker.isdigit() else COUNT_WORD_VALUES[marker]
+        event_instruction = (
+            normalized[: match.start()]
+            + " " * (match.end() - match.start())
+            + normalized[match.end() :]
+        )
+        return count, event_instruction
+    return None, normalized
+
+
 def resolve_sports_request(
     control_mode: ControlMode,
     raw_instruction: str,
 ) -> SportsTaskRequest:
     normalized = raw_instruction.casefold()
+    target_count, event_instruction = _extract_target_count(normalized)
     required: list[SportsEventType] = []
     forbidden: list[SportsEventType] = []
     for event_type, markers in EVENT_MARKERS.items():
-        matching = tuple(marker for marker in markers if marker in normalized)
+        matching = tuple(marker for marker in markers if marker in event_instruction)
         if not matching:
             continue
         negated = any(
             re.search(
                 rf"(?:不要|排除|不需要|exclude|without|not)\s*.{{0,6}}{re.escape(marker)}",
-                normalized,
+                event_instruction,
             )
             for marker in matching
         )
         (forbidden if negated else required).append(event_type)
-    target_count = next(
-        (count for marker, count in COUNT_MARKERS.items() if marker in normalized),
-        None,
-    )
     include_replays = bool(
         re.search(r"(?:include|with|包含|要|保留)\s*.{0,6}(?:replay|回放)", normalized)
     ) and not bool(re.search(r"(?:不要|排除|without|exclude)\s*.{0,6}(?:replay|回放)", normalized))

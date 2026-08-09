@@ -261,6 +261,72 @@ def test_external_plan_checks_bilingual_languages_independently_before_output(
     assert not output_root.exists()
 
 
+def test_external_plan_rejects_subtitle_cue_longer_than_seven_seconds(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "long-cue-source.mp4"
+    subprocess.run(
+        [
+            "ffmpeg",
+            "-hide_banner",
+            "-loglevel",
+            "error",
+            "-f",
+            "lavfi",
+            "-i",
+            "color=c=navy:s=320x180:d=10",
+            "-f",
+            "lavfi",
+            "-i",
+            "sine=frequency=440:duration=10",
+            "-c:v",
+            "libx264",
+            "-pix_fmt",
+            "yuv420p",
+            "-c:a",
+            "aac",
+            "-shortest",
+            str(source),
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=20,
+    )
+    plan = make_plan(source, subtitle_mode="sidecar")
+    candidate = plan.candidates[0].model_copy(
+        update={
+            "end_ms": 9_500,
+            "subtitle_cues": (
+                SubtitleCue(
+                    cue_id="cue-long",
+                    source_id="source-1",
+                    start_ms=500,
+                    end_ms=8_501,
+                    text="Wait",
+                    language="en",
+                    source_segment_ids=("segment-1",),
+                ),
+            ),
+        }
+    )
+    plan = plan.model_copy(update={"candidates": (candidate,)})
+    output_root = tmp_path / "long-cue-output"
+
+    execution = execute_external_plan(
+        plan,
+        binding=MediaBinding(source_id=plan.source.source_id, local_path=str(source)),
+        output_root=output_root,
+    )
+
+    assert execution.status == "failed"
+    assert execution.artifacts == ()
+    assert execution.steps[-1].step_id == "subtitle-readability-preflight"
+    assert execution.steps[-1].error_code == ErrorCode.CAPABILITY_CONFLICT.value
+    assert "8.00s > 7.00s" in execution.steps[-1].message
+    assert not output_root.exists()
+
+
 @pytest.mark.parametrize("subtitle_mode", ["sidecar", "burn_in"])
 def test_external_plan_produces_verified_artifacts(
     synthetic_media: Path,

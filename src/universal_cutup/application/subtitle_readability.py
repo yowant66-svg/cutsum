@@ -14,6 +14,7 @@ from universal_cutup.domain.subtitles import (
 CJK_CONTENT_PATTERN = re.compile(r"[\u3400-\u9fff]")
 CHINESE_MAX_CHARACTERS_PER_SECOND = 10.0
 ENGLISH_MAX_CHARACTERS_PER_SECOND = 20.0
+MAXIMUM_STANDARD_SUBTITLE_CUE_DURATION_MS = 7_000
 
 
 def subtitle_character_count(text: str) -> int:

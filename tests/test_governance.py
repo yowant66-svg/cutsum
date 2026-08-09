@@ -122,7 +122,7 @@ def test_public_alpha_identity_and_version_are_consistent() -> None:
         "cutup": "universal_cutup.cli:app",
         "cutsum": "universal_cutup.cli:app",
     }
-    assert __version__ == "0.1.0a1"
+    assert __version__ == "0.1.0a2"
     assert project["project"]["version"] == __version__
     assert locked_project["version"] == __version__
 

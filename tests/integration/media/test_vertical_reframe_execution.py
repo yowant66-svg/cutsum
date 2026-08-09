@@ -5,6 +5,8 @@ import subprocess
 from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
+from statistics import median
+from typing import Literal
 
 import pytest
 from typer.testing import CliRunner
@@ -66,6 +68,21 @@ def _pixel_bounds(
         max(point[0] for point in matches),
         max(point[1] for point in matches),
     )
+
+
+def _pixel_y_median(
+    frame: bytes,
+    *,
+    width: int,
+    predicate: Callable[[int, int, int], bool],
+) -> float:
+    matches = []
+    for offset in range(0, len(frame), 3):
+        red, green, blue = frame[offset : offset + 3]
+        if predicate(red, green, blue):
+            matches.append((offset // 3) // width)
+    assert matches
+    return float(median(matches))
 
 
 def _plan(source_path: Path) -> CutPlan:
@@ -287,10 +304,16 @@ def test_vertical_burn_in_remains_playable_inside_safe_area(
 
 
 @pytest.mark.parametrize(
-    ("subtitle_mode", "translation_text", "maximum_block_ratio"),
+    ("subtitle_mode", "translation_text", "maximum_block_ratio", "bilingual_order"),
     [
-        (SubtitleMode.SOURCE_BURN_IN, None, 0.14),
-        (SubtitleMode.BILINGUAL_BURN_IN, "竖屏双语安全字幕", 0.20),
+        (SubtitleMode.SOURCE_BURN_IN, None, 0.14, "source_first"),
+        (SubtitleMode.BILINGUAL_BURN_IN, "竖屏双语安全字幕", 0.20, "source_first"),
+        (
+            SubtitleMode.BILINGUAL_BURN_IN,
+            "竖屏双语安全字幕",
+            0.20,
+            "translation_first",
+        ),
     ],
 )
 def test_vertical_burn_in_actual_pixels_meet_subtitle_safe_area_and_block_height(
@@ -298,6 +321,7 @@ def test_vertical_burn_in_actual_pixels_meet_subtitle_safe_area_and_block_height
     subtitle_mode: SubtitleMode,
     translation_text: str | None,
     maximum_block_ratio: float,
+    bilingual_order: Literal["source_first", "translation_first"],
 ) -> None:
     source = tmp_path / "solid-vertical-source.mp4"
     subprocess.run(
@@ -340,9 +364,7 @@ def test_vertical_burn_in_actual_pixels_meet_subtitle_safe_area_and_block_height
         base = base.model_copy(
             update={
                 "candidates": (
-                    candidate.model_copy(
-                        update={"translated_subtitle_cues": (translated_cue,)}
-                    ),
+                    candidate.model_copy(update={"translated_subtitle_cues": (translated_cue,)}),
                 )
             }
         )
@@ -363,6 +385,7 @@ def test_vertical_burn_in_actual_pixels_meet_subtitle_safe_area_and_block_height
                     mode=subtitle_mode,
                     language="en",
                     translation_language="zh-CN" if translation_text is not None else None,
+                    bilingual_order=bilingual_order,
                     safe_area=SubtitleSafeAreaSpec(
                         preset=SubtitleSafeAreaPreset.YOUTUBE_SHORTS,
                     ),
@@ -419,6 +442,28 @@ def test_vertical_burn_in_actual_pixels_meet_subtitle_safe_area_and_block_height
     assert glyph_bounds[2] < 720 - 54
     assert glyph_bounds[3] < 1280 - 160
     assert block_bounds[3] - block_bounds[1] + 1 <= round(1280 * maximum_block_ratio)
+    if translation_text is not None:
+        source_center_y = _pixel_y_median(
+            extracted.stdout,
+            width=720,
+            predicate=lambda red, green, blue: (
+                red > 220
+                and green > 220
+                and blue > 220
+                and max(red, green, blue) - min(red, green, blue) < 18
+            ),
+        )
+        translation_center_y = _pixel_y_median(
+            extracted.stdout,
+            width=720,
+            predicate=lambda red, green, blue: (
+                red > 180 and green > 150 and blue < 130 and red > blue + 70 and green > blue + 50
+            ),
+        )
+        if bilingual_order == "source_first":
+            assert source_center_y < translation_center_y
+        else:
+            assert translation_center_y < source_center_y
 
 
 def test_sdk_and_cli_derive_new_reframe_plan_without_mutating_original(

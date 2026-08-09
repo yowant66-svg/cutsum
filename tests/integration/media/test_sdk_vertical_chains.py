@@ -129,6 +129,21 @@ def test_cli_inspect_plan_and_full_dry_run(
     assert (cut_output / "execution-record.json").exists()
 
 
+def test_cli_inspect_rejects_corrupt_media_with_structured_error(tmp_path: Path) -> None:
+    corrupt_media = tmp_path / "损坏 input file.mp4"
+    corrupt_media.write_bytes(b"this is not a media container")
+    runner = CliRunner()
+
+    inspected = runner.invoke(app, ["inspect", str(corrupt_media)])
+
+    assert inspected.exit_code == 2
+    payload = json.loads(inspected.stderr)
+    assert payload["code"] == "MEDIA_PROCESS_FAILED"
+    assert payload["category"] == "media"
+    assert payload["step"] == "probe"
+    assert str(tmp_path) not in inspected.stderr
+
+
 def test_cli_education_and_sports_planning_share_sdk_workflows(
     synthetic_media: Path,
     tmp_path: Path,

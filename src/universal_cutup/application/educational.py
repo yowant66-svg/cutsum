@@ -137,11 +137,7 @@ def _has_unresolved_directed_semantics(
     removable = {
         *COUNT_MARKERS,
         *DIRECTED_CONTROL_MARKERS,
-        *(
-            marker
-            for markers in EDUCATIONAL_INTENT_MARKERS.values()
-            for marker in markers
-        ),
+        *(marker for markers in EDUCATIONAL_INTENT_MARKERS.values() for marker in markers),
     }
     for marker in sorted(removable, key=len, reverse=True):
         residual = residual.replace(marker, "")
@@ -170,11 +166,8 @@ def _expand_semantic_spans(
 ) -> tuple[SubtitleSemanticSpan, ...]:
     first = last = index
     while (
-        spans[last].end_ms - spans[first].start_ms
-        < MINIMUM_EDUCATIONAL_CANDIDATE_DURATION_MS
-    ) and (
-        first > 0 or last < len(spans) - 1
-    ):
+        spans[last].end_ms - spans[first].start_ms < MINIMUM_EDUCATIONAL_CANDIDATE_DURATION_MS
+    ) and (first > 0 or last < len(spans) - 1):
         options: list[tuple[bool, int, str]] = []
         if first > 0:
             options.append(
@@ -273,9 +266,7 @@ def propose_educational_candidates(
             subtitle_semantic_spans=context_semantic_spans,
             tags=("education", "semantic-proposal"),
         )
-        signal_source = candidate.model_copy(
-            update={"subtitle_semantic_spans": (span,)}
-        )
+        signal_source = candidate.model_copy(update={"subtitle_semantic_spans": (span,)})
         candidate = candidate.model_copy(
             update={"education_signals": extract_education_signals(signal_source)}
         )

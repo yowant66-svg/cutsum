@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import shutil
+import subprocess
 from datetime import UTC, datetime
 from pathlib import Path
 from threading import Event
@@ -365,6 +366,191 @@ def test_preview_downscale_matches_execution_record_and_ffprobe(
     assert artifact.source_resolution == "320x180"
     assert artifact.actual_output_resolution == "256x144"
     assert artifact.quality_preset == "preview"
+
+
+def test_rotation_metadata_is_normalized_in_render_and_execution_record(
+    synthetic_media: Path,
+    tmp_path: Path,
+) -> None:
+    rotated_media = tmp_path / "旋转 metadata source.mp4"
+    subprocess.run(
+        [
+            "ffmpeg",
+            "-hide_banner",
+            "-loglevel",
+            "error",
+            "-display_rotation:v:0",
+            "90",
+            "-i",
+            str(synthetic_media),
+            "-c",
+            "copy",
+            str(rotated_media),
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=20,
+    )
+    plan = make_plan(rotated_media, subtitle_mode="sidecar")
+    output_root = tmp_path / "Unicode 输出目录"
+
+    execution = execute_external_plan(
+        plan,
+        binding=MediaBinding(source_id="source-1", local_path=str(rotated_media)),
+        output_root=output_root,
+    )
+
+    artifact = next(item for item in execution.artifacts if item.artifact_type == "video")
+    output_probe = probe_media(output_root / artifact.relative_path)
+    assert execution.status == "success"
+    assert (output_probe.width, output_probe.height) == (180, 320)
+    assert artifact.source_resolution == "180x320"
+    assert artifact.actual_output_resolution == "180x320"
+
+
+@pytest.mark.parametrize(
+    ("video_encoder", "expected_video_codec", "audio_encoder", "container", "encoder_args"),
+    [
+        ("libx265", "hevc", "aac", "mov", ("-preset", "ultrafast")),
+        ("libsvtav1", "av1", "libopus", "mkv", ("-preset", "12")),
+    ],
+)
+def test_modern_input_codecs_render_through_fresh_execution_path(
+    tmp_path: Path,
+    video_encoder: str,
+    expected_video_codec: str,
+    audio_encoder: str,
+    container: str,
+    encoder_args: tuple[str, ...],
+) -> None:
+    encoder_listing = subprocess.run(
+        ["ffmpeg", "-hide_banner", "-encoders"],
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=20,
+    ).stdout
+    if video_encoder not in encoder_listing or audio_encoder not in encoder_listing:
+        pytest.skip(f"fixture encoders unavailable: {video_encoder}/{audio_encoder}")
+    source = tmp_path / f"输入 codec 空格.{container}"
+    subprocess.run(
+        [
+            "ffmpeg",
+            "-hide_banner",
+            "-loglevel",
+            "error",
+            "-f",
+            "lavfi",
+            "-i",
+            "testsrc2=size=320x180:rate=25:duration=4",
+            "-f",
+            "lavfi",
+            "-i",
+            "sine=frequency=660:sample_rate=48000:duration=4",
+            "-c:v",
+            video_encoder,
+            "-pix_fmt",
+            "yuv420p",
+            *encoder_args,
+            "-c:a",
+            audio_encoder,
+            "-shortest",
+            str(source),
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
+    source_probe = probe_media(source)
+    plan = make_plan(source, subtitle_mode="sidecar")
+    output_root = tmp_path / f"output-{expected_video_codec}"
+
+    execution = execute_external_plan(
+        plan,
+        binding=MediaBinding(source_id="source-1", local_path=str(source)),
+        output_root=output_root,
+    )
+
+    artifact = next(item for item in execution.artifacts if item.artifact_type == "video")
+    output_probe = probe_media(output_root / artifact.relative_path)
+    assert source_probe.video_codec == expected_video_codec
+    assert source_probe.audio_codec == ("opus" if audio_encoder == "libopus" else "aac")
+    assert execution.status == "success"
+    assert output_probe.video_codec == "h264"
+    assert output_probe.audio_codec == "aac"
+    assert abs(output_probe.duration_ms - 2000) <= 200
+
+
+def test_variable_frame_rate_input_renders_to_a_playable_bounded_clip(tmp_path: Path) -> None:
+    source = tmp_path / "variable-frame-rate.mp4"
+    subprocess.run(
+        [
+            "ffmpeg",
+            "-hide_banner",
+            "-loglevel",
+            "error",
+            "-f",
+            "lavfi",
+            "-i",
+            "testsrc2=size=320x180:rate=30:duration=4",
+            "-f",
+            "lavfi",
+            "-i",
+            "sine=frequency=550:sample_rate=48000:duration=4",
+            "-vf",
+            "select='if(lt(t,2),not(mod(n,2)),not(mod(n,3)))'",
+            "-fps_mode",
+            "vfr",
+            "-c:v",
+            "libx264",
+            "-pix_fmt",
+            "yuv420p",
+            "-c:a",
+            "aac",
+            "-shortest",
+            str(source),
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=20,
+    )
+    frame_rates = subprocess.run(
+        [
+            "ffprobe",
+            "-v",
+            "error",
+            "-select_streams",
+            "v:0",
+            "-show_entries",
+            "stream=r_frame_rate,avg_frame_rate",
+            "-of",
+            "default=nw=1:nk=1",
+            str(source),
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=20,
+    ).stdout.splitlines()
+    assert len(frame_rates) == 2 and frame_rates[0] != frame_rates[1]
+    plan = make_plan(source, subtitle_mode="sidecar")
+    output_root = tmp_path / "vfr-output"
+
+    execution = execute_external_plan(
+        plan,
+        binding=MediaBinding(source_id="source-1", local_path=str(source)),
+        output_root=output_root,
+    )
+
+    artifact = next(item for item in execution.artifacts if item.artifact_type == "video")
+    output_probe = probe_media(output_root / artifact.relative_path)
+    assert execution.status == "success"
+    assert output_probe.has_video is True
+    assert output_probe.has_audio is True
+    assert abs(output_probe.duration_ms - 2000) <= 200
 
 
 def test_each_replay_has_independent_execution_record(

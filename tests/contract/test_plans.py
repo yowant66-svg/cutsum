@@ -23,7 +23,12 @@ from universal_cutup.hashing import document_sha256, semantic_fingerprint
 FIXED_TIME = datetime(2026, 7, 30, 12, 0, tzinfo=UTC)
 
 
-def make_plan(*, plan_id: str, created_at: datetime) -> CutPlan:
+def make_plan(
+    *,
+    plan_id: str,
+    created_at: datetime,
+    source_duration_ms: int | None = None,
+) -> CutPlan:
     evidence = EvidenceRef(
         evidence_id="evidence-1",
         artifact_id="transcript-1",
@@ -73,6 +78,7 @@ def make_plan(*, plan_id: str, created_at: datetime) -> CutPlan:
             kind="video",
             sha256="d" * 64,
             basename_hint="input.mp4",
+            duration_ms=source_duration_ms,
         ),
         evidence_artifacts=(
             EvidenceArtifactIdentity(
@@ -133,3 +139,22 @@ def test_cut_plan_is_frozen() -> None:
     plan = make_plan(plan_id="plan-1", created_at=FIXED_TIME)
     with pytest.raises(ValidationError):
         plan.plan_id = "changed"
+
+
+def test_candidate_cannot_extend_beyond_declared_source_duration() -> None:
+    with pytest.raises(ValidationError, match="candidate range exceeds source duration"):
+        make_plan(
+            plan_id="plan-out-of-range",
+            created_at=FIXED_TIME,
+            source_duration_ms=500,
+        )
+
+
+def test_candidate_allows_small_container_duration_rounding_difference() -> None:
+    plan = make_plan(
+        plan_id="plan-rounded-duration",
+        created_at=FIXED_TIME,
+        source_duration_ms=900,
+    )
+
+    assert plan.candidates[0].end_ms == 1000

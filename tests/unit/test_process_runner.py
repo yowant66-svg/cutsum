@@ -80,3 +80,21 @@ def test_home_directory_is_redacted_from_auditable_commands() -> None:
 
     assert str(Path.home()) not in " ".join(redacted)
     assert redacted[2] == "<HOME>/private/source.mp4"
+
+
+def test_absolute_path_outside_home_is_reduced_to_basename() -> None:
+    private_media = "/private/var/folders/session/source clip.mp4"
+
+    redacted = redact_command(["ffprobe", "-i", private_media])
+
+    assert "/private/var/folders/session" not in " ".join(redacted)
+    assert redacted[2] == "<ABSOLUTE_PATH>/source clip.mp4"
+
+
+def test_embedded_subtitle_filter_path_is_redacted() -> None:
+    filter_value = "subtitles=filename='/private/var/session/private subtitle.ass'"
+
+    redacted = redact_command(["ffmpeg", "-vf", filter_value])
+
+    assert "/private/var/session" not in " ".join(redacted)
+    assert redacted[2] == "subtitles=filename='<ABSOLUTE_PATH>/private subtitle.ass'"

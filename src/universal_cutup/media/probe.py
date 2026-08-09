@@ -20,6 +20,30 @@ class MediaProbe:
     height: int | None
 
 
+def _display_dimensions(video_stream: dict[str, object] | None) -> tuple[int | None, int | None]:
+    if video_stream is None:
+        return None, None
+    width = video_stream.get("width")
+    height = video_stream.get("height")
+    normalized_width = width if isinstance(width, int) else None
+    normalized_height = height if isinstance(height, int) else None
+    side_data_value = video_stream.get("side_data_list")
+    side_data = side_data_value if isinstance(side_data_value, list) else []
+    tags = video_stream.get("tags")
+    tagged_rotation = tags.get("rotate") if isinstance(tags, dict) else None
+    rotation = next(
+        (
+            item.get("rotation")
+            for item in side_data
+            if isinstance(item, dict) and item.get("rotation") is not None
+        ),
+        tagged_rotation,
+    )
+    if rotation is not None and round(float(rotation)) % 180 == 90:
+        return normalized_height, normalized_width
+    return normalized_width, normalized_height
+
+
 def probe_media(
     media_path: Path,
     *,
@@ -59,6 +83,7 @@ def probe_media(
         (stream for stream in streams if stream.get("codec_type") == "audio"),
         None,
     )
+    width, height = _display_dimensions(video_stream)
     duration_seconds = float(parsed.get("format", {}).get("duration", 0))
     return MediaProbe(
         duration_ms=round(duration_seconds * 1000),
@@ -66,6 +91,6 @@ def probe_media(
         has_audio=audio_stream is not None,
         video_codec=video_stream.get("codec_name") if video_stream else None,
         audio_codec=audio_stream.get("codec_name") if audio_stream else None,
-        width=video_stream.get("width") if video_stream else None,
-        height=video_stream.get("height") if video_stream else None,
+        width=width,
+        height=height,
     )

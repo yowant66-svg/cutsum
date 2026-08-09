@@ -356,7 +356,11 @@ def _artifact(
                     "mkv": "audio/x-matroska",
                 }.get(path.suffix.removeprefix("."), "application/octet-stream")
                 if artifact_type == "audio"
-                else "application/x-subrip"
+                else {
+                    "srt": "application/x-subrip",
+                    "vtt": "text/vtt",
+                    "ass": "text/x-ssa",
+                }.get(path.suffix.removeprefix("."), "application/octet-stream")
             )
         ),
         source_resolution=(

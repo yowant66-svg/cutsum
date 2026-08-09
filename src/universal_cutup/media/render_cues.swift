@@ -93,7 +93,9 @@ do {
             return NSFont.systemFont(ofSize: 10, weight: .semibold)
         }
 
-        let lineHeight = CGFloat(height - 16) / 2
+        let contentHeight = CGFloat(height - 16)
+        let hasTranslation = !cue.translationText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        let lineHeight = hasTranslation ? contentHeight / 2 : contentHeight
         let sourceAttributes: [NSAttributedString.Key: Any] = [
             .font: fittingFont(
                 text: cue.sourceText,
@@ -115,21 +117,23 @@ do {
         cue.sourceText.draw(
             in: NSRect(
                 x: 16,
-                y: 8 + lineHeight,
+                y: hasTranslation ? 8 + lineHeight : 8,
                 width: textWidth,
                 height: lineHeight
             ).offsetBy(dx: horizontalInset - 16, dy: 0),
             withAttributes: sourceAttributes
         )
-        cue.translationText.draw(
-            in: NSRect(
-                x: 16,
-                y: 8,
-                width: textWidth,
-                height: lineHeight
-            ).offsetBy(dx: horizontalInset - 16, dy: 0),
-            withAttributes: translationAttributes
-        )
+        if hasTranslation {
+            cue.translationText.draw(
+                in: NSRect(
+                    x: 16,
+                    y: 8,
+                    width: textWidth,
+                    height: lineHeight
+                ).offsetBy(dx: horizontalInset - 16, dy: 0),
+                withAttributes: translationAttributes
+            )
+        }
         NSGraphicsContext.restoreGraphicsState()
 
         guard

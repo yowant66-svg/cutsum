@@ -95,6 +95,7 @@ from .subtitle_display import (
 from .subtitle_readability import assess_subtitle_readability
 
 __all__ = [
+    "DEFAULT_MAX_FULL_CLIPS",
     "CapabilityReport",
     "CapabilityState",
     "DetectedSportsObservations",
@@ -150,6 +151,8 @@ __all__ = [
     "subtitle_capabilities",
     "validate_intelligence_document",
 ]
+
+DEFAULT_MAX_FULL_CLIPS = 24
 
 
 class SdkResult(BaseModel):
@@ -704,6 +707,7 @@ def run_full_offline(
     output_root: Path,
     rights_attestation: RightsAttestation,
     output_spec: OutputSpec | None = None,
+    maximum_clip_count: int | None = DEFAULT_MAX_FULL_CLIPS,
 ) -> FullOfflineResult:
     inspection = inspect_source(
         media_path,
@@ -716,6 +720,22 @@ def run_full_offline(
         transcript,
         output_spec=output_spec,
     )
+    selected_clip_count = len(plan.selection_result.selected_candidate_ids)
+    if maximum_clip_count is not None:
+        if maximum_clip_count < 1:
+            raise ValueError("maximum_clip_count must be positive or None")
+        if selected_clip_count > maximum_clip_count:
+            raise CutupError(
+                ErrorCode.CAPABILITY_CONFLICT,
+                "full workflow selected more clips than the configured safety limit",
+                category="safety",
+                step="full_output_guard",
+                recoverable=True,
+                details={
+                    "maximum_clip_count": maximum_clip_count,
+                    "selected_clip_count": selected_clip_count,
+                },
+            )
     execution = execute_cut_plan(
         plan,
         binding=inspection.binding,

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import hashlib
+import subprocess
+from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -43,6 +45,27 @@ from universal_cutup.sdk import configure_reframe
 
 def _file_hash(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _pixel_bounds(
+    frame: bytes,
+    *,
+    width: int,
+    predicate: Callable[[int, int, int], bool],
+) -> tuple[int, int, int, int]:
+    matches = []
+    for offset in range(0, len(frame), 3):
+        red, green, blue = frame[offset : offset + 3]
+        if predicate(red, green, blue):
+            pixel_index = offset // 3
+            matches.append((pixel_index % width, pixel_index // width))
+    assert matches
+    return (
+        min(point[0] for point in matches),
+        min(point[1] for point in matches),
+        max(point[0] for point in matches),
+        max(point[1] for point in matches),
+    )
 
 
 def _plan(source_path: Path) -> CutPlan:
@@ -261,6 +284,141 @@ def test_vertical_burn_in_remains_playable_inside_safe_area(
     video = next(item for item in execution.artifacts if item.artifact_type == "video")
     probe = probe_media(output_root / video.relative_path)
     assert (probe.width, probe.height) == (180, 320)
+
+
+@pytest.mark.parametrize(
+    ("subtitle_mode", "translation_text", "maximum_block_ratio"),
+    [
+        (SubtitleMode.SOURCE_BURN_IN, None, 0.14),
+        (SubtitleMode.BILINGUAL_BURN_IN, "竖屏双语安全字幕", 0.20),
+    ],
+)
+def test_vertical_burn_in_actual_pixels_meet_subtitle_safe_area_and_block_height(
+    tmp_path: Path,
+    subtitle_mode: SubtitleMode,
+    translation_text: str | None,
+    maximum_block_ratio: float,
+) -> None:
+    source = tmp_path / "solid-vertical-source.mp4"
+    subprocess.run(
+        [
+            "ffmpeg",
+            "-hide_banner",
+            "-loglevel",
+            "error",
+            "-f",
+            "lavfi",
+            "-i",
+            "color=c=navy:s=320x180:d=4",
+            "-f",
+            "lavfi",
+            "-i",
+            "sine=frequency=440:duration=4",
+            "-c:v",
+            "libx264",
+            "-pix_fmt",
+            "yuv420p",
+            "-c:a",
+            "aac",
+            "-shortest",
+            str(source),
+        ],
+        check=True,
+        capture_output=True,
+        timeout=20,
+    )
+    base = _plan(source)
+    if translation_text is not None:
+        candidate = base.candidates[0]
+        translated_cue = candidate.subtitle_cues[0].model_copy(
+            update={
+                "cue_id": "cue-vertical-translation",
+                "text": translation_text,
+                "language": "zh-CN",
+            }
+        )
+        base = base.model_copy(
+            update={
+                "candidates": (
+                    candidate.model_copy(
+                        update={"translated_subtitle_cues": (translated_cue,)}
+                    ),
+                )
+            }
+        )
+    plan = base.model_copy(
+        update={
+            "output_spec": OutputSpec(
+                render=RenderSpec(
+                    target_width=720,
+                    target_height=1280,
+                    allow_upscale=True,
+                    duration_tolerance_ms=200,
+                ),
+                reframe=ReframeSpec(
+                    mode="fit_background",
+                    safe_area_preset=ReframeSafeAreaPreset.YOUTUBE_SHORTS,
+                ),
+                subtitle=SubtitleSpec(
+                    mode=subtitle_mode,
+                    language="en",
+                    translation_language="zh-CN" if translation_text is not None else None,
+                    safe_area=SubtitleSafeAreaSpec(
+                        preset=SubtitleSafeAreaPreset.YOUTUBE_SHORTS,
+                    ),
+                ),
+            )
+        }
+    )
+    output_root = tmp_path / "pixel-safe-area"
+
+    execution = execute_external_plan(
+        plan,
+        binding=MediaBinding(source_id=plan.source.source_id, local_path=str(source)),
+        output_root=output_root,
+    )
+
+    assert execution.status == "success"
+    clip = output_root / "clips/candidate-vertical.mp4"
+    extracted = subprocess.run(
+        [
+            "ffmpeg",
+            "-hide_banner",
+            "-loglevel",
+            "error",
+            "-ss",
+            "1",
+            "-i",
+            str(clip),
+            "-frames:v",
+            "1",
+            "-f",
+            "rawvideo",
+            "-pix_fmt",
+            "rgb24",
+            "-",
+        ],
+        check=True,
+        capture_output=True,
+        timeout=20,
+    )
+    assert len(extracted.stdout) == 720 * 1280 * 3
+    glyph_bounds = _pixel_bounds(
+        extracted.stdout,
+        width=720,
+        predicate=lambda red, green, blue: red > 180 and green > 160 and blue > 40,
+    )
+    block_bounds = _pixel_bounds(
+        extracted.stdout,
+        width=720,
+        predicate=lambda red, green, blue: red < 20 and green < 20 and blue < 110,
+    )
+
+    assert glyph_bounds[0] >= 54
+    assert glyph_bounds[1] >= 64
+    assert glyph_bounds[2] < 720 - 54
+    assert glyph_bounds[3] < 1280 - 160
+    assert block_bounds[3] - block_bounds[1] + 1 <= round(1280 * maximum_block_ratio)
 
 
 def test_sdk_and_cli_derive_new_reframe_plan_without_mutating_original(

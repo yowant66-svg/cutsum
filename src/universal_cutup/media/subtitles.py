@@ -7,6 +7,7 @@ from pathlib import Path
 from universal_cutup.domain.errors import CutupError, ErrorCode
 from universal_cutup.domain.specs import (
     RenderSpec,
+    SubtitleMode,
     SubtitleSafeAreaPreset,
     SubtitleSafeAreaSpec,
     SubtitleSidecarFormat,
@@ -60,6 +61,14 @@ PLATFORM_SAFE_AREA_RATIOS = {
     SubtitleSafeAreaPreset.TIKTOK: (0.10, 0.25),
     SubtitleSafeAreaPreset.INSTAGRAM_REELS: (0.12, 0.20),
 }
+PLATFORM_HORIZONTAL_SAFE_AREA_RATIO = 0.075
+SUBTITLE_FONT_REFERENCE_HEIGHT = 720
+SINGLE_LANGUAGE_BLOCK_HEIGHT_RATIO = 0.14
+BILINGUAL_BLOCK_HEIGHT_RATIO = 0.20
+
+
+def _scaled_font_size(preferred_size: int, *, height: int) -> int:
+    return max(10, round(preferred_size * height / SUBTITLE_FONT_REFERENCE_HEIGHT))
 
 
 def resolve_safe_area_pixels(
@@ -69,9 +78,14 @@ def resolve_safe_area_pixels(
     height: int,
 ) -> ResolvedSafeArea:
     preset_top, preset_bottom = PLATFORM_SAFE_AREA_RATIOS[spec.preset]
+    platform_horizontal = (
+        0.0
+        if spec.preset is SubtitleSafeAreaPreset.NONE
+        else PLATFORM_HORIZONTAL_SAFE_AREA_RATIO
+    )
     return ResolvedSafeArea(
-        left=round(width * spec.left_ratio),
-        right=round(width * spec.right_ratio),
+        left=round(width * max(spec.left_ratio, platform_horizontal)),
+        right=round(width * max(spec.right_ratio, platform_horizontal)),
         top=round(height * max(spec.top_ratio, preset_top)),
         bottom=round(height * max(spec.bottom_ratio, preset_bottom)),
     )
@@ -270,6 +284,7 @@ def _write_single_ass(
         safe_area.top if alignment == 8 else safe_area.bottom,
     )
     back_color, border_style = _ass_background_style(spec.background_opacity)
+    source_font_size = _scaled_font_size(spec.source_font_size, height=height)
     header = "\n".join(
         [
             "[Script Info]",
@@ -286,7 +301,7 @@ def _write_single_ass(
                 "MarginR,MarginV,Encoding"
             ),
             (
-                f"Style: Default,{spec.font_family},{spec.source_font_size},"
+                f"Style: Default,{spec.font_family},{source_font_size},"
                 f"&H00FFFFFF,&H00000000,{back_color},0,0,0,0,100,100,0,0,"
                 f"{border_style},"
                 f"{spec.outline_width},0,{alignment},{horizontal_margin},"
@@ -336,7 +351,9 @@ def write_bilingual_ass(
         spec.margin_vertical,
         safe_area.top if alignment == 8 else safe_area.bottom,
     )
-    line_offset = max(spec.source_font_size, spec.translation_font_size) + 14
+    source_font_size = _scaled_font_size(spec.source_font_size, height=height)
+    translation_font_size = _scaled_font_size(spec.translation_font_size, height=height)
+    line_offset = max(source_font_size, translation_font_size) + 14
     source_is_first = spec.bilingual_order == "source_first"
     if alignment == 2:
         source_margin = base_margin + line_offset if source_is_first else base_margin
@@ -352,13 +369,13 @@ def write_bilingual_ass(
         "Outline,Shadow,Alignment,MarginL,MarginR,MarginV,Encoding"
     )
     source_style = (
-        f"Style: Source,{spec.font_family},{spec.source_font_size},"
+        f"Style: Source,{spec.font_family},{source_font_size},"
         f"&H00FFFFFF,&H00000000,{back_color},0,0,0,0,100,100,0,0,"
         f"{border_style},{outline},"
         f"0,{alignment},{horizontal_margin},{horizontal_margin},{source_margin},1"
     )
     translation_style = (
-        f"Style: Translation,{spec.font_family},{spec.translation_font_size},"
+        f"Style: Translation,{spec.font_family},{translation_font_size},"
         f"&H0000FFFF,&H00000000,{back_color},0,0,0,0,100,100,0,0,"
         f"{border_style},{outline},"
         f"0,{alignment},{horizontal_margin},{horizontal_margin},{translation_margin},1"
@@ -521,7 +538,33 @@ def _burn_with_macos_system_font(
         height=height,
     )
     available_height = height - safe_area.top - safe_area.bottom
-    overlay_height = max(32, min(max(96, round(height * 0.36)), available_height))
+    is_bilingual = subtitle_spec.mode is SubtitleMode.BILINGUAL_BURN_IN
+    source_font_size = _scaled_font_size(subtitle_spec.source_font_size, height=height)
+    translation_font_size = _scaled_font_size(
+        subtitle_spec.translation_font_size,
+        height=height,
+    )
+    block_height_ratio = (
+        BILINGUAL_BLOCK_HEIGHT_RATIO if is_bilingual else SINGLE_LANGUAGE_BLOCK_HEIGHT_RATIO
+    )
+    maximum_block_height = min(round(height * block_height_ratio), available_height)
+    desired_block_height = round(
+        (
+            source_font_size
+            + (translation_font_size if is_bilingual else 0)
+        )
+        * subtitle_spec.max_lines
+        * 1.35
+        + 16
+    )
+    overlay_height = max(
+        1,
+        min(max(32, desired_block_height), maximum_block_height),
+    )
+    maximum_text_width_ratio = min(
+        subtitle_spec.max_width_ratio,
+        (width - safe_area.left - safe_area.right) / width,
+    )
     overlays = tuple(
         working_directory / f"subtitle-overlay-{index:04d}.png"
         for index in range(1, len(timed_cues) + 1)
@@ -533,11 +576,11 @@ def _burn_with_macos_system_font(
                 {
                     "sourceText": cue.text.partition("\n")[0],
                     "translationText": semantic_two_line_text(cue.text.partition("\n")[2]),
-                    "sourceFontSize": subtitle_spec.source_font_size,
-                    "translationFontSize": subtitle_spec.translation_font_size,
+                    "sourceFontSize": source_font_size,
+                    "translationFontSize": translation_font_size,
                     "maxLines": subtitle_spec.max_lines,
                     "backgroundOpacity": subtitle_spec.background_opacity,
-                    "maxWidthRatio": subtitle_spec.max_width_ratio,
+                    "maxWidthRatio": maximum_text_width_ratio,
                     "outputPath": str(path),
                 }
                 for cue, path in zip(timed_cues, overlays, strict=True)

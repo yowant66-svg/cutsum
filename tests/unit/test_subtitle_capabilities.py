@@ -88,8 +88,8 @@ def test_vertical_safe_area_resolves_platform_ui_insets() -> None:
 
     resolved = resolve_safe_area_pixels(spec, width=1080, height=1920)
 
-    assert resolved.left == 54
-    assert resolved.right == 54
+    assert resolved.left == 81
+    assert resolved.right == 81
     assert resolved.bottom == 480
     assert resolved.top == 192
 

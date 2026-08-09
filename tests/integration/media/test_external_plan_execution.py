@@ -257,6 +257,7 @@ def test_external_plan_checks_bilingual_languages_independently_before_output(
     assert execution.artifacts == ()
     assert execution.steps[-1].step_id == "subtitle-readability-preflight"
     assert execution.steps[-1].error_code == ErrorCode.CAPABILITY_CONFLICT.value
+    assert execution.steps[-1].message is not None
     assert "zh-CN" in execution.steps[-1].message
     assert not output_root.exists()
 
@@ -323,6 +324,7 @@ def test_external_plan_rejects_subtitle_cue_longer_than_seven_seconds(
     assert execution.artifacts == ()
     assert execution.steps[-1].step_id == "subtitle-readability-preflight"
     assert execution.steps[-1].error_code == ErrorCode.CAPABILITY_CONFLICT.value
+    assert execution.steps[-1].message is not None
     assert "8.00s > 7.00s" in execution.steps[-1].message
     assert not output_root.exists()
 

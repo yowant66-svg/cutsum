@@ -4,6 +4,7 @@ import Foundation
 struct CueOverlay: Decodable {
     let sourceText: String
     let translationText: String
+    let sourceIsFirst: Bool
     let sourceFontSize: Double
     let translationFontSize: Double
     let maxLines: Int
@@ -114,20 +115,22 @@ do {
             .foregroundColor: NSColor(calibratedRed: 1.0, green: 0.92, blue: 0.36, alpha: 1.0),
             .paragraphStyle: paragraph,
         ]
+        let sourceY = hasTranslation && cue.sourceIsFirst ? 8 + lineHeight : 8
         cue.sourceText.draw(
             in: NSRect(
                 x: 16,
-                y: hasTranslation ? 8 + lineHeight : 8,
+                y: sourceY,
                 width: textWidth,
                 height: lineHeight
             ).offsetBy(dx: horizontalInset - 16, dy: 0),
             withAttributes: sourceAttributes
         )
         if hasTranslation {
+            let translationY = cue.sourceIsFirst ? 8 : 8 + lineHeight
             cue.translationText.draw(
                 in: NSRect(
                     x: 16,
-                    y: 8,
+                    y: translationY,
                     width: textWidth,
                     height: lineHeight
                 ).offsetBy(dx: horizontalInset - 16, dy: 0),

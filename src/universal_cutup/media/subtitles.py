@@ -79,9 +79,7 @@ def resolve_safe_area_pixels(
 ) -> ResolvedSafeArea:
     preset_top, preset_bottom = PLATFORM_SAFE_AREA_RATIOS[spec.preset]
     platform_horizontal = (
-        0.0
-        if spec.preset is SubtitleSafeAreaPreset.NONE
-        else PLATFORM_HORIZONTAL_SAFE_AREA_RATIO
+        0.0 if spec.preset is SubtitleSafeAreaPreset.NONE else PLATFORM_HORIZONTAL_SAFE_AREA_RATIO
     )
     return ResolvedSafeArea(
         left=round(width * max(spec.left_ratio, platform_horizontal)),
@@ -549,10 +547,7 @@ def _burn_with_macos_system_font(
     )
     maximum_block_height = min(round(height * block_height_ratio), available_height)
     desired_block_height = round(
-        (
-            source_font_size
-            + (translation_font_size if is_bilingual else 0)
-        )
+        (source_font_size + (translation_font_size if is_bilingual else 0))
         * subtitle_spec.max_lines
         * 1.35
         + 16
@@ -576,6 +571,7 @@ def _burn_with_macos_system_font(
                 {
                     "sourceText": cue.text.partition("\n")[0],
                     "translationText": semantic_two_line_text(cue.text.partition("\n")[2]),
+                    "sourceIsFirst": subtitle_spec.bilingual_order == "source_first",
                     "sourceFontSize": source_font_size,
                     "translationFontSize": translation_font_size,
                     "maxLines": subtitle_spec.max_lines,

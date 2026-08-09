@@ -1,10 +1,16 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Literal
 
 import pytest
 
-from universal_cutup.domain.specs import SubtitleSidecarFormat, SubtitleSpec
+from universal_cutup.domain.specs import (
+    SubtitleSafeAreaPreset,
+    SubtitleSafeAreaSpec,
+    SubtitleSidecarFormat,
+    SubtitleSpec,
+)
 from universal_cutup.media.subtitles import (
     RelativeBilingualCue,
     RelativeSubtitleCue,
@@ -89,3 +95,64 @@ def test_bilingual_sidecar_keeps_one_semantic_timeline(
     assert PAIRS[0].source_text in content
     assert PAIRS[0].translation_text in content
     assert content.count("00:00:02") <= 1
+
+
+@pytest.mark.parametrize(
+    (
+        "width",
+        "height",
+        "bilingual_order",
+        "source_margin",
+        "translation_margin",
+        "font_size",
+        "first_dialogue_style",
+    ),
+    [
+        (720, 1280, "source_first", 309, 256, 39, "Source"),
+        (720, 1280, "translation_first", 256, 309, 39, "Translation"),
+        (1080, 1920, "source_first", 457, 384, 59, "Source"),
+        (1080, 1920, "translation_first", 384, 457, 59, "Translation"),
+    ],
+)
+def test_vertical_bilingual_ass_contract_scales_and_preserves_order(
+    tmp_path: Path,
+    width: int,
+    height: int,
+    bilingual_order: Literal["source_first", "translation_first"],
+    source_margin: int,
+    translation_margin: int,
+    font_size: int,
+    first_dialogue_style: str,
+) -> None:
+    output = tmp_path / "vertical-bilingual.ass"
+
+    write_bilingual_sidecar(
+        output,
+        cues=PAIRS,
+        sidecar_format=SubtitleSidecarFormat.ASS,
+        spec=SubtitleSpec(
+            sidecar_format=SubtitleSidecarFormat.ASS,
+            bilingual_order=bilingual_order,
+            safe_area=SubtitleSafeAreaSpec(
+                preset=SubtitleSafeAreaPreset.YOUTUBE_SHORTS,
+            ),
+        ),
+        width=width,
+        height=height,
+    )
+
+    content = output.read_text(encoding="utf-8")
+    assert f"PlayResX: {width}" in content
+    assert f"PlayResY: {height}" in content
+    assert (
+        f"Style: Source,Arial,{font_size},&H00FFFFFF,&H00000000,&HA6000000,"
+        f"0,0,0,0,100,100,0,0,3,2,0,2,{round(width * 0.075)},"
+        f"{round(width * 0.075)},{source_margin},1"
+    ) in content
+    assert (
+        f"Style: Translation,Arial,{font_size},&H0000FFFF,&H00000000,&HA6000000,"
+        f"0,0,0,0,100,100,0,0,3,2,0,2,{round(width * 0.075)},"
+        f"{round(width * 0.075)},{translation_margin},1"
+    ) in content
+    first_dialogue = next(line for line in content.splitlines() if line.startswith("Dialogue:"))
+    assert f",{first_dialogue_style}," in first_dialogue

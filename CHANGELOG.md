@@ -11,6 +11,8 @@ All notable changes will be documented here.
 - Redact standalone and embedded absolute filesystem paths from auditable process-error commands.
 - Parse DIRECTED sports counts as whole, event-bound quantities so phrases such as `six saves`
   cannot also request a cricket score event and multi-digit counts remain intact.
+- Refuse generic `full` execution above its default 24-clip safety limit unless the caller
+  explicitly raises `--max-clips`, and expose the projected count in dry-run output.
 - Add real FFmpeg pressure coverage for HEVC/AAC, AV1/Opus, variable frame rate, Unicode paths,
   rotation metadata, corrupt media, and media/transcript duration mismatch.
 

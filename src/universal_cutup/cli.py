@@ -15,6 +15,7 @@ from universal_cutup.application.blind_runs import (
     verify_frozen_blind_run,
 )
 from universal_cutup.application.sdk import (
+    DEFAULT_MAX_FULL_CLIPS,
     aggregate_intelligence,
     analyze_transcript,
     capability_report,
@@ -671,21 +672,40 @@ def full_pipeline(
     rights: RightsAttestation = RightsAttestation.OWNED,
     subtitle_mode: SubtitleMode = SubtitleMode.SOURCE_SIDECAR,
     dry_run: bool = False,
+    max_clips: Annotated[
+        int,
+        typer.Option(
+            "--max-clips",
+            min=1,
+            help="Maximum selected clips allowed before full execution is refused.",
+        ),
+    ] = DEFAULT_MAX_FULL_CLIPS,
 ) -> None:
     """Run inspect-to-render entirely offline."""
     try:
-        inspection = inspect_source(media)
+        inspection = inspect_source(media, rights_attestation=rights)
         parsed = _transcript(transcript, inspection.source.source_id)
-        if dry_run:
-            _emit({"dry_run": True, "analysis": analyze_transcript(parsed)})
-            return
         output_spec = OutputSpec(subtitle=SubtitleSpec(mode=subtitle_mode))
+        if dry_run:
+            cut_plan = create_plan(inspection.source, parsed, output_spec=output_spec)
+            selected_clip_count = len(cut_plan.selection_result.selected_candidate_ids)
+            _emit(
+                {
+                    "dry_run": True,
+                    "analysis": analyze_transcript(parsed),
+                    "selected_clip_count": selected_clip_count,
+                    "maximum_clip_count": max_clips,
+                    "within_output_limit": selected_clip_count <= max_clips,
+                }
+            )
+            return
         result = run_full_offline(
             media,
             parsed,
             output_root=output_dir,
             rights_attestation=rights,
             output_spec=output_spec,
+            maximum_clip_count=max_clips,
         )
         _write_json_no_overwrite(output_dir / "execution-record.json", result.execution)
         _emit(result)

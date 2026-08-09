@@ -118,6 +118,11 @@ Every selected clip is verified with ffprobe. The output directory is no-overwri
 the same paths returns a structured conflict instead of replacing files. Save the emitted
 ExecutionRecord with the media when auditability matters.
 
+The generic deterministic `cutsum full` command has a default 24-clip safety limit because it can
+select one clip per transcript cue. Use `--dry-run` to inspect `selected_clip_count`; if a larger
+batch is intentional, raise the bound explicitly with `--max-clips N` or create and inspect a
+content-aware plan before execution.
+
 Derive a new 9:16 plan without modifying the original:
 
 ```bash

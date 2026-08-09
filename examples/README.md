@@ -32,6 +32,9 @@ cutsum full \
   --subtitle-mode source_sidecar
 ```
 
+`full` refuses more than 24 selected clips by default. Run the same command with `--dry-run` to
+inspect the projected count, then pass `--max-clips N` only when the larger batch is intentional.
+
 ## Education distillation
 
 ```bash

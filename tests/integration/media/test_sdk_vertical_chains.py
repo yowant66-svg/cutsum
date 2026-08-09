@@ -119,6 +119,10 @@ def test_cli_inspect_plan_and_full_dry_run(
         ],
     )
     assert full.exit_code == 0
+    full_payload = json.loads(full.stdout)
+    assert full_payload["selected_clip_count"] == 1
+    assert full_payload["maximum_clip_count"] == 24
+    assert full_payload["within_output_limit"] is True
     assert not (tmp_path / "dry-output").exists()
     cut_output = tmp_path / "cut-output"
     cut = runner.invoke(
@@ -127,6 +131,45 @@ def test_cli_inspect_plan_and_full_dry_run(
     )
     assert cut.exit_code == 0
     assert (cut_output / "execution-record.json").exists()
+
+
+def test_cli_full_refuses_to_exceed_explicit_clip_limit_before_writing(
+    synthetic_media: Path,
+    tmp_path: Path,
+) -> None:
+    transcript_path = tmp_path / "two-cues.srt"
+    transcript_path.write_text(
+        (
+            "1\n00:00:00,500 --> 00:00:01,500\nFirst selected cue\n\n"
+            "2\n00:00:01,500 --> 00:00:02,500\nSecond selected cue\n"
+        ),
+        encoding="utf-8",
+    )
+    output_root = tmp_path / "bounded-output"
+    runner = CliRunner()
+
+    result = runner.invoke(
+        app,
+        [
+            "full",
+            str(synthetic_media),
+            str(transcript_path),
+            str(output_root),
+            "--max-clips",
+            "1",
+        ],
+    )
+
+    assert result.exit_code == 2
+    payload = json.loads(result.stderr)
+    assert payload["code"] == "CAPABILITY_CONFLICT"
+    assert payload["step"] == "full_output_guard"
+    assert payload["recoverable"] is True
+    assert payload["details"] == {
+        "maximum_clip_count": 1,
+        "selected_clip_count": 2,
+    }
+    assert not output_root.exists()
 
 
 def test_cli_inspect_rejects_corrupt_media_with_structured_error(tmp_path: Path) -> None:

@@ -1,12 +1,12 @@
 # Maintainer release approval
 
-Approval date: 2026-08-04
+Approval date: 2026-08-09
 
 Maintainer: DXBATM
 
-Release: CutSum `0.1.0a1`
+Release: CutSum `0.1.0a2`
 
-The maintainer authorized Codex to complete and publish the first GitHub Alpha Release under the
+The maintainer authorized Codex to complete and publish this GitHub Alpha Release under the
 following boundaries:
 
 - Use the project and distribution names `CutSum` and `cutsum` for this Alpha, accepting that the

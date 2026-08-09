@@ -4,6 +4,8 @@ All notable changes will be documented here.
 
 ## Unreleased
 
+## 0.1.0a2 — 2026-08-09
+
 - Normalize quarter-turn video rotation metadata before resolution planning so rendered dimensions
   and `ExecutionRecord` provenance agree with the displayed media orientation.
 - Reject candidates that materially exceed the declared source duration while allowing a 250 ms
@@ -15,6 +17,13 @@ All notable changes will be documented here.
   explicitly raises `--max-clips`, and expose the projected count in dry-run output.
 - Add real FFmpeg pressure coverage for HEVC/AAC, AV1/Opus, variable frame rate, Unicode paths,
   rotation metadata, corrupt media, and media/transcript duration mismatch.
+- Preserve independent educational clip boundaries, extend referential context, and enforce
+  completeness at transcript-window edges.
+- Enforce requested educational clip counts, output duration, and vertical canvas constraints.
+- Bound subtitle cue duration, reading speed, vertical overlays, and bilingual display order.
+- Reject unwritable output roots and unsupported audio burn-in before execution begins.
+- Require auditable translation provenance before rendering translated or bilingual subtitles.
+- Report correct media types for generated subtitle sidecars.
 
 ## 0.1.0a1 — 2026-08-04
 

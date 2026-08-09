@@ -26,7 +26,7 @@ git clone https://github.com/yowant66-svg/cutsum.git
 cd cutsum
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install https://github.com/yowant66-svg/cutsum/releases/download/v0.1.0a1/cutsum-0.1.0a1-py3-none-any.whl
+python -m pip install https://github.com/yowant66-svg/cutsum/releases/download/v0.1.0a2/cutsum-0.1.0a2-py3-none-any.whl
 cutsum --help
 ```
 
@@ -37,12 +37,12 @@ git clone https://github.com/yowant66-svg/cutsum.git
 Set-Location cutsum
 py -3.11 -m venv .venv
 .\.venv\Scripts\Activate.ps1
-python -m pip install https://github.com/yowant66-svg/cutsum/releases/download/v0.1.0a1/cutsum-0.1.0a1-py3-none-any.whl
+python -m pip install https://github.com/yowant66-svg/cutsum/releases/download/v0.1.0a2/cutsum-0.1.0a2-py3-none-any.whl
 cutsum --help
 ```
 
 For a security-sensitive installation, download the wheel and `SHA256SUMS.txt` from the
-[`v0.1.0a1` Release](https://github.com/yowant66-svg/cutsum/releases/tag/v0.1.0a1) and verify the
+[`v0.1.0a2` Release](https://github.com/yowant66-svg/cutsum/releases/tag/v0.1.0a2) and verify the
 checksum before installing.
 
 ## 3. Run all three demonstrations

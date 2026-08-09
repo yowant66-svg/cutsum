@@ -98,3 +98,13 @@ def test_embedded_subtitle_filter_path_is_redacted() -> None:
 
     assert "/private/var/session" not in " ".join(redacted)
     assert redacted[2] == "subtitles=filename='<ABSOLUTE_PATH>/private subtitle.ass'"
+
+
+def test_non_utf8_process_output_is_replaced_without_reader_failure() -> None:
+    result = ProcessRunner().run(
+        [sys.executable, "-c", "import os; os.write(2, bytes([0x8d]))"],
+        timeout_seconds=1,
+    )
+
+    assert result.status is ProcessStatus.COMPLETED
+    assert result.stderr == "�"

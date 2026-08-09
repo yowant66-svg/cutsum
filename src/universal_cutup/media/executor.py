@@ -674,7 +674,7 @@ def execute_external_plan(
                 temporary_clip = temporary_root / f"base-clip.{extension}"
                 temporary_sidecar_format = (
                     SubtitleSidecarFormat.ASS
-                    if subtitle_mode is SubtitleMode.BILINGUAL_BURN_IN
+                    if subtitle_mode in BURN_IN_MODES
                     else (
                         sidecar_format
                         if subtitle_mode in SIDECAR_MODES
@@ -721,7 +721,21 @@ def execute_external_plan(
                         height=resolution.output_height if resolution is not None else 1080,
                     )
                 elif subtitle_mode in BURN_IN_MODES:
-                    write_sidecar(temporary_sidecar, cues=active_cues)
+                    if resolution is None:
+                        raise CutupError(
+                            ErrorCode.CAPABILITY_UNAVAILABLE,
+                            "burn-in subtitles require a video resolution",
+                            category="capability",
+                            step="subtitle",
+                        )
+                    write_sidecar(
+                        temporary_sidecar,
+                        cues=active_cues,
+                        sidecar_format=SubtitleSidecarFormat.ASS,
+                        spec=plan.output_spec.subtitle,
+                        width=resolution.output_width,
+                        height=resolution.output_height,
+                    )
                 cut_media(
                     source_path,
                     temporary_clip,

@@ -26,6 +26,8 @@ All notable changes will be documented here.
 - Report correct media types for generated subtitle sidecars.
 - Reserve one pixel of portrait ASS font height so libass background rounding stays within the
   single-language 14% subtitle-block limit across supported CI platforms.
+- Render single-language burn-in from a canvas-aware ASS sidecar, redact POSIX absolute paths on
+  Windows, and replace invalid subprocess output bytes without leaking or crashing reader threads.
 
 ## 0.1.0a1 — 2026-08-04
 

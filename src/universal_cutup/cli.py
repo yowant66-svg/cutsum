@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import asdict
+from enum import StrEnum
 from pathlib import Path
 from typing import Annotated, Any, cast
 
@@ -73,6 +74,15 @@ from universal_cutup.providers.sports_text import SportsTextProfile
 from universal_cutup.serialization import SerializationProfile, serialize_document
 
 app = typer.Typer(no_args_is_help=True, help="CutSum offline media planning and execution engine.")
+
+
+class SupportedSportsTextProfile(StrEnum):
+    FOOTBALL = "football"
+    AMERICAN_FOOTBALL = "american_football"
+    RUGBY = "rugby"
+    BASKETBALL = "basketball"
+    TENNIS = "tennis"
+    CRICKET = "cricket"
 
 
 def _emit(value: BaseModel | dict[str, Any] | tuple[Any, ...]) -> None:
@@ -632,7 +642,7 @@ def sports_plan(
 def sports_transcript_plan(
     media: Path,
     transcript: Path,
-    profile: SportsTextProfile,
+    profile: SupportedSportsTextProfile,
     instruction: str = "",
     mode: ControlMode = ControlMode.AUTO,
     output: Path | None = None,
@@ -647,7 +657,7 @@ def sports_transcript_plan(
         result = plan_sports_transcript(
             inspection.source,
             parsed,
-            profile=profile,
+            profile=SportsTextProfile(profile.value),
             control_mode=mode,
             raw_instruction=instruction,
             output_spec=OutputSpec(

@@ -69,6 +69,28 @@ def test_cli_capabilities_match_sdk_operation_states() -> None:
     assert operations["package"]["state"] == "unavailable"
 
 
+def test_sports_transcript_cli_only_exposes_six_supported_profiles() -> None:
+    help_result = runner.invoke(app, ["sports-transcript-plan", "--help"])
+
+    assert help_result.exit_code == 0
+    for profile in (
+        "football",
+        "american_football",
+        "rugby",
+        "basketball",
+        "tennis",
+        "cricket",
+    ):
+        assert profile in help_result.stdout
+    assert "generic" not in help_result.stdout
+
+    unsupported = runner.invoke(
+        app,
+        ["sports-transcript-plan", "media.mp4", "captions.srt", "generic"],
+    )
+    assert unsupported.exit_code == 2
+
+
 def test_subtitle_capabilities_reports_explicit_backend() -> None:
     result = runner.invoke(app, ["subtitle-capabilities"])
 

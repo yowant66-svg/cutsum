@@ -105,7 +105,9 @@ cutsum sports-transcript-plan game.mp4 commentary.srt basketball \
 cutsum cut sports-plan.json game.mp4 sports-output
 ```
 
-Profiles keep American football and rugby separate. The local detector filters common
+The public command accepts exactly `football`, `american_football`, `rugby`, `basketball`,
+`tennis`, and `cricket`; unsupported sports are rejected instead of silently routed through a
+generic detector. Profiles keep American football and rugby separate. The local detector filters common
 hypothetical, replay, failed-attempt, and overturned-result language across a bounded adjacent-cue
 context. Ambiguous rugby `try`, cricket `six`, and football `score` wording requires explicit event
 language. A DIRECTED request for a buzzer beater, game winner, `绝杀`, or `压哨` requires a matching

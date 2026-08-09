@@ -68,6 +68,24 @@ def test_source_sidecar_formats(
         assert "&HA6000000" in content
 
 
+def test_vertical_single_ass_reserves_one_pixel_for_libass_block_rounding(
+    tmp_path: Path,
+) -> None:
+    output = tmp_path / "vertical-source.ass"
+
+    write_sidecar(
+        output,
+        cues=SOURCE_CUES,
+        sidecar_format=SubtitleSidecarFormat.ASS,
+        spec=SubtitleSpec(sidecar_format=SubtitleSidecarFormat.ASS),
+        width=720,
+        height=1280,
+    )
+
+    content = output.read_text(encoding="utf-8")
+    assert "Style: Default,Arial,38," in content
+
+
 @pytest.mark.parametrize(
     "sidecar_format",
     [

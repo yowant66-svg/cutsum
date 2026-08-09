@@ -65,10 +65,18 @@ PLATFORM_HORIZONTAL_SAFE_AREA_RATIO = 0.075
 SUBTITLE_FONT_REFERENCE_HEIGHT = 720
 SINGLE_LANGUAGE_BLOCK_HEIGHT_RATIO = 0.14
 BILINGUAL_BLOCK_HEIGHT_RATIO = 0.20
+ASS_PORTRAIT_SINGLE_FONT_GUARD_PX = 1
 
 
 def _scaled_font_size(preferred_size: int, *, height: int) -> int:
     return max(10, round(preferred_size * height / SUBTITLE_FONT_REFERENCE_HEIGHT))
+
+
+def _single_ass_font_size(preferred_size: int, *, width: int, height: int) -> int:
+    scaled = _scaled_font_size(preferred_size, height=height)
+    if height <= width:
+        return scaled
+    return max(10, scaled - ASS_PORTRAIT_SINGLE_FONT_GUARD_PX)
 
 
 def resolve_safe_area_pixels(
@@ -282,7 +290,11 @@ def _write_single_ass(
         safe_area.top if alignment == 8 else safe_area.bottom,
     )
     back_color, border_style = _ass_background_style(spec.background_opacity)
-    source_font_size = _scaled_font_size(spec.source_font_size, height=height)
+    source_font_size = _single_ass_font_size(
+        spec.source_font_size,
+        width=width,
+        height=height,
+    )
     header = "\n".join(
         [
             "[Script Info]",

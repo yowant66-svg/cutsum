@@ -24,6 +24,8 @@ All notable changes will be documented here.
 - Reject unwritable output roots and unsupported audio burn-in before execution begins.
 - Require auditable translation provenance before rendering translated or bilingual subtitles.
 - Report correct media types for generated subtitle sidecars.
+- Reserve one pixel of portrait ASS font height so libass background rounding stays within the
+  single-language 14% subtitle-block limit across supported CI platforms.
 
 ## 0.1.0a1 — 2026-08-04
 

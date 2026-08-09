@@ -205,6 +205,21 @@ def _candidate_subtitle_tracks(candidate: CutCandidate) -> _CandidateSubtitleTra
     )
 
 
+def _validate_output_root_writable(output_root: Path) -> None:
+    try:
+        with TemporaryDirectory(prefix=".cutup-write-probe-", dir=output_root):
+            pass
+    except OSError as error:
+        raise CutupError(
+            ErrorCode.OUTPUT_NOT_WRITABLE,
+            "output root is not writable",
+            category="permission/policy",
+            step="preflight-output",
+            recoverable=True,
+            details={"errno": error.errno},
+        ) from error
+
+
 def _validate_candidate_subtitle_readability(
     candidate: CutCandidate,
     *,
@@ -445,8 +460,19 @@ def execute_external_plan(
                 source_language=plan.output_spec.subtitle.language,
                 translation_language=plan.output_spec.subtitle.translation_language,
             )
-        output_root.mkdir(parents=True, exist_ok=True)
-        resolved_output_root = output_root.resolve(strict=True)
+        try:
+            output_root.mkdir(parents=True, exist_ok=True)
+            resolved_output_root = output_root.resolve(strict=True)
+            _validate_output_root_writable(resolved_output_root)
+        except OSError as error:
+            raise CutupError(
+                ErrorCode.OUTPUT_NOT_WRITABLE,
+                "output root is not writable",
+                category="permission/policy",
+                step="preflight-output",
+                recoverable=True,
+                details={"errno": error.errno},
+            ) from error
         path_policy = SafePathPolicy(output_root=resolved_output_root)
     except (CutupError, OSError) as error:
         cutup_error = (

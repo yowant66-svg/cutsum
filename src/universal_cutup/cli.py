@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from contextlib import suppress
 from dataclasses import asdict
 from enum import StrEnum
 from pathlib import Path
@@ -439,10 +440,13 @@ def cut(plan_file: Path, media: Path, output_dir: Path, dry_run: bool = False) -
             ),
             output_root=output_dir,
         )
+        if execution.status != "success":
+            with suppress(OSError):
+                _write_json_no_overwrite(output_dir / "execution-record.json", execution)
+            _emit(execution)
+            raise typer.Exit(4)
         _write_json_no_overwrite(output_dir / "execution-record.json", execution)
         _emit(execution)
-        if execution.status != "success":
-            raise typer.Exit(4)
     except typer.Exit:
         raise
     except Exception as error:
@@ -717,8 +721,15 @@ def full_pipeline(
             output_spec=output_spec,
             maximum_clip_count=max_clips,
         )
+        if result.execution.status != "success":
+            with suppress(OSError):
+                _write_json_no_overwrite(output_dir / "execution-record.json", result.execution)
+            _emit(result)
+            raise typer.Exit(4)
         _write_json_no_overwrite(output_dir / "execution-record.json", result.execution)
         _emit(result)
+    except typer.Exit:
+        raise
     except Exception as error:
         _error(error)
 

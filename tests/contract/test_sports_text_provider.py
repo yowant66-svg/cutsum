@@ -256,6 +256,54 @@ def test_detector_replaces_adjacent_score_with_cross_cue_cancellation() -> None:
     )
 
 
+def test_detector_replaces_the_latest_score_with_delayed_cross_cue_cancellation() -> None:
+    detected = LocalSportsTextProvider(
+        profile=SportsTextProfile.FOOTBALL,
+        clock=lambda: FIXED_TIME,
+    ).detect(
+        _transcript(
+            (0, 1_000, "GOAL! The striker celebrates."),
+            (3_000, 4_000, "But VAR says no goal after the review."),
+        )
+    )
+
+    assert tuple(item.event_type_hint for item in detected.artifact.observations) == (
+        SportsEventType.CONTROVERSY,
+    )
+
+
+@pytest.mark.parametrize(
+    ("profile", "result", "cancellation"),
+    (
+        (
+            SportsTextProfile.RUGBY,
+            "What a try! It is awarded on the field.",
+            "The try is disallowed for a forward pass.",
+        ),
+        (
+            SportsTextProfile.CRICKET,
+            "Wicket! The batter is given out.",
+            "It was a no-ball and the wicket does not count.",
+        ),
+    ),
+)
+def test_detector_replaces_delayed_cancelled_results_for_supported_profiles(
+    profile: SportsTextProfile,
+    result: str,
+    cancellation: str,
+) -> None:
+    detected = LocalSportsTextProvider(profile=profile, clock=lambda: FIXED_TIME).detect(
+        _transcript(
+            (0, 1_000, result),
+            (3_000, 4_000, cancellation),
+        )
+    )
+
+    assert tuple(item.event_type_hint for item in detected.artifact.observations) == (
+        SportsEventType.CONTROVERSY,
+    )
+
+
 def test_detector_filters_replay_context_split_across_cues() -> None:
     detected = LocalSportsTextProvider(
         profile=SportsTextProfile.FOOTBALL,

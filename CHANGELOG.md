@@ -4,6 +4,21 @@ All notable changes will be documented here.
 
 ## Unreleased
 
+## 0.1.0a3 — 2026-08-10
+
+- Return a valid, auditable empty sports CutPlan when transcript detection finds no qualified event.
+- Extend explicit cancellation handling to delayed goal, try, touchdown, wicket, and point reversals
+  while retaining the transcript-only heuristic Alpha boundary.
+- Parse compound Chinese and multi-digit educational or sports clip counts without silently
+  truncating hard constraints.
+- Fail closed when one sports event class contains conflicting required and forbidden markers that
+  the current protocol cannot represent safely.
+- Reject an existing `execution-record.json` before `cut` or `full` renders media, and return a
+  structured `OUTPUT_EXISTS` error for every no-overwrite JSON or plan output.
+- Classify missing files, invalid JSON, permission failures, and unexpected CLI errors without
+  leaking raw internal paths or mislabeling every exception as `INVALID_INPUT`.
+- Keep the standalone Schema export script runnable directly from a clean source checkout.
+
 ## 0.1.0a2 — 2026-08-09
 
 - Normalize quarter-turn video rotation metadata before resolution planning so rendered dimensions

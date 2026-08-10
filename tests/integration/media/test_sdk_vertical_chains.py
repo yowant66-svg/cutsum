@@ -135,6 +135,138 @@ def test_cli_inspect_plan_and_full_dry_run(
     assert (cut_output / "execution-record.json").exists()
 
 
+def test_cli_plan_refuses_to_overwrite_an_existing_plan(
+    synthetic_media: Path,
+    tmp_path: Path,
+) -> None:
+    transcript_path = tmp_path / "input.srt"
+    transcript_path.write_text(
+        "1\n00:00:00,500 --> 00:00:01,500\nCLI offline segment\n",
+        encoding="utf-8",
+    )
+    plan_path = tmp_path / "plan.json"
+    plan_path.write_text("preserve-me", encoding="utf-8")
+
+    result = CliRunner().invoke(
+        app,
+        [
+            "plan",
+            str(synthetic_media),
+            str(transcript_path),
+            "--output",
+            str(plan_path),
+            "--rights",
+            "owned",
+        ],
+    )
+
+    assert result.exit_code == 2
+    payload = json.loads(result.stderr)
+    assert payload["code"] == "OUTPUT_EXISTS"
+    assert payload["step"] == "write-output"
+    assert plan_path.read_text(encoding="utf-8") == "preserve-me"
+
+
+def test_cli_cut_rejects_an_existing_execution_record_before_rendering(
+    synthetic_media: Path,
+    tmp_path: Path,
+) -> None:
+    transcript_path = tmp_path / "input.srt"
+    transcript_path.write_text(
+        "1\n00:00:00,500 --> 00:00:01,500\nCLI offline segment\n",
+        encoding="utf-8",
+    )
+    plan_path = tmp_path / "plan.json"
+    planned = CliRunner().invoke(
+        app,
+        [
+            "plan",
+            str(synthetic_media),
+            str(transcript_path),
+            "--output",
+            str(plan_path),
+            "--rights",
+            "owned",
+        ],
+    )
+    assert planned.exit_code == 0
+    output_root = tmp_path / "cut-output"
+    output_root.mkdir()
+    record_path = output_root / "execution-record.json"
+    record_path.write_text("preserve-me", encoding="utf-8")
+
+    result = CliRunner().invoke(
+        app,
+        ["cut", str(plan_path), str(synthetic_media), str(output_root)],
+    )
+
+    assert result.exit_code == 2
+    payload = json.loads(result.stderr)
+    assert payload["code"] == "OUTPUT_EXISTS"
+    assert payload["step"] == "preflight-output"
+    assert record_path.read_text(encoding="utf-8") == "preserve-me"
+    assert tuple(output_root.iterdir()) == (record_path,)
+
+
+def test_cli_full_rejects_an_existing_execution_record_before_rendering(
+    synthetic_media: Path,
+    tmp_path: Path,
+) -> None:
+    transcript_path = tmp_path / "input.srt"
+    transcript_path.write_text(
+        "1\n00:00:00,500 --> 00:00:01,500\nCLI offline segment\n",
+        encoding="utf-8",
+    )
+    output_root = tmp_path / "full-output"
+    output_root.mkdir()
+    record_path = output_root / "execution-record.json"
+    record_path.write_text("preserve-me", encoding="utf-8")
+
+    result = CliRunner().invoke(
+        app,
+        ["full", str(synthetic_media), str(transcript_path), str(output_root)],
+    )
+
+    assert result.exit_code == 2
+    payload = json.loads(result.stderr)
+    assert payload["code"] == "OUTPUT_EXISTS"
+    assert payload["step"] == "preflight-output"
+    assert record_path.read_text(encoding="utf-8") == "preserve-me"
+    assert tuple(output_root.iterdir()) == (record_path,)
+
+
+def test_cli_sports_transcript_plan_returns_an_empty_auditable_plan(
+    synthetic_media: Path,
+    tmp_path: Path,
+) -> None:
+    transcript_path = tmp_path / "quiet-football.srt"
+    transcript_path.write_text(
+        "1\n00:00:00,500 --> 00:00:01,500\nThe teams exchange possession.\n",
+        encoding="utf-8",
+    )
+    plan_path = tmp_path / "empty-sports-plan.json"
+
+    result = CliRunner().invoke(
+        app,
+        [
+            "sports-transcript-plan",
+            str(synthetic_media),
+            str(transcript_path),
+            "football",
+            "--rights",
+            "owned",
+            "--output",
+            str(plan_path),
+        ],
+    )
+
+    assert result.exit_code == 0, result.stderr
+    payload = json.loads(result.stdout)
+    assert payload["plan"]["candidates"] == []
+    assert payload["plan"]["selection_result"]["warnings"] == ["sports_no_qualified_candidate"]
+    assert plan_path.exists()
+
+
 def test_cli_full_refuses_to_exceed_explicit_clip_limit_before_writing(
     synthetic_media: Path,
     tmp_path: Path,

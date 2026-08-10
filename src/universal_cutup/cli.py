@@ -104,14 +104,45 @@ def _error(error: Exception) -> None:
     if isinstance(error, CutupError):
         payload = error.as_dict()
         exit_code = 3 if error.code is ErrorCode.CAPABILITY_UNAVAILABLE else 2
-    else:
+    elif isinstance(error, FileNotFoundError):
+        path = Path(error.filename).name if error.filename is not None else None
         payload = {
-            "code": "INVALID_INPUT",
+            "code": ErrorCode.SOURCE_NOT_FOUND.value,
+            "category": "source",
+            "message": "input file could not be read",
+            "step": None,
+            "recoverable": True,
+            "details": {"path": path} if path is not None else {},
+        }
+        exit_code = 2
+    elif isinstance(error, PermissionError):
+        payload = {
+            "code": ErrorCode.OUTPUT_NOT_WRITABLE.value,
+            "category": "permission/policy",
+            "message": "file access was denied",
+            "step": None,
+            "recoverable": True,
+            "details": {},
+        }
+        exit_code = 2
+    elif isinstance(error, (json.JSONDecodeError, ValueError)):
+        payload = {
+            "code": ErrorCode.PROTOCOL_INVALID.value,
             "category": "validation",
             "message": str(error),
             "step": None,
-            "recoverable": False,
+            "recoverable": True,
             "details": {},
+        }
+        exit_code = 2
+    else:
+        payload = {
+            "code": ErrorCode.INTERNAL_ERROR.value,
+            "category": "internal",
+            "message": "unexpected internal error",
+            "step": None,
+            "recoverable": False,
+            "details": {"exception_type": type(error).__name__},
         }
         exit_code = 2
     typer.echo(json.dumps(payload, ensure_ascii=False, sort_keys=True), err=True)
@@ -143,14 +174,61 @@ def _plan(path: Path) -> CutPlan:
 
 
 def _json_payload(path: Path) -> object:
-    return json.loads(path.read_text(encoding="utf-8"))
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except OSError as error:
+        raise CutupError(
+            ErrorCode.SOURCE_NOT_FOUND,
+            "JSON input file could not be read",
+            category="source",
+            step="load_json",
+            recoverable=True,
+            details={"path": path.name},
+        ) from error
+    except json.JSONDecodeError as error:
+        raise CutupError(
+            ErrorCode.PROTOCOL_INVALID,
+            "JSON input file is invalid",
+            step="load_json",
+            recoverable=True,
+            details={"path": path.name},
+        ) from error
+
+
+def _write_text_no_overwrite(path: Path, content: str, *, step: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        with path.open("x", encoding="utf-8") as file_handle:
+            file_handle.write(content)
+    except FileExistsError as error:
+        raise CutupError(
+            ErrorCode.OUTPUT_EXISTS,
+            f"output already exists: {path.name}",
+            category="output",
+            step=step,
+            recoverable=True,
+            details={"path": path.name},
+        ) from error
+
+
+def _require_output_available(path: Path, *, step: str) -> None:
+    if path.exists():
+        raise CutupError(
+            ErrorCode.OUTPUT_EXISTS,
+            f"output already exists: {path.name}",
+            category="output",
+            step=step,
+            recoverable=True,
+            details={"path": path.name},
+        )
 
 
 def _write_json_no_overwrite(path: Path, document: BaseModel) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("x", encoding="utf-8") as file_handle:
-        file_handle.write(document.model_dump_json(exclude_none=True))
-        file_handle.write("\n")
+    _write_text_no_overwrite(
+        path,
+        document.model_dump_json(exclude_none=True) + "\n",
+        step="write-output",
+    )
 
 
 def _emit_or_write(document: BaseModel, output: Path | None) -> None:
@@ -417,8 +495,7 @@ def plan(
         cut_plan = create_plan(inspection.source, parsed)
         serialized = serialize_document(cut_plan, profile=SerializationProfile.PORTABLE)
         if output is not None and not dry_run:
-            output.parent.mkdir(parents=True, exist_ok=True)
-            output.write_text(serialized + "\n", encoding="utf-8")
+            _write_text_no_overwrite(output, serialized + "\n", step="write-output")
         _emit({"dry_run": dry_run, "plan": json.loads(serialized)})
     except Exception as error:
         _error(error)
@@ -432,6 +509,10 @@ def cut(plan_file: Path, media: Path, output_dir: Path, dry_run: bool = False) -
         if dry_run:
             _emit({"dry_run": True, "plan_id": cut_plan.plan_id})
             return
+        _require_output_available(
+            output_dir / "execution-record.json",
+            step="preflight-output",
+        )
         execution = execute_cut_plan(
             cut_plan,
             binding=MediaBinding(
@@ -713,6 +794,10 @@ def full_pipeline(
                 }
             )
             return
+        _require_output_available(
+            output_dir / "execution-record.json",
+            step="preflight-output",
+        )
         result = run_full_offline(
             media,
             parsed,

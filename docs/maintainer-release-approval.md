@@ -1,10 +1,10 @@
 # Maintainer release approval
 
-Approval date: 2026-08-09
+Approval date: 2026-08-10
 
 Maintainer: DXBATM
 
-Release: CutSum `0.1.0a2`
+Release: CutSum `0.1.0a3`
 
 The maintainer authorized Codex to complete and publish this GitHub Alpha Release under the
 following boundaries:
@@ -20,7 +20,8 @@ following boundaries:
 - Publish rights-safe examples made from FFmpeg-generated test media and maintainer-authored
   synthetic transcripts.
 - Publish wheel, source distribution, SBOM, checksums, and a release manifest on GitHub only. This
-  approval does not authorize a PyPI upload or a Codex for Open Source application.
+  approval does not authorize a PyPI upload; the previously submitted Codex for Open Source
+  application is managed separately.
 - Continue describing sports support as transcript-only heuristic Alpha and avoid claims of visual,
   audio, OCR, scoreboard, MatchState, precision/recall, or proven editorial quality.
 

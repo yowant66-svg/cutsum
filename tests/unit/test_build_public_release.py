@@ -12,8 +12,8 @@ REPOSITORY_ROOT = Path(__file__).parents[2]
 def test_public_release_assets_are_manifested_and_checksummed(tmp_path: Path) -> None:
     dist = tmp_path / "dist"
     dist.mkdir()
-    (dist / "cutsum-0.1.0a2-py3-none-any.whl").write_bytes(b"wheel")
-    (dist / "cutsum-0.1.0a2.tar.gz").write_bytes(b"sdist")
+    (dist / "cutsum-0.1.0a3-py3-none-any.whl").write_bytes(b"wheel")
+    (dist / "cutsum-0.1.0a3.tar.gz").write_bytes(b"sdist")
     output = tmp_path / "release"
     source_commit = "a" * 40
 
@@ -24,10 +24,10 @@ def test_public_release_assets_are_manifested_and_checksummed(tmp_path: Path) ->
         source_commit=source_commit,
     )
 
-    assert manifest["tag"] == "v0.1.0a2"
+    assert manifest["tag"] == "v0.1.0a3"
     assert manifest["source_commit"] == source_commit
     assert manifest["pypi_published"] is False
-    sbom = json.loads((output / "cutsum-0.1.0a2.cdx.json").read_text(encoding="utf-8"))
+    sbom = json.loads((output / "cutsum-0.1.0a3.cdx.json").read_text(encoding="utf-8"))
     assert sbom["bomFormat"] == "CycloneDX"
     assert sbom["specVersion"] == "1.6"
     assert sbom["metadata"]["component"]["name"] == "cutsum"

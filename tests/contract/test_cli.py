@@ -117,6 +117,19 @@ def test_analyze_writes_only_json_to_stdout(tmp_path: Path) -> None:
     assert payload["character_count"] == len("Offline cue")
 
 
+def test_missing_intelligence_document_uses_a_source_error() -> None:
+    result = runner.invoke(
+        app,
+        ["intelligence-validate", "host_intent", "missing-host-intent.json"],
+    )
+
+    assert result.exit_code == 2
+    payload = json.loads(result.stderr)
+    assert payload["code"] == "SOURCE_NOT_FOUND"
+    assert payload["category"] == "source"
+    assert payload["details"] == {"path": "missing-host-intent.json"}
+
+
 def test_deterministic_commands_and_reframe_none(tmp_path: Path) -> None:
     transcript_path = tmp_path / "sample.vtt"
     transcript_path.write_text(

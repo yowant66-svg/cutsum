@@ -84,6 +84,33 @@ def test_directed_natural_language_selects_examples_and_excludes_definitions() -
     assert set(result.selected_candidate_ids) == {"example-1", "example-2"}
 
 
+def test_directed_compound_chinese_count_is_not_silently_truncated() -> None:
+    request = resolve_educational_request(
+        ControlMode.DIRECTED,
+        "只要十一个定义。",
+    )
+
+    assert request.target_count == 11
+
+
+def test_directed_multi_digit_count_is_not_silently_truncated() -> None:
+    request = resolve_educational_request(
+        ControlMode.DIRECTED,
+        "Select 11 definitions.",
+    )
+
+    assert request.target_count == 11
+
+
+def test_directed_english_count_word_remains_a_whole_constraint() -> None:
+    request = resolve_educational_request(
+        ControlMode.DIRECTED,
+        "Select six examples.",
+    )
+
+    assert request.target_count == 6
+
+
 def test_auto_prefers_clean_transcript_when_education_type_is_equal() -> None:
     candidates = (
         _candidate(

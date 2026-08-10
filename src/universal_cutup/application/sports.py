@@ -5,11 +5,13 @@ import re
 from datetime import UTC, datetime
 
 from universal_cutup import __version__
+from universal_cutup.application.counts import CHINESE_COUNT_TOKEN, parse_chinese_count
 from universal_cutup.domain.candidates import (
     CutCandidate,
     EvidenceArtifactIdentity,
     EvidenceRef,
 )
+from universal_cutup.domain.errors import CutupError, ErrorCode
 from universal_cutup.domain.intelligence import ControlMode
 from universal_cutup.domain.plans import CutPlan
 from universal_cutup.domain.records import ProviderRecord, StrategyRecord, StrategyRole
@@ -92,7 +94,7 @@ ENGLISH_COUNTED_EVENT_PATTERN = re.compile(
     r"controvers(?:y|ies)|penalty calls?)(?![\w-]))"
 )
 CHINESE_COUNTED_EVENT_PATTERN = re.compile(
-    r"(?P<count>[1-9]\d*|一|二|两|三|四|五|六|七|八|九|十)(?:个)?"
+    rf"(?P<count>[1-9]\d*|{CHINESE_COUNT_TOKEN})(?:个)?"
     r"(?=\s*(?:得分|进球|扣篮|达阵|绝杀|压哨|三分|六分球|射门|尝试|扑救|盖帽|"
     r"封堵|超越|终场|冲线|出局|庆祝|争议|判罚))"
 )
@@ -104,6 +106,7 @@ NARRATIVE_CUE_MARKERS: dict[SportsNarrativeCue, tuple[str, ...]] = {
         "压哨",
     ),
 }
+SCORE_WIDE_NEGATION_MARKERS = frozenset({"score", "得分"})
 
 
 def _extract_target_count(normalized: str) -> tuple[int | None, str]:
@@ -112,7 +115,12 @@ def _extract_target_count(normalized: str) -> tuple[int | None, str]:
         if match is None:
             continue
         marker = match.group("count")
-        count = int(marker) if marker.isascii() and marker.isdigit() else COUNT_WORD_VALUES[marker]
+        if marker.isascii() and marker.isdigit():
+            count = int(marker)
+        elif marker in COUNT_WORD_VALUES:
+            count = COUNT_WORD_VALUES[marker]
+        else:
+            count = parse_chinese_count(marker)
         event_instruction = (
             normalized[: match.start()]
             + " " * (match.end() - match.start())
@@ -134,14 +142,31 @@ def resolve_sports_request(
         matching = tuple(marker for marker in markers if marker in event_instruction)
         if not matching:
             continue
-        negated = any(
-            re.search(
+        negated_markers = tuple(
+            marker
+            for marker in matching
+            if re.search(
                 rf"(?:不要|排除|不需要|exclude|without|not)\s*.{{0,6}}{re.escape(marker)}",
                 event_instruction,
             )
-            for marker in matching
         )
-        (forbidden if negated else required).append(event_type)
+        positive_markers = tuple(marker for marker in matching if marker not in negated_markers)
+        score_subtype_negation = event_type is SportsEventType.SCORE and any(
+            marker not in SCORE_WIDE_NEGATION_MARKERS for marker in negated_markers
+        )
+        if (positive_markers and negated_markers) or score_subtype_negation:
+            raise CutupError(
+                ErrorCode.HOST_INTENT_CONFLICT,
+                "sports instruction contains event subtype constraints that cannot be represented",
+                step="resolve_sports_request",
+                recoverable=True,
+                details={
+                    "event_type": event_type.value,
+                    "required_markers": positive_markers,
+                    "forbidden_markers": negated_markers,
+                },
+            )
+        (forbidden if negated_markers else required).append(event_type)
     include_replays = bool(
         re.search(r"(?:include|with|包含|要|保留)\s*.{0,6}(?:replay|回放)", normalized)
     ) and not bool(re.search(r"(?:不要|排除|without|exclude)\s*.{0,6}(?:replay|回放)", normalized))
@@ -330,6 +355,14 @@ def build_sports_plan(
         completed_at=occurred_at,
         provenance_ref="new-original:sports-highlight-alpha-0.2.0",
     )
+    plan_warnings = tuple(
+        dict.fromkeys(
+            (
+                *selection.unsatisfied_requirements,
+                *(("sports_no_qualified_candidate",) if not candidates else ()),
+            )
+        )
+    )
     return CutPlan(
         document_type="cut_plan",
         created_at=occurred_at,
@@ -337,13 +370,17 @@ def build_sports_plan(
         plan_id=f"plan-sports-{fingerprint}",
         source=source,
         evidence_artifacts=(
-            EvidenceArtifactIdentity(
-                artifact_id=bundle.bundle_id,
-                source_id=bundle.source_id,
-                segment_ids=tuple(
-                    observation.observation_id for observation in bundle.observations
+            (
+                EvidenceArtifactIdentity(
+                    artifact_id=bundle.bundle_id,
+                    source_id=bundle.source_id,
+                    segment_ids=tuple(
+                        observation.observation_id for observation in bundle.observations
+                    ),
                 ),
-            ),
+            )
+            if bundle.observations
+            else ()
         ),
         candidates=candidates,
         selection_result=SelectionResult(
@@ -370,7 +407,7 @@ def build_sports_plan(
                 )
                 for candidate in candidates
             ),
-            warnings=selection.unsatisfied_requirements,
+            warnings=plan_warnings,
             provider_record_refs=tuple(record.provider_record_id for record in provider_records),
             strategy_record_ref=strategy_record_id,
         ),

@@ -3,12 +3,15 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from typing import cast
 
+import pytest
+
 from universal_cutup.application.sports import (
     create_sports_plan,
     propose_sports_candidates,
     resolve_sports_request,
     select_sports_for_request,
 )
+from universal_cutup.domain.errors import CutupError, ErrorCode
 from universal_cutup.domain.intelligence import ControlMode
 from universal_cutup.domain.records import ProviderRecord
 from universal_cutup.domain.sources import MediaSource, RightsAttestation
@@ -233,6 +236,35 @@ def test_directed_multi_digit_count_is_parsed_as_a_whole_number() -> None:
     assert request.target_count == 10
 
 
+def test_directed_compound_chinese_count_is_parsed_as_a_whole_number() -> None:
+    request = resolve_sports_request(ControlMode.DIRECTED, "只要十一个进球。")
+
+    assert request.required_event_types == (SportsEventType.SCORE,)
+    assert request.target_count == 11
+
+
+def test_directed_mixed_score_subtype_requirements_fail_closed() -> None:
+    with pytest.raises(CutupError) as raised:
+        resolve_sports_request(
+            ControlMode.DIRECTED,
+            "goals but exclude three-pointers",
+        )
+
+    assert raised.value.code is ErrorCode.HOST_INTENT_CONFLICT
+    assert raised.value.details["event_type"] == SportsEventType.SCORE.value
+
+
+def test_directed_score_subtype_exclusion_fails_closed_without_overblocking() -> None:
+    with pytest.raises(CutupError) as raised:
+        resolve_sports_request(
+            ControlMode.DIRECTED,
+            "exclude three-pointers",
+        )
+
+    assert raised.value.code is ErrorCode.HOST_INTENT_CONFLICT
+    assert raised.value.details["forbidden_markers"] == ("three-pointer",)
+
+
 def test_existing_chinese_two_count_remains_supported() -> None:
     request = resolve_sports_request(ControlMode.DIRECTED, "只要两个扑救。")
 
@@ -281,6 +313,38 @@ def test_sports_plan_is_portable_and_carries_provider_provenance() -> None:
     }
     assert len(plan.strategy_records) == 1
     assert plan.selection_result.strategy_record_ref == plan.strategy_records[0].strategy_record_id
+
+
+def test_sports_plan_represents_an_empty_detector_result_without_crashing() -> None:
+    bundle = _bundle().model_copy(update={"observations": ()})
+    source = MediaSource(
+        source_id=bundle.source_id,
+        media_id="media-sports-empty",
+        kind="video",
+        sha256="a" * 64,
+        basename_hint="sports-empty.mp4",
+        rights_attestation=RightsAttestation.OWNED,
+        duration_ms=60_000,
+    )
+    provider_record = ProviderRecord(
+        provider_record_id="provider-sports",
+        provider_id="sports-fixture-provider",
+        operation="observe_sports_events",
+        started_at=FIXED_TIME,
+        completed_at=FIXED_TIME,
+    )
+
+    plan = create_sports_plan(
+        source,
+        bundle,
+        resolve_sports_request(ControlMode.AUTO, ""),
+        provider_records=(provider_record,),
+    )
+
+    assert plan.evidence_artifacts == ()
+    assert plan.candidates == ()
+    assert plan.selection_result.decisions == ()
+    assert plan.selection_result.warnings == ("sports_no_qualified_candidate",)
 
 
 def test_plan_preserves_candidate_qualification_reasons() -> None:

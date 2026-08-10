@@ -5,7 +5,7 @@ clip plans, and rendering verified media outputs. It is designed for creators, c
 teams, developers, automation workflows, and AI agents that need the same “find the right segment
 and cut it” capability without coupling the workflow to one model or one video platform.
 
-> Current release: [`0.1.0a2` public Alpha](https://github.com/yowant66-svg/cutsum/releases/tag/v0.1.0a2).
+> Current release: [`0.1.0a3` public Alpha](https://github.com/yowant66-svg/cutsum/releases/tag/v0.1.0a3).
 > The release is intentionally conservative: automated evidence proves engineering behavior, not
 > universal editorial quality. Sports support remains transcript-only heuristic Alpha.
 
@@ -51,7 +51,7 @@ CutSum is not on PyPI. Install the reviewed wheel from the GitHub Alpha Release:
 python -m venv .venv
 source .venv/bin/activate  # Windows PowerShell: .venv\Scripts\Activate.ps1
 python -m pip install \
-  https://github.com/yowant66-svg/cutsum/releases/download/v0.1.0a2/cutsum-0.1.0a2-py3-none-any.whl
+  https://github.com/yowant66-svg/cutsum/releases/download/v0.1.0a3/cutsum-0.1.0a3-py3-none-any.whl
 cutsum --help
 ```
 

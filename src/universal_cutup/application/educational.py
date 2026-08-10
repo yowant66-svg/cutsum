@@ -4,6 +4,7 @@ import hashlib
 import re
 from datetime import UTC, datetime
 
+from universal_cutup.application.counts import CHINESE_COUNT_TOKEN, parse_chinese_count
 from universal_cutup.application.duration import (
     ABSOLUTE_PART_DURATION_MS,
     DEFAULT_PART_DURATION_MS,
@@ -51,29 +52,62 @@ EDUCATIONAL_INTENT_MARKERS: dict[EducationSignalType, tuple[str, ...]] = {
     EducationSignalType.TEACHER_EMPHASIS: ("emphasis", "important", "重点", "强调"),
     EducationSignalType.EXAM_RELEVANCE: ("exam", "test point", "考试", "考点"),
 }
-COUNT_MARKERS = {
-    "1": 1,
+COUNT_WORD_VALUES = {
     "one": 1,
-    "一个": 1,
-    "2": 2,
     "two": 2,
-    "两个": 2,
-    "3": 3,
     "three": 3,
-    "三个": 3,
-    "4": 4,
     "four": 4,
-    "四个": 4,
-    "5": 5,
     "five": 5,
-    "五个": 5,
+    "six": 6,
+    "seven": 7,
+    "eight": 8,
+    "nine": 9,
+    "ten": 10,
 }
+EDUCATIONAL_COUNT_TARGET = (
+    r"(?:clips?|definitions?|theorems?|rules?|formulas?|examples?|steps?|summaries?|"
+    r"mistakes?|difficult points?|highlights?|定义|定理|规则|公式|推理|证明|例题|例子|"
+    r"步骤|操作|总结|常见错误|易错|难点|重点|考点|知识片段|片段)"
+)
+ARABIC_EDUCATIONAL_COUNT_PATTERN = re.compile(
+    rf"(?<!\d)(?P<count>[1-9]\d*)(?!\d)(?!\s*(?:秒|分钟|seconds?|minutes?))"
+    rf"(?=.{{0,20}}{EDUCATIONAL_COUNT_TARGET})",
+    flags=re.IGNORECASE,
+)
+ENGLISH_EDUCATIONAL_COUNT_PATTERN = re.compile(
+    rf"\b(?P<count>one|two|three|four|five|six|seven|eight|nine|ten)\b"
+    rf"(?=.{{0,20}}{EDUCATIONAL_COUNT_TARGET})",
+    flags=re.IGNORECASE,
+)
+CHINESE_EDUCATIONAL_COUNT_PATTERN = re.compile(
+    rf"(?P<count>{CHINESE_COUNT_TOKEN})(?:个|(?=.{{0,20}}{EDUCATIONAL_COUNT_TARGET}))"
+)
 MINIMUM_EDUCATIONAL_CANDIDATE_DURATION_MS = 15_000
 MAXIMUM_DURATION_PATTERN = re.compile(
     r"(?:最多|最长|不超过)\s*(\d+)\s*(秒|分钟)|"
     r"(?:at most|maximum|max|no more than)\s*(\d+)\s*(seconds?|minutes?)",
     flags=re.IGNORECASE,
 )
+
+
+def _extract_educational_target_count(normalized: str) -> int | None:
+    for pattern in (
+        ARABIC_EDUCATIONAL_COUNT_PATTERN,
+        ENGLISH_EDUCATIONAL_COUNT_PATTERN,
+        CHINESE_EDUCATIONAL_COUNT_PATTERN,
+    ):
+        match = pattern.search(normalized)
+        if match is None:
+            continue
+        marker = match.group("count")
+        if marker.isascii() and marker.isdigit():
+            return int(marker)
+        if marker in COUNT_WORD_VALUES:
+            return COUNT_WORD_VALUES[marker]
+        return parse_chinese_count(marker)
+    return None
+
+
 DEPENDENT_SEMANTIC_START_PATTERN = re.compile(
     (
         r"^\s*(?:(?:and\s+)?(?:then|similarly|likewise|therefore|thus|so)|"
@@ -134,8 +168,14 @@ def _has_unresolved_directed_semantics(
     ):
         return False
     residual = MAXIMUM_DURATION_PATTERN.sub("", normalized_instruction)
+    for pattern in (
+        ARABIC_EDUCATIONAL_COUNT_PATTERN,
+        ENGLISH_EDUCATIONAL_COUNT_PATTERN,
+        CHINESE_EDUCATIONAL_COUNT_PATTERN,
+    ):
+        residual = pattern.sub("", residual)
     removable = {
-        *COUNT_MARKERS,
+        *COUNT_WORD_VALUES,
         *DIRECTED_CONTROL_MARKERS,
         *(marker for markers in EDUCATIONAL_INTENT_MARKERS.values() for marker in markers),
     }
@@ -305,10 +345,7 @@ def resolve_educational_request(
         )
         target = forbidden if negated else required
         target.append(signal_type)
-    target_count = next(
-        (count for marker, count in COUNT_MARKERS.items() if marker in normalized),
-        None,
-    )
+    target_count = _extract_educational_target_count(normalized)
     duration_match = MAXIMUM_DURATION_PATTERN.search(normalized)
     maximum_duration_ms = None
     if duration_match is not None:

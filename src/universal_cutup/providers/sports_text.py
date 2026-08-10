@@ -251,8 +251,11 @@ RETROSPECTIVE_PATTERN = re.compile(
     re.IGNORECASE,
 )
 CANCELLED_PATTERN = re.compile(
-    r"\b(?:no goal|goal (?:is )?(?:disallowed|ruled out|overturned)"
-    r"|(?:disallowed|ruled out|overturned) (?:the )?goal|(?:goal|score) does not count)\b"
+    r"\b(?:no goal|(?:goal|score|try|touchdown|wicket|point) (?:is )?"
+    r"(?:disallowed|ruled out|overturned|does not count)"
+    r"|(?:disallowed|ruled out|overturned) (?:the )?"
+    r"(?:goal|score|try|touchdown|wicket|point)"
+    r"|no[- ]ball.{0,30}(?:wicket|out|dismissal))\b"
     r"|进球无效|取消进球|(?:进球|得分).{0,12}改判|改判.{0,12}(?:进球|得分)",
     re.IGNORECASE,
 )
@@ -286,6 +289,7 @@ NOMINAL_RESULT_PATTERN = re.compile(
     re.IGNORECASE,
 )
 CONTEXT_MAX_GAP_MS = 1_500
+CANCELLATION_LOOKBACK_MS = 15_000
 ROLLING_DUPLICATE_MAX_GAP_MS = 1_500
 
 
@@ -399,14 +403,17 @@ class LocalSportsTextProvider:
                 result_assertion=current_assertion,
             )
             if any(item.signal == "cancelled_score" for item in current):
-                detections = [
-                    item
-                    for item in detections
-                    if not (
-                        item.event_type is SportsEventType.SCORE
-                        and 0 <= segment.start_ms - item.end_ms <= CONTEXT_MAX_GAP_MS
-                    )
-                ]
+                for index in range(len(detections) - 1, -1, -1):
+                    previous_detection = detections[index]
+                    if (
+                        previous_detection.event_type
+                        in {SportsEventType.SCORE, SportsEventType.FINISH}
+                        and 0
+                        <= segment.start_ms - previous_detection.end_ms
+                        <= CANCELLATION_LOOKBACK_MS
+                    ):
+                        del detections[index]
+                        break
             for detection in current:
                 if not self._is_rolling_duplicate(detection, detections):
                     detections.append(detection)

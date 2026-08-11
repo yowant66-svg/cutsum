@@ -43,20 +43,25 @@ class _BoundedCapture:
         self._limit = limit
         self._head_limit = (limit - len(TRUNCATION_MARKER)) // 2
         self._tail_limit = limit - len(TRUNCATION_MARKER) - self._head_limit
+        self._buffer = bytearray()
         self._head = bytearray()
         self._tail = bytearray()
         self.total_bytes = 0
 
     def feed(self, chunk: bytes) -> None:
         self.total_bytes += len(chunk)
-        head_missing = self._head_limit - len(self._head)
-        if head_missing > 0:
-            self._head.extend(chunk[:head_missing])
-            chunk = chunk[head_missing:]
-        if chunk:
-            self._tail.extend(chunk)
-            if len(self._tail) > self._tail_limit:
-                del self._tail[: -self._tail_limit]
+        if not self._head:
+            combined = self._buffer + chunk
+            if len(combined) <= self._limit:
+                self._buffer = combined
+                return
+            self._head.extend(combined[: self._head_limit])
+            self._tail.extend(combined[-self._tail_limit :])
+            self._buffer.clear()
+            return
+        self._tail.extend(chunk)
+        if len(self._tail) > self._tail_limit:
+            del self._tail[: -self._tail_limit]
 
     @property
     def truncated(self) -> bool:
@@ -66,7 +71,7 @@ class _BoundedCapture:
         if self.truncated:
             payload = bytes(self._head) + TRUNCATION_MARKER + bytes(self._tail)
         else:
-            payload = bytes(self._head) + bytes(self._tail)
+            payload = bytes(self._buffer)
         return payload.decode("utf-8", errors="replace")
 
 

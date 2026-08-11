@@ -1,0 +1,39 @@
+{
+  "name": "cutsum",
+  "version": "0.1.0-alpha.4",
+  "description": "Plan auditable clips from authorized local transcripts and execute validated CutSum media plans.",
+  "author": {
+    "name": "DXBATM",
+    "email": "yowant66@gmail.com",
+    "url": "https://github.com/yowant66-svg"
+  },
+  "homepage": "https://github.com/yowant66-svg/cutsum",
+  "repository": "https://github.com/yowant66-svg/cutsum",
+  "license": "Apache-2.0",
+  "keywords": [
+    "video",
+    "transcript",
+    "editing",
+    "education",
+    "sports"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "CutSum",
+    "shortDescription": "Auditable transcript-first video cuts",
+    "longDescription": "Create validated CutPlans from authorized local transcripts, inspect evidence and constraints, and execute supported media operations without overstating unavailable capabilities.",
+    "developerName": "DXBATM",
+    "category": "Productivity",
+    "capabilities": [
+      "Local transcript planning",
+      "Auditable media execution"
+    ],
+    "websiteURL": "https://github.com/yowant66-svg/cutsum",
+    "defaultPrompt": [
+      "Plan clips from this authorized transcript.",
+      "Validate and explain this CutPlan.",
+      "Execute this existing CutPlan locally."
+    ],
+    "brandColor": "#315C47"
+  }
+}

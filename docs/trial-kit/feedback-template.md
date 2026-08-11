@@ -31,5 +31,5 @@
 
 ## Attachments
 
-Attach `quickstart-report.json` if you reviewed it. Do not attach credentials, cookies, tokens,
+Attach `demo-report.json` if you reviewed it. Do not attach credentials, cookies, tokens,
 private media, sensitive transcripts, terminal history, or unredacted home-directory paths.

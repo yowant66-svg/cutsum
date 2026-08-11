@@ -17,38 +17,34 @@ ffmpeg -version
 ffprobe -version
 ```
 
-## 2. Install the reviewed Alpha wheel
+## 2. Install the reviewed Alpha
 
 macOS or Linux:
 
 ```bash
-git clone https://github.com/yowant66-svg/cutsum.git
-cd cutsum
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install https://github.com/yowant66-svg/cutsum/releases/download/v0.1.0a3/cutsum-0.1.0a3-py3-none-any.whl
+python -m pip install --pre cutsum==0.1.0a4
 cutsum --help
 ```
 
 Windows PowerShell:
 
 ```powershell
-git clone https://github.com/yowant66-svg/cutsum.git
-Set-Location cutsum
 py -3.11 -m venv .venv
 .\.venv\Scripts\Activate.ps1
-python -m pip install https://github.com/yowant66-svg/cutsum/releases/download/v0.1.0a3/cutsum-0.1.0a3-py3-none-any.whl
+python -m pip install --pre cutsum==0.1.0a4
 cutsum --help
 ```
 
 For a security-sensitive installation, download the wheel and `SHA256SUMS.txt` from the
-[`v0.1.0a3` Release](https://github.com/yowant66-svg/cutsum/releases/tag/v0.1.0a3) and verify the
+[`v0.1.0a4` Release](https://github.com/yowant66-svg/cutsum/releases/tag/v0.1.0a4) and verify the
 checksum before installing.
 
 ## 3. Run all three demonstrations
 
 ```bash
-python examples/run_quickstart.py cutsum-demo
+cutsum demo cutsum-demo
 ```
 
 The command runs:
@@ -64,20 +60,21 @@ cutsum-demo/
 ├── interview/
 ├── education/
 ├── sports/
+├── interview-plan.json
 ├── education-plan.json
 ├── sports-plan.json
 ├── owned-synthetic-source.mp4
-└── quickstart-report.json
+└── demo-report.json
 ```
 
-`quickstart-report.json` contains only relative artifact paths, hashes, codec information,
+`demo-report.json` contains only relative artifact paths, hashes, codec information,
 dimensions, durations, package/runtime versions, and the declared evidence boundary. It contains no
 credentials or media content and is the preferred attachment for trial feedback.
 
 Run just one workflow by repeating `--track` as needed:
 
 ```bash
-python examples/run_quickstart.py education-demo --track education
+cutsum demo education-demo --track education
 ```
 
 CutSum refuses to overwrite an existing output directory. Choose a new directory for each run.

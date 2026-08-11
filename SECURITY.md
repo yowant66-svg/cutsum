@@ -33,6 +33,6 @@ fix timeline is guaranteed for this pre-release project.
 
 ## Supported versions
 
-The public `0.1.0a3` Alpha receives best-effort security fixes. Alpha security fixes may change
+The public `0.1.0a4` Alpha receives best-effort security fixes. Alpha security fixes may change
 schemas or behavior when preserving the previous behavior would keep a vulnerability. Older
 internal RC identifiers are not publicly supported releases.

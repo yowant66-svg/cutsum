@@ -1,11 +1,16 @@
 # CutSum
 
+[![CI](https://github.com/yowant66-svg/cutsum/actions/workflows/ci.yml/badge.svg)](https://github.com/yowant66-svg/cutsum/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/cutsum?include_prereleases)](https://pypi.org/project/cutsum/)
+[![Python](https://img.shields.io/pypi/pyversions/cutsum)](https://pypi.org/project/cutsum/)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+
 CutSum is a provider-neutral engine for understanding long-form content, creating portable
 clip plans, and rendering verified media outputs. It is designed for creators, course and podcast
 teams, developers, automation workflows, and AI agents that need the same “find the right segment
 and cut it” capability without coupling the workflow to one model or one video platform.
 
-> Current release: [`0.1.0a3` public Alpha](https://github.com/yowant66-svg/cutsum/releases/tag/v0.1.0a3).
+> Current release: [`0.1.0a4` public Alpha](https://github.com/yowant66-svg/cutsum/releases/tag/v0.1.0a4).
 > The release is intentionally conservative: automated evidence proves engineering behavior, not
 > universal editorial quality. Sports support remains transcript-only heuristic Alpha.
 
@@ -45,13 +50,12 @@ cutsum subtitle-capabilities
 
 ## Install
 
-CutSum is not on PyPI. Install the reviewed wheel from the GitHub Alpha Release:
+Install the exact pre-release from PyPI:
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate  # Windows PowerShell: .venv\Scripts\Activate.ps1
-python -m pip install \
-  https://github.com/yowant66-svg/cutsum/releases/download/v0.1.0a3/cutsum-0.1.0a3-py3-none-any.whl
+python -m pip install --pre cutsum==0.1.0a4
 cutsum --help
 ```
 
@@ -68,15 +72,15 @@ uv run pytest -q
 
 ## 5–10 minute rights-safe quickstart
 
-Clone the repository after installing the reviewed Alpha wheel, then run one command to generate
-owned synthetic media and produce playable interview, education, and sports examples:
+After installing the Alpha, run one command to generate owned synthetic media and produce playable
+interview, education, and sports examples:
 
 ```bash
-python examples/run_quickstart.py cutsum-demo
+cutsum demo cutsum-demo
 ```
 
 The runner makes no network Provider calls and writes a shareable, machine-readable
-`quickstart-report.json`. Follow the complete [5–10 minute quickstart](docs/quickstart.md) for
+`demo-report.json`. Follow the complete [5–10 minute quickstart](docs/quickstart.md) for
 macOS, Linux, Windows PowerShell, expected outputs, and troubleshooting.
 
 ## Plan and cut your own authorized media
@@ -238,6 +242,6 @@ uv build
 git diff --check
 ```
 
-The checked-in CI is read-only and contains no PyPI publish job. GitHub-hosted Ubuntu, macOS, and
-Windows runs verify Python 3.11, while Ubuntu additionally verifies Python 3.12 and 3.13. A separate
-job enforces at least 85% branch coverage, and pull requests require DCO sign-off.
+GitHub-hosted Ubuntu, macOS, and Windows runs verify Python 3.11, while Ubuntu additionally verifies
+Python 3.12 and 3.13. A separate job enforces at least 85% branch coverage, and pull requests require
+DCO sign-off. Tagged Alpha releases use PyPI Trusted Publishing; no long-lived PyPI token is stored.

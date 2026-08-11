@@ -117,6 +117,7 @@ def build_release_assets(
     output_directory: Path,
     *,
     source_commit: str,
+    plugin_archive: Path,
 ) -> dict[str, Any]:
     if COMMIT_PATTERN.fullmatch(source_commit) is None:
         raise ValueError("source_commit must be a full lowercase Git SHA-1")
@@ -128,12 +129,12 @@ def build_release_assets(
     tag = f"v{version}"
     wheel = dist_directory / f"cutsum-{version}-py3-none-any.whl"
     sdist = dist_directory / f"cutsum-{version}.tar.gz"
-    for artifact in (wheel, sdist):
+    for artifact in (wheel, sdist, plugin_archive):
         if not artifact.is_file():
             raise FileNotFoundError(f"missing release artifact: {artifact.name}")
     output_directory.mkdir(parents=True)
     copied = []
-    for artifact in (wheel, sdist):
+    for artifact in (wheel, sdist, plugin_archive):
         target = output_directory / artifact.name
         shutil.copyfile(artifact, target)
         copied.append(target)
@@ -153,6 +154,8 @@ def build_release_assets(
         "source_commit": source_commit,
         "repository": REPOSITORY_URL,
         "pypi_published": False,
+        "publication_targets": ["github", "pypi", "testpypi"],
+        "publication_state": "built_not_published",
         "media_included": False,
         "runtime_python": project["project"]["requires-python"],
         "assets": {
@@ -187,6 +190,7 @@ def main() -> None:
     parser.add_argument("dist_directory", type=Path)
     parser.add_argument("output_directory", type=Path)
     parser.add_argument("--source-commit", required=True)
+    parser.add_argument("--plugin-archive", type=Path, required=True)
     parser.add_argument("--repository", type=Path, default=Path(__file__).parents[1])
     args = parser.parse_args()
     manifest = build_release_assets(
@@ -194,6 +198,7 @@ def main() -> None:
         args.dist_directory.resolve(),
         args.output_directory.resolve(),
         source_commit=args.source_commit,
+        plugin_archive=args.plugin_archive.resolve(),
     )
     print(json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True))
 

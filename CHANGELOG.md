@@ -4,6 +4,17 @@ All notable changes will be documented here.
 
 ## Unreleased
 
+## 0.1.0a4 — 2026-08-11
+
+- Add `cutsum demo` as an installed, rights-safe, zero-network three-track execution proof.
+- Bound subprocess diagnostic output while continuously draining stdout and stderr, retaining
+  head/tail evidence, byte counts, truncation state, and termination signals.
+- Package the repo-local `cutsum-intelligence` Skill as a reproducible OpenAI Plugin ZIP without
+  duplicating its instruction source or claiming official marketplace inclusion.
+- Add one-build Trusted Publishing gates for TestPyPI, PyPI, and GitHub Release distribution.
+- Publish the first PyPI Alpha while retaining GitHub checksums, SBOM, provenance, and capability
+  boundaries.
+
 ## 0.1.0a3 — 2026-08-10
 
 - Return a valid, auditable empty sports CutPlan when transcript detection finds no qualified event.

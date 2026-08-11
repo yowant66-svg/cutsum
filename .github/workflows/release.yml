@@ -1,0 +1,170 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch: {}
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build and verify once
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          fetch-depth: 0
+      - name: Install uv and Python
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
+        with:
+          python-version: "3.12"
+          enable-cache: true
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install --yes ffmpeg
+      - name: Install locked dependencies
+        run: uv sync --locked --all-extras --dev
+      - name: Run release gates
+        run: |
+          uv run ruff format --check .
+          uv run ruff check .
+          uv run mypy src tests scripts examples
+          uv run reuse lint
+          uv run pip-audit
+          uv run pytest -q --cov=universal_cutup --cov-branch --cov-fail-under=85
+      - name: Build distributions and plugin
+        env:
+          SOURCE_DATE_EPOCH: "1786406400"
+        run: |
+          uv build
+          uv run python scripts/build_openai_plugin.py build/plugin-staging
+          mv build/plugin-staging.zip cutsum-0.1.0a4-openai-plugin.zip
+          uv run python scripts/build_public_release.py dist release-assets \
+            --source-commit "${GITHUB_SHA}" \
+            --plugin-archive cutsum-0.1.0a4-openai-plugin.zip
+      - name: Upload immutable release artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: cutsum-release
+          path: release-assets/
+          if-no-files-found: error
+          retention-days: 30
+
+  publish-testpypi:
+    name: Publish to TestPyPI
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: testpypi
+    permissions:
+      id-token: write
+    steps:
+      - name: Download immutable release artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: cutsum-release
+          path: release-assets
+      - name: Select Python distributions
+        run: |
+          mkdir publish-dist
+          cp release-assets/cutsum-*.whl release-assets/cutsum-*.tar.gz publish-dist/
+      - name: Trusted publish to TestPyPI
+        uses: pypa/gh-action-pypi-publish@106e0b0b7c337fa67ed433972f777c6357f78598
+        with:
+          packages-dir: publish-dist
+          repository-url: https://test.pypi.org/legacy/
+
+  verify-testpypi:
+    name: Verify TestPyPI hashes
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [build, publish-testpypi]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: cutsum-release
+          path: release-assets
+      - name: Wait for index and verify exact hashes
+        run: |
+          for attempt in 1 2 3 4 5 6; do
+            python scripts/verify_published_release.py 0.1.0a4 \
+              release-assets/SHA256SUMS.txt \
+              --repository-url https://test.pypi.org && exit 0
+            sleep 10
+          done
+          exit 1
+
+  publish-pypi:
+    name: Publish to PyPI
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [build, publish-testpypi, verify-testpypi]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: cutsum-release
+          path: release-assets
+      - name: Select Python distributions
+        run: |
+          mkdir publish-dist
+          cp release-assets/cutsum-*.whl release-assets/cutsum-*.tar.gz publish-dist/
+      - name: Trusted publish to PyPI
+        uses: pypa/gh-action-pypi-publish@106e0b0b7c337fa67ed433972f777c6357f78598
+        with:
+          packages-dir: publish-dist
+
+  verify-pypi:
+    name: Verify PyPI hashes
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [build, publish-pypi]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: cutsum-release
+          path: release-assets
+      - name: Verify exact PyPI hashes
+        run: >-
+          python scripts/verify_published_release.py 0.1.0a4
+          release-assets/SHA256SUMS.txt
+
+  github-release:
+    name: Publish GitHub prerelease
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [build, verify-pypi]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: cutsum-release
+          path: release-assets
+      - name: Create immutable prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "${GITHUB_REF_NAME}" release-assets/*
+          --prerelease --verify-tag
+          --title "CutSum ${GITHUB_REF_NAME#v}"
+          --notes-file docs/releases/0.1.0a4.md

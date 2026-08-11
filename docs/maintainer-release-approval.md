@@ -1,10 +1,10 @@
 # Maintainer release approval
 
-Approval date: 2026-08-10
+Approval date: 2026-08-11
 
 Maintainer: DXBATM
 
-Release: CutSum `0.1.0a3`
+Release: CutSum `0.1.0a4`
 
 The maintainer authorized Codex to complete and publish this GitHub Alpha Release under the
 following boundaries:
@@ -19,9 +19,9 @@ following boundaries:
   media, complete third-party transcripts, credentials, cookies, or private account data.
 - Publish rights-safe examples made from FFmpeg-generated test media and maintainer-authored
   synthetic transcripts.
-- Publish wheel, source distribution, SBOM, checksums, and a release manifest on GitHub only. This
-  approval does not authorize a PyPI upload; the previously submitted Codex for Open Source
-  application is managed separately.
+- Publish the same wheel and source distribution through TestPyPI, PyPI, and GitHub Release using
+  GitHub OIDC Trusted Publishing; also publish the SBOM, checksums, release manifest, and
+  reproducible OpenAI Plugin ZIP. Do not create or store a long-lived PyPI API token.
 - Continue describing sports support as transcript-only heuristic Alpha and avoid claims of visual,
   audio, OCR, scoreboard, MatchState, precision/recall, or proven editorial quality.
 

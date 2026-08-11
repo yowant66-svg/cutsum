@@ -12,7 +12,7 @@ access. A useful trial normally takes 15–30 minutes.
    [GitHub trial-feedback form](https://github.com/yowant66-svg/cutsum/issues/new?template=trial_feedback.yml)
    or copy the [feedback template](feedback-template.md) into a private message.
 
-The generated `quickstart-report.json` is safe to share after the tester reviews it. Do not attach
+The generated `demo-report.json` is safe to share after the tester reviews it. Do not attach
 source media, subtitles, terminal history, home-directory paths, credentials, cookies, tokens, or
 private project data.
 

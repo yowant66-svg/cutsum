@@ -146,6 +146,18 @@ def test_small_output_is_not_marked_truncated() -> None:
     assert result.stdout_truncated is False
 
 
+def test_output_at_the_configured_limit_is_preserved_exactly() -> None:
+    size = 1024
+    result = ProcessRunner(max_output_bytes=size).run(
+        [sys.executable, "-c", f"import os; os.write(1, b'Z' * {size})"],
+        timeout_seconds=2,
+    )
+
+    assert result.stdout == "Z" * size
+    assert result.stdout_bytes == size
+    assert result.stdout_truncated is False
+
+
 @pytest.mark.skipif(sys.platform == "win32", reason="POSIX signal semantics")
 def test_negative_return_code_records_signal_name() -> None:
     result = ProcessRunner().run(

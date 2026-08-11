@@ -52,6 +52,11 @@ def test_public_demo_generator_creates_decodable_owned_synthetic_media(tmp_path:
             "1",
         ],
         cwd=REPOSITORY_ROOT,
+        env={
+            **os.environ,
+            "PYTHONPATH": str(REPOSITORY_ROOT / "src"),
+            "PYTHONUTF8": "1",
+        },
         check=True,
         capture_output=True,
         text=True,
@@ -92,7 +97,7 @@ def test_public_quickstart_runs_all_tracks_and_writes_shareable_report(tmp_path:
     )
     assert completed.returncode == 0, f"stdout:\n{completed.stdout}\n\nstderr:\n{completed.stderr}"
 
-    report = json.loads((output / "quickstart-report.json").read_text(encoding="utf-8"))
+    report = json.loads((output / "demo-report.json").read_text(encoding="utf-8"))
     assert report["result"] == "success"
     assert report["network_provider_calls"] == 0
     assert report["third_party_media_included"] is False

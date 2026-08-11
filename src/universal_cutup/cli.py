@@ -16,6 +16,7 @@ from universal_cutup.application.blind_runs import (
     load_reference_after_freeze,
     verify_frozen_blind_run,
 )
+from universal_cutup.application.demo import DEMO_TRACKS, run_demo
 from universal_cutup.application.sdk import (
     DEFAULT_MAX_FULL_CLIPS,
     aggregate_intelligence,
@@ -84,6 +85,23 @@ class SupportedSportsTextProfile(StrEnum):
     BASKETBALL = "basketball"
     TENNIS = "tennis"
     CRICKET = "cricket"
+
+
+@app.command(name="demo")
+def demo(
+    output: Path,
+    track: Annotated[
+        list[str] | None,
+        typer.Option("--track", help="Repeat to run selected demo tracks."),
+    ] = None,
+) -> None:
+    """Generate and run rights-safe local CutSum examples."""
+    try:
+        selected_tracks = tuple(track) if track else DEMO_TRACKS
+        result = run_demo(output.resolve(), selected_tracks=selected_tracks)
+        _emit(result.report)
+    except Exception as error:
+        _error(error)
 
 
 def _emit(value: BaseModel | dict[str, Any] | tuple[Any, ...]) -> None:

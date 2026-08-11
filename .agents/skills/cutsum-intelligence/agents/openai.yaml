@@ -1,4 +1,7 @@
 interface:
   display_name: "CutSum Intelligence"
-  short_description: "Create validated adaptive offline cut plans"
-  default_prompt: "Use $cutsum-intelligence to analyze this transcript and produce a validated offline cut plan."
+  short_description: "Plan and execute auditable long-video cuts"
+  brand_color: "#315C47"
+  default_prompt: "Use $cutsum-intelligence to analyze this authorized transcript and create a validated CutSum plan without overstating unavailable capabilities."
+policy:
+  allow_implicit_invocation: true

@@ -5,6 +5,8 @@ import time
 from pathlib import Path
 from threading import Event, Timer
 
+import pytest
+
 from universal_cutup.media.process import ProcessRunner, ProcessStatus, redact_command
 
 
@@ -108,3 +110,57 @@ def test_non_utf8_process_output_is_replaced_without_reader_failure() -> None:
 
     assert result.status is ProcessStatus.COMPLETED
     assert result.stderr == "�"
+
+
+def test_large_stdout_and_stderr_are_drained_and_bounded() -> None:
+    size = 2 * 1024 * 1024
+    result = ProcessRunner(max_output_bytes=64 * 1024).run(
+        [
+            sys.executable,
+            "-c",
+            (
+                "import os,sys; "
+                f"os.write(1, b'A' * {size}); "
+                f"os.write(2, b'B' * {size}); "
+                "sys.exit(7)"
+            ),
+        ],
+        timeout_seconds=10,
+    )
+
+    assert result.status is ProcessStatus.FAILED
+    assert result.return_code == 7
+    assert result.stdout_bytes == size
+    assert result.stderr_bytes == size
+    assert result.stdout_truncated is True
+    assert result.stderr_truncated is True
+    assert len(result.stdout.encode("utf-8")) <= 64 * 1024
+    assert len(result.stderr.encode("utf-8")) <= 64 * 1024
+    assert result.stdout.startswith("A" * 100)
+    assert result.stdout.endswith("A" * 100)
+    assert "[output truncated]" in result.stdout
+
+
+def test_small_output_is_not_marked_truncated() -> None:
+    result = ProcessRunner(max_output_bytes=1024).run(
+        [sys.executable, "-c", "print('ok')"], timeout_seconds=2
+    )
+
+    assert result.stdout == "ok\n"
+    assert result.stdout_bytes == 3
+    assert result.stdout_truncated is False
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="POSIX signal semantics")
+def test_negative_return_code_records_signal_name() -> None:
+    result = ProcessRunner().run(
+        [
+            sys.executable,
+            "-c",
+            "import os,signal; os.kill(os.getpid(), signal.SIGTERM)",
+        ],
+        timeout_seconds=2,
+    )
+
+    assert result.status is ProcessStatus.FAILED
+    assert result.termination_signal == "SIGTERM"

@@ -536,7 +536,7 @@ def verify_pypi_release(
 - setup-uv：`08807647e7069bb48b6ef5acd8ec9567f424441b`
 - upload-artifact：`ea165f8d65b6e75b540449e92b4886f43607fa02`
 - download-artifact：`d3f86a106a0bac45b974a628896c90dbdf5c8093`
-- gh-action-pypi-publish：`106e0b0b7c337fa67ed433972f777c6357f78598`
+- gh-action-pypi-publish：`dc37677b2e1c63e2034f94d8a5b11f265b73ba33`
 
 `build` job 运行完整门禁、构建 wheel/sdist、Plugin ZIP 和 release assets，然后上传名为 `cutsum-release-${{ github.ref_name }}` 的 artifact。`workflow_dispatch` 仅用于构建演练；所有发布 job 必须额外用 `startsWith(github.ref, 'refs/tags/v')` 防止从分支手动触发外部发布。TestPyPI 和 PyPI job 只下载该 artifact，并把 `cutsum-*.whl` 与 `cutsum-*.tar.gz` 复制到独立 `dist/` 后发布。PyPI job `needs` TestPyPI smoke test，环境为 `pypi`；GitHub Release job `needs` PyPI 核验，使用 `gh release create --prerelease --verify-tag` 上传原始 artifact。
 

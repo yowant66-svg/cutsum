@@ -118,12 +118,7 @@ def test_large_stdout_and_stderr_are_drained_and_bounded() -> None:
         [
             sys.executable,
             "-c",
-            (
-                "import os,sys; "
-                f"os.write(1, b'A' * {size}); "
-                f"os.write(2, b'B' * {size}); "
-                "sys.exit(7)"
-            ),
+            (f"import os,sys; os.write(1, b'A' * {size}); os.write(2, b'B' * {size}); sys.exit(7)"),
         ],
         timeout_seconds=10,
     )

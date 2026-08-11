@@ -249,11 +249,7 @@ class ProcessRunner:
                 break
             return_code = process.poll()
             if return_code is not None:
-                status = (
-                    ProcessStatus.COMPLETED
-                    if return_code == 0
-                    else ProcessStatus.FAILED
-                )
+                status = ProcessStatus.COMPLETED if return_code == 0 else ProcessStatus.FAILED
                 break
             time.sleep(min(0.05, remaining))
 

@@ -44,12 +44,7 @@ def test_large_stdout_and_stderr_are_drained_and_bounded() -> None:
         [
             sys.executable,
             "-c",
-            (
-                "import os,sys; "
-                f"os.write(1, b'A' * {size}); "
-                f"os.write(2, b'B' * {size}); "
-                "sys.exit(7)"
-            ),
+            (f"import os,sys; os.write(1, b'A' * {size}); os.write(2, b'B' * {size}); sys.exit(7)"),
         ],
         timeout_seconds=10,
     )
@@ -129,7 +124,7 @@ class _BoundedCapture:
         if chunk:
             self._tail.extend(chunk)
             if len(self._tail) > self._tail_limit:
-                del self._tail[:-self._tail_limit]
+                del self._tail[: -self._tail_limit]
 
     @property
     def truncated(self) -> bool:
@@ -267,7 +262,9 @@ class DemoResult:
 
 
 def generate_demo_media(output: Path, *, duration_seconds: int = 60) -> None: ...
-def run_demo(output_root: Path, *, selected_tracks: tuple[str, ...] = DEMO_TRACKS) -> DemoResult: ...
+def run_demo(
+    output_root: Path, *, selected_tracks: tuple[str, ...] = DEMO_TRACKS
+) -> DemoResult: ...
 ```
 
 三个 SRT 常量逐字采用当前 `examples/transcripts/*.srt` 的维护者原创内容。媒体命令继续使用 `testsrc2`、`sine`、H.264、AAC 和 `-n`，但通过 `ProcessRunner` 执行；失败时映射为 `FFMPEG_NOT_FOUND`、`MEDIA_PROCESS_TIMEOUT` 或 `MEDIA_PROCESS_FAILED`。
@@ -333,9 +330,10 @@ def test_plugin_build_copies_repo_skill_byte_for_byte(tmp_path: Path) -> None:
         names = set(package.namelist())
         assert "cutsum/.codex-plugin/plugin.json" in names
         assert "cutsum/skills/cutsum-intelligence/SKILL.md" in names
-        assert package.read("cutsum/skills/cutsum-intelligence/SKILL.md") == (
-            REPOSITORY_ROOT / ".agents/skills/cutsum-intelligence/SKILL.md"
-        ).read_bytes()
+        assert (
+            package.read("cutsum/skills/cutsum-intelligence/SKILL.md")
+            == (REPOSITORY_ROOT / ".agents/skills/cutsum-intelligence/SKILL.md").read_bytes()
+        )
 
 
 def test_plugin_manifest_keeps_capability_boundary() -> None:
@@ -518,7 +516,9 @@ Expected: FAIL。
 def verify_pypi_release(
     *, repository_url: str, version: str, expected_hashes: dict[str, str]
 ) -> dict[str, str]:
-    with urlopen(f"{repository_url.rstrip('/')}/pypi/cutsum/{version}/json", timeout=30) as response:
+    with urlopen(
+        f"{repository_url.rstrip('/')}/pypi/cutsum/{version}/json", timeout=30
+    ) as response:
         payload = json.load(response)
     observed = {item["filename"]: item["digests"]["sha256"] for item in payload["urls"]}
     if observed != expected_hashes:

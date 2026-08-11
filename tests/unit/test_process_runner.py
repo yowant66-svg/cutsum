@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import sys
 import time
 from pathlib import Path
@@ -141,8 +142,9 @@ def test_small_output_is_not_marked_truncated() -> None:
         [sys.executable, "-c", "print('ok')"], timeout_seconds=2
     )
 
-    assert result.stdout == "ok\n"
-    assert result.stdout_bytes == 3
+    expected = f"ok{os.linesep}"
+    assert result.stdout == expected
+    assert result.stdout_bytes == len(expected.encode())
     assert result.stdout_truncated is False
 
 

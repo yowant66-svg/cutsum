@@ -11,6 +11,15 @@ Required document order:
 5. `assessment-bundle.schema.json`
 6. `adaptive-selection-result.schema.json`
 
+For host model routing, validate:
+
+- `model-routing-decision.schema.json`
+
+The decision contains a provider-neutral task and tier, not permission to call a provider. A
+`blocked` decision must remain blocked until the host changes the tier ceiling, frontier-call
+budget, or task requirements. Actual calls are recorded in ProviderRecord with the decision ID,
+actual model ID, escalation reasons, and known cost.
+
 For education-first workflows, also validate:
 
 - `educational-task-request.schema.json`

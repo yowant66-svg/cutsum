@@ -84,3 +84,24 @@ def test_repo_skill_uses_public_sdk_cli_and_structured_capability_boundary() -> 
     assert "cutsum sports-plan" in skill
     assert "provider_required" in skill
     assert "CutupError.as_dict()" in reference
+
+
+def test_repo_skill_uses_auditable_cost_aware_model_routing() -> None:
+    skill = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
+    routing_reference = (SKILL_ROOT / "references/model-routing.md").read_text(
+        encoding="utf-8"
+    )
+    protocol_reference = (SKILL_ROOT / "references/protocol-workflow.md").read_text(
+        encoding="utf-8"
+    )
+
+    assert "cutsum model-route" in skill
+    assert "references/model-routing.md" in skill
+    assert "silent downgrade" in skill
+    for tier in ("deterministic", "economy", "balanced", "frontier"):
+        assert tier in routing_reference
+    assert "ProviderRecord" in routing_reference
+    assert "routing_decision_id" in routing_reference
+    assert "cost_minor_units" in routing_reference
+    assert "must not call a network provider" in routing_reference
+    assert "model-routing-decision.schema.json" in protocol_reference

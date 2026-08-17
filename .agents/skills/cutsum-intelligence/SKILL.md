@@ -13,6 +13,21 @@ For Python integrations, import the stable surface from `universal_cutup.sdk`, n
 operation; preserve the returned state and structured error instead of guessing that a provider or
 media feature exists.
 
+## Route model work
+
+Before each host-model stage, run `cutsum model-route TASK` with every observed `--reason`, the
+host's `--maximum-tier`, and the remaining `--frontier-calls-remaining` budget when one is set.
+Map the returned provider-neutral tier to an actually available host model. Never silently replace
+a blocked or required tier with a weaker model. If tiered delegation is unavailable, disclose that
+the current host model performed the stage instead of claiming cost-aware routing occurred.
+
+Keep validation, hashing, aggregation, selection arithmetic, subtitle layout, and FFmpeg execution
+deterministic. Use economy for bulk cleanup and prefiltering, balanced for normal semantic planning,
+and frontier only for required ambiguity resolution or final editorial review. Every actual model
+call must create a `ProviderRecord` containing the routing decision, actual `model_id`, and known
+cost. Read [references/model-routing.md](references/model-routing.md) for the task table, escalation
+rules, budget behavior, and provenance fields.
+
 ## Choose the mode
 
 - **AUTO**: Read the complete transcript, infer a multi-label ContentProfile, then resolve strategy.
@@ -99,6 +114,8 @@ Read [references/protocol-workflow.md](references/protocol-workflow.md) before a
 - Do not accept a model-reported overall score as authoritative.
 - Do not call network providers, download media, publish, or access credentials without separate
   authorization.
+- Do not bypass a blocked model-routing decision or hide a silent downgrade behind a generic
+  ProviderRecord.
 - Preserve `CutupError` fields `code`, `category`, `step`, `recoverable`, and `details`. A
   `provider_required` or `unavailable` capability report is an explicit boundary, not permission to
   install, configure, or silently substitute a provider.

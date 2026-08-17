@@ -92,15 +92,17 @@ def test_provider_record_remains_backward_compatible_without_routing_metadata() 
 def test_provider_record_rejects_partial_routing_metadata(
     partial_update: dict[str, object],
 ) -> None:
+    payload: dict[str, object] = {
+        "provider_record_id": "provider-record-partial",
+        "provider_id": "host-provider",
+        "operation": "content_profile",
+        "started_at": FIXED_TIME,
+        "completed_at": FIXED_TIME,
+    }
+    payload.update(partial_update)
+
     with pytest.raises(ValidationError, match="routing metadata must be supplied together"):
-        ProviderRecord(
-            provider_record_id="provider-record-partial",
-            provider_id="host-provider",
-            operation="content_profile",
-            started_at=FIXED_TIME,
-            completed_at=FIXED_TIME,
-            **partial_update,
-        )
+        ProviderRecord.model_validate(payload)
 
 
 def test_provider_record_rejects_selected_tier_below_base_tier() -> None:

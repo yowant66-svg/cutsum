@@ -4,6 +4,13 @@ All notable changes will be documented here.
 
 ## Unreleased
 
+- Add provider-neutral `deterministic`, `economy`, `balanced`, and `frontier` model-tier routing
+  with explicit uncertainty escalation, host ceilings, and frontier-call budgets.
+- Preserve routing decision IDs, generic tiers, escalation reasons, actual model IDs, and known
+  costs in the existing ProviderRecord provenance chain.
+- Teach the repository-local Skill to keep deterministic media work outside LLMs, use cheaper
+  models for bulk preprocessing, and reserve frontier reasoning for ambiguous or final review work.
+
 ## 0.1.0a4 — 2026-08-11
 
 - Add `cutsum demo` as an installed, rights-safe, zero-network three-track execution proof.

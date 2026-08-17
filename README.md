@@ -26,6 +26,8 @@ and cut it” capability without coupling the workflow to one model or one video
 - Deterministic 9:16 center crop, manual focus, fit-over-blur, fixed-focus composition, and platform
   safe areas.
 - Python SDK, CLI, and repository-local Codex/ChatGPT Skill using the same application logic.
+- Provider-neutral model-tier recommendations that separate deterministic work, economical bulk
+  processing, balanced semantic planning, and frontier ambiguity or quality review.
 - Offline deterministic operation with no API key; cloud or local model Providers can be added.
 
 The current release does **not** download YouTube URLs, perform ASR or translation without a
@@ -46,7 +48,13 @@ Check the real machine boundary before planning optional work:
 ```bash
 cutsum capabilities
 cutsum subtitle-capabilities
+cutsum model-route candidate_prefilter --reason low_confidence
 ```
+
+`model-route` does not call a model. It returns a generic recommendation for the host to map to an
+available model. A tier ceiling or exhausted frontier-call budget produces `status=blocked`; CutSum
+never silently downgrades a required tier. Separate authorization is still required for network or
+paid Providers.
 
 ## Install
 
@@ -184,6 +192,12 @@ The repository-local Skill is in `.agents/skills/cutsum-intelligence/`. It tells
 model to understand full transcripts while leaving validation, aggregation, selection, provenance,
 and media execution to this package. The Skill does not contain a second ranking formula and does
 not grant permission to download, publish, access credentials, or call paid Providers.
+
+For hosts that support tiered delegation, the Skill routes cleanup and prefiltering to an economy
+tier, normal content understanding and assessment to a balanced tier, and only unresolved semantic
+ambiguity or final editorial review to a frontier tier. The actual model and known cost are recorded
+in ProviderRecord. Hosts without tiered delegation must disclose that limitation rather than claim
+that cost-aware routing occurred.
 
 ## Rights-safe examples
 

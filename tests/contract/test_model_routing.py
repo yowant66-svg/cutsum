@@ -122,7 +122,10 @@ def test_routing_deduplicates_repeated_reasons_deterministically() -> None:
 
 
 def test_deterministic_task_rejects_model_escalation() -> None:
-    with pytest.raises(ValidationError, match="deterministic tasks cannot request model escalation"):
+    with pytest.raises(
+        ValidationError,
+        match="deterministic tasks cannot request model escalation",
+    ):
         ModelRoutingRequest(
             task=ModelTask.MEDIA_EXECUTION,
             escalation_reasons=(EscalationReason.LOW_CONFIDENCE,),

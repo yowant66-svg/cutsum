@@ -27,6 +27,25 @@ def test_public_sdk_exports_v1_planning_and_execution_surface() -> None:
     assert {"DetectedSportsObservations", "SportsTextProfile"} <= set(sdk.__all__)
 
 
+def test_public_sdk_exports_model_routing_surface() -> None:
+    expected = {
+        "EscalationReason",
+        "ModelRoutingDecision",
+        "ModelRoutingRequest",
+        "ModelTask",
+        "ModelTier",
+        "RoutingStatus",
+        "route_model_task",
+    }
+
+    assert expected <= set(sdk.__all__)
+    assert callable(sdk.route_model_task)
+    decision = sdk.route_model_task(
+        sdk.ModelRoutingRequest(task=sdk.ModelTask.CANDIDATE_PREFILTER)
+    )
+    assert decision.selected_tier is sdk.ModelTier.ECONOMY
+
+
 def test_public_sdk_load_plan_error_does_not_expose_parent_path(tmp_path: Path) -> None:
     missing = tmp_path / "private-location" / "missing.json"
 

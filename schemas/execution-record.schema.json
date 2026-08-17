@@ -289,6 +289,19 @@
       "title": "CutArtifact",
       "type": "object"
     },
+    "EscalationReason": {
+      "enum": [
+        "low_confidence",
+        "close_candidate_margin",
+        "cross_segment_ambiguity",
+        "semantic_conflict",
+        "directed_constraint_ambiguity",
+        "specialist_terminology",
+        "final_quality_gate"
+      ],
+      "title": "EscalationReason",
+      "type": "string"
+    },
     "ExecutionStatus": {
       "enum": [
         "success",
@@ -301,9 +314,56 @@
       "type": "string"
     },
     "JsonValue": {},
+    "ModelTask": {
+      "enum": [
+        "protocol_validation",
+        "hashing_and_provenance",
+        "selection_arithmetic",
+        "subtitle_layout",
+        "media_execution",
+        "transcript_cleanup",
+        "language_segmentation",
+        "keyword_extraction",
+        "candidate_prefilter",
+        "title_draft",
+        "content_profile",
+        "intent_interpretation",
+        "candidate_proposal",
+        "dimension_assessment",
+        "semantic_subtitle_grouping",
+        "contextual_translation",
+        "editorial_selection_review",
+        "ambiguity_resolution",
+        "specialist_translation_review",
+        "final_quality_review"
+      ],
+      "title": "ModelTask",
+      "type": "string"
+    },
+    "ModelTier": {
+      "enum": [
+        "deterministic",
+        "economy",
+        "balanced",
+        "frontier"
+      ],
+      "title": "ModelTier",
+      "type": "string"
+    },
     "ProviderRecord": {
       "additionalProperties": false,
       "properties": {
+        "base_model_tier": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ModelTier"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
         "completed_at": {
           "format": "date-time",
           "title": "Completed At",
@@ -342,6 +402,14 @@
           "title": "Input Hashes",
           "type": "array"
         },
+        "model_escalation_reasons": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/EscalationReason"
+          },
+          "title": "Model Escalation Reasons",
+          "type": "array"
+        },
         "model_id": {
           "anyOf": [
             {
@@ -353,6 +421,17 @@
           ],
           "default": null,
           "title": "Model Id"
+        },
+        "model_task": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ModelTask"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         },
         "operation": {
           "title": "Operation",
@@ -373,6 +452,30 @@
         "provider_record_id": {
           "title": "Provider Record Id",
           "type": "string"
+        },
+        "routing_decision_id": {
+          "anyOf": [
+            {
+              "pattern": "^route-[0-9a-f]{20}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Routing Decision Id"
+        },
+        "selected_model_tier": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ModelTier"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         },
         "started_at": {
           "format": "date-time",

@@ -37,6 +37,7 @@ from universal_cutup.application.sdk import (
     require_operation,
     require_reframe_mode,
     resolve_intelligence_task,
+    route_model_task,
     run_full_offline,
     score_candidates,
     select_intelligence,
@@ -54,6 +55,12 @@ from universal_cutup.domain.intelligence import (
     ControlMode,
     HostIntent,
     ResolvedTaskProfile,
+)
+from universal_cutup.domain.model_routing import (
+    EscalationReason,
+    ModelRoutingRequest,
+    ModelTask,
+    ModelTier,
 )
 from universal_cutup.domain.plans import CutPlan
 from universal_cutup.domain.records import ProviderRecord
@@ -644,6 +651,34 @@ def package() -> None:
 def capabilities() -> None:
     """Report machine-readable SDK and CLI operation capabilities."""
     _emit(capability_report())
+
+
+@app.command(name="model-route")
+def model_route(
+    task: ModelTask,
+    reason: Annotated[
+        list[EscalationReason] | None,
+        typer.Option("--reason", help="Repeat for each observed escalation reason."),
+    ] = None,
+    maximum_tier: ModelTier = ModelTier.FRONTIER,
+    frontier_calls_remaining: Annotated[
+        int | None,
+        typer.Option(min=0, help="Optional remaining host budget for frontier calls."),
+    ] = None,
+) -> None:
+    """Recommend a provider-neutral model tier without calling a provider."""
+    try:
+        decision = route_model_task(
+            ModelRoutingRequest(
+                task=task,
+                escalation_reasons=tuple(reason or ()),
+                maximum_tier=maximum_tier,
+                frontier_calls_remaining=frontier_calls_remaining,
+            )
+        )
+        _emit(decision.model_dump(mode="json"))
+    except Exception as error:
+        _error(error)
 
 
 @app.command(name="education-plan")

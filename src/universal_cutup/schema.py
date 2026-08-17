@@ -17,6 +17,7 @@ from .domain.blind_runs import BlindRunInput, BlindRunManifest
 from .domain.education import EducationalSelectionResult, EducationalTaskRequest
 from .domain.execution import ExecutionRecord, RunManifest
 from .domain.intelligence import ContentProfile, HostIntent, ResolvedTaskProfile
+from .domain.model_routing import ModelRoutingDecision
 from .domain.plans import CutPlan, CutRequest
 from .domain.sports import (
     SportsObservationBundle,
@@ -35,6 +36,7 @@ SCHEMA_MODELS: dict[str, type[BaseModel]] = {
     "educational-selection-result.schema.json": EducationalSelectionResult,
     "educational-task-request.schema.json": EducationalTaskRequest,
     "host-intent.schema.json": HostIntent,
+    "model-routing-decision.schema.json": ModelRoutingDecision,
     "content-profile.schema.json": ContentProfile,
     "assessment-bundle.schema.json": AssessmentBundle,
     "candidate-proposal-bundle.schema.json": CandidateProposalBundle,

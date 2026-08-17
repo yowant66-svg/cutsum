@@ -1,0 +1,113 @@
+{
+  "$defs": {
+    "EscalationReason": {
+      "enum": [
+        "low_confidence",
+        "close_candidate_margin",
+        "cross_segment_ambiguity",
+        "semantic_conflict",
+        "directed_constraint_ambiguity",
+        "specialist_terminology",
+        "final_quality_gate"
+      ],
+      "title": "EscalationReason",
+      "type": "string"
+    },
+    "ModelTask": {
+      "enum": [
+        "protocol_validation",
+        "hashing_and_provenance",
+        "selection_arithmetic",
+        "subtitle_layout",
+        "media_execution",
+        "transcript_cleanup",
+        "language_segmentation",
+        "keyword_extraction",
+        "candidate_prefilter",
+        "title_draft",
+        "content_profile",
+        "intent_interpretation",
+        "candidate_proposal",
+        "dimension_assessment",
+        "semantic_subtitle_grouping",
+        "contextual_translation",
+        "editorial_selection_review",
+        "ambiguity_resolution",
+        "specialist_translation_review",
+        "final_quality_review"
+      ],
+      "title": "ModelTask",
+      "type": "string"
+    },
+    "ModelTier": {
+      "enum": [
+        "deterministic",
+        "economy",
+        "balanced",
+        "frontier"
+      ],
+      "title": "ModelTier",
+      "type": "string"
+    },
+    "RoutingStatus": {
+      "enum": [
+        "selected",
+        "blocked"
+      ],
+      "title": "RoutingStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "base_tier": {
+      "$ref": "#/$defs/ModelTier"
+    },
+    "escalation_reasons": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/EscalationReason"
+      },
+      "title": "Escalation Reasons",
+      "type": "array"
+    },
+    "explanation": {
+      "title": "Explanation",
+      "type": "string"
+    },
+    "required_tier": {
+      "$ref": "#/$defs/ModelTier"
+    },
+    "routing_decision_id": {
+      "title": "Routing Decision Id",
+      "type": "string"
+    },
+    "selected_tier": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ModelTier"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "status": {
+      "$ref": "#/$defs/RoutingStatus"
+    },
+    "task": {
+      "$ref": "#/$defs/ModelTask"
+    }
+  },
+  "required": [
+    "routing_decision_id",
+    "task",
+    "base_tier",
+    "required_tier",
+    "selected_tier",
+    "status",
+    "explanation"
+  ],
+  "title": "ModelRoutingDecision",
+  "type": "object"
+}

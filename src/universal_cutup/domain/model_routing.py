@@ -113,10 +113,7 @@ class ModelRoutingRequest(FrozenModel):
 
     @model_validator(mode="after")
     def validate_deterministic_task(self) -> ModelRoutingRequest:
-        if (
-            _BASE_TIERS[self.task] is ModelTier.DETERMINISTIC
-            and self.escalation_reasons
-        ):
+        if _BASE_TIERS[self.task] is ModelTier.DETERMINISTIC and self.escalation_reasons:
             raise ValueError("deterministic tasks cannot request model escalation")
         return self
 

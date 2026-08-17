@@ -143,6 +143,10 @@ def _required_tier(
     return _NEXT_TIER[base_tier]
 
 
+def model_task_base_tier(task: ModelTask) -> ModelTier:
+    return _BASE_TIERS[task]
+
+
 def _decision_id(
     request: ModelRoutingRequest,
     reasons: tuple[EscalationReason, ...],
@@ -161,7 +165,7 @@ def _decision_id(
 
 def route_model_task(request: ModelRoutingRequest) -> ModelRoutingDecision:
     reasons = tuple(dict.fromkeys(request.escalation_reasons))
-    base_tier = _BASE_TIERS[request.task]
+    base_tier = model_task_base_tier(request.task)
     required_tier = _required_tier(base_tier, reasons)
     decision_id = _decision_id(request, reasons)
 

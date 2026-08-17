@@ -88,9 +88,7 @@ def test_repo_skill_uses_public_sdk_cli_and_structured_capability_boundary() -> 
 
 def test_repo_skill_uses_auditable_cost_aware_model_routing() -> None:
     skill = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
-    routing_reference = (SKILL_ROOT / "references/model-routing.md").read_text(
-        encoding="utf-8"
-    )
+    routing_reference = (SKILL_ROOT / "references/model-routing.md").read_text(encoding="utf-8")
     protocol_reference = (SKILL_ROOT / "references/protocol-workflow.md").read_text(
         encoding="utf-8"
     )

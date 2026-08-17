@@ -40,9 +40,7 @@ def test_public_sdk_exports_model_routing_surface() -> None:
 
     assert expected <= set(sdk.__all__)
     assert callable(sdk.route_model_task)
-    decision = sdk.route_model_task(
-        sdk.ModelRoutingRequest(task=sdk.ModelTask.CANDIDATE_PREFILTER)
-    )
+    decision = sdk.route_model_task(sdk.ModelRoutingRequest(task=sdk.ModelTask.CANDIDATE_PREFILTER))
     assert decision.selected_tier is sdk.ModelTier.ECONOMY
 
 

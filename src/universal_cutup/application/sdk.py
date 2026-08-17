@@ -22,6 +22,15 @@ from universal_cutup.domain.education import EducationalSelectionResult, Educati
 from universal_cutup.domain.errors import CutupError, ErrorCode
 from universal_cutup.domain.execution import ExecutionRecord
 from universal_cutup.domain.intelligence import ControlMode
+from universal_cutup.domain.model_routing import (
+    EscalationReason,
+    ModelRoutingDecision,
+    ModelRoutingRequest,
+    ModelTask,
+    ModelTier,
+    RoutingStatus,
+    route_model_task,
+)
 from universal_cutup.domain.plans import CutPlan
 from universal_cutup.domain.records import ProviderRecord
 from universal_cutup.domain.sources import MediaBinding, MediaSource, RightsAttestation
@@ -100,8 +109,14 @@ __all__ = [
     "CapabilityState",
     "DetectedSportsObservations",
     "EducationalPlanningResult",
+    "EscalationReason",
     "FullOfflineResult",
+    "ModelRoutingDecision",
+    "ModelRoutingRequest",
+    "ModelTask",
+    "ModelTier",
     "OperationCapability",
+    "RoutingStatus",
     "SourceInspection",
     "SportsPlanningResult",
     "SportsTextProfile",
@@ -140,6 +155,7 @@ __all__ = [
     "resolve_educational_request",
     "resolve_intelligence_task",
     "resolve_sports_request",
+    "route_model_task",
     "run_full_offline",
     "score_candidates",
     "select_educational_candidates",

@@ -29,6 +29,7 @@ def test_cli_exposes_all_gate_e1_commands() -> None:
         "education-plan",
         "sports-plan",
         "sports-transcript-plan",
+        "model-route",
         "transcribe",
         "translate",
         "reframe",
@@ -36,6 +37,61 @@ def test_cli_exposes_all_gate_e1_commands() -> None:
         "full",
     ):
         assert command in result.stdout
+
+
+def test_model_route_cli_emits_provider_neutral_recommendation() -> None:
+    result = runner.invoke(
+        app,
+        [
+            "model-route",
+            "candidate_prefilter",
+            "--reason",
+            "low_confidence",
+        ],
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["task"] == "candidate_prefilter"
+    assert payload["base_tier"] == "economy"
+    assert payload["selected_tier"] == "balanced"
+    assert payload["status"] == "selected"
+    assert "model_id" not in payload
+
+
+def test_model_route_cli_reports_blocked_tier_without_silent_downgrade() -> None:
+    result = runner.invoke(
+        app,
+        [
+            "model-route",
+            "content_profile",
+            "--reason",
+            "semantic_conflict",
+            "--maximum-tier",
+            "balanced",
+        ],
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["status"] == "blocked"
+    assert payload["required_tier"] == "frontier"
+    assert payload["selected_tier"] is None
+
+
+def test_model_route_cli_applies_frontier_call_budget() -> None:
+    result = runner.invoke(
+        app,
+        [
+            "model-route",
+            "final_quality_review",
+            "--frontier-calls-remaining",
+            "0",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert json.loads(result.stdout)["status"] == "blocked"
 
 
 def test_provider_and_capability_stubs_use_stable_json_errors() -> None:

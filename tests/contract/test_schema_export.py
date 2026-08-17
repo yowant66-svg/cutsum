@@ -30,6 +30,11 @@ def test_schema_export_is_deterministic(tmp_path: Path) -> None:
     assert "four-track-evaluation-report.schema.json" in first_manifest
     assert "blind-run-input.schema.json" in first_manifest
     assert "blind-run-manifest.schema.json" in first_manifest
+    assert "model-routing-decision.schema.json" in first_manifest
+    routing_schema = json.loads(
+        (tmp_path / "model-routing-decision.schema.json").read_text(encoding="utf-8")
+    )
+    assert routing_schema["title"] == "ModelRoutingDecision"
 
 
 def test_schema_export_cli_honors_explicit_output_directory(tmp_path: Path) -> None:

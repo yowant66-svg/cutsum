@@ -135,3 +135,57 @@ def test_provider_record_requires_reason_when_selected_tier_exceeds_base() -> No
             started_at=FIXED_TIME,
             completed_at=FIXED_TIME,
         )
+
+
+@pytest.mark.parametrize(
+    ("task", "base_tier", "selected_tier", "reason"),
+    [
+        (
+            ModelTask.CANDIDATE_PREFILTER,
+            ModelTier.ECONOMY,
+            ModelTier.FRONTIER,
+            EscalationReason.LOW_CONFIDENCE,
+        ),
+        (
+            ModelTask.CONTENT_PROFILE,
+            ModelTier.BALANCED,
+            ModelTier.BALANCED,
+            EscalationReason.SEMANTIC_CONFLICT,
+        ),
+        (
+            ModelTask.CANDIDATE_PREFILTER,
+            ModelTier.ECONOMY,
+            ModelTier.ECONOMY,
+            EscalationReason.LOW_CONFIDENCE,
+        ),
+        (
+            ModelTask.CANDIDATE_PREFILTER,
+            ModelTier.ECONOMY,
+            ModelTier.ECONOMY,
+            EscalationReason.CLOSE_CANDIDATE_MARGIN,
+        ),
+    ],
+)
+def test_provider_record_rejects_tier_that_contradicts_routing_policy(
+    task: ModelTask,
+    base_tier: ModelTier,
+    selected_tier: ModelTier,
+    reason: EscalationReason,
+) -> None:
+    with pytest.raises(
+        ValidationError,
+        match="selected model tier must match the routing policy",
+    ):
+        ProviderRecord(
+            provider_record_id="provider-record-contradictory",
+            provider_id="host-provider",
+            operation=task.value,
+            model_id="configured-model",
+            routing_decision_id="route-" + "e" * 20,
+            model_task=task,
+            base_model_tier=base_tier,
+            selected_model_tier=selected_tier,
+            model_escalation_reasons=(reason,),
+            started_at=FIXED_TIME,
+            completed_at=FIXED_TIME,
+        )

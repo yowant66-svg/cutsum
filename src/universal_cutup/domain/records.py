@@ -8,9 +8,11 @@ from pydantic import Field, field_validator, model_validator
 from .common import SHA256_PATTERN, FrozenModel
 from .model_routing import (
     EscalationReason,
+    ModelRoutingRequest,
     ModelTask,
     ModelTier,
     model_task_base_tier,
+    route_model_task,
 )
 
 
@@ -93,6 +95,14 @@ class ProviderRecord(TimestampedRecord):
             raise ValueError("selected model tier cannot be below base tier")
         if selected_rank > base_rank and not self.model_escalation_reasons:
             raise ValueError("tier escalation requires at least one reason")
+        expected_tier = route_model_task(
+            ModelRoutingRequest(
+                task=self.model_task,
+                escalation_reasons=self.model_escalation_reasons,
+            )
+        ).required_tier
+        if self.selected_model_tier is not expected_tier:
+            raise ValueError("selected model tier must match the routing policy")
         return self
 
 

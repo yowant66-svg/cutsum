@@ -116,6 +116,7 @@ __all__ = [
     "ModelTask",
     "ModelTier",
     "OperationCapability",
+    "ProviderRecord",
     "RoutingStatus",
     "SourceInspection",
     "SportsPlanningResult",

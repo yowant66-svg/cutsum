@@ -150,7 +150,7 @@ def _decision_id(
 ) -> str:
     payload = {
         "task": request.task.value,
-        "escalation_reasons": [reason.value for reason in reasons],
+        "escalation_reasons": sorted(reason.value for reason in reasons),
         "maximum_tier": request.maximum_tier.value,
         "frontier_calls_remaining": request.frontier_calls_remaining,
     }

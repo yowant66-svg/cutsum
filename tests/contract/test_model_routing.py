@@ -121,6 +121,29 @@ def test_routing_deduplicates_repeated_reasons_deterministically() -> None:
     )
 
 
+def test_routing_decision_id_is_independent_of_reason_order() -> None:
+    first = route_model_task(
+        ModelRoutingRequest(
+            task=ModelTask.CONTEXTUAL_TRANSLATION,
+            escalation_reasons=(
+                EscalationReason.SPECIALIST_TERMINOLOGY,
+                EscalationReason.LOW_CONFIDENCE,
+            ),
+        )
+    )
+    second = route_model_task(
+        ModelRoutingRequest(
+            task=ModelTask.CONTEXTUAL_TRANSLATION,
+            escalation_reasons=(
+                EscalationReason.LOW_CONFIDENCE,
+                EscalationReason.SPECIALIST_TERMINOLOGY,
+            ),
+        )
+    )
+
+    assert first.routing_decision_id == second.routing_decision_id
+
+
 def test_deterministic_task_rejects_model_escalation() -> None:
     with pytest.raises(
         ValidationError,
